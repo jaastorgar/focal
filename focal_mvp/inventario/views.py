@@ -21,7 +21,7 @@ def vista_registro(request):
                 snombre=form.cleaned_data['snombre'],
                 apellido=form.cleaned_data['apellido'],
                 sapellido=form.cleaned_data['sapellido'],
-                rut=form.cleaned_data['rut'],
+                run=form.cleaned_data['run'],
                 telefono=form.cleaned_data['telefono'],
                 direccion=form.cleaned_data['direccion'],
                 comuna=form.cleaned_data['comuna'],

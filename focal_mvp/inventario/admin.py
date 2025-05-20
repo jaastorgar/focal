@@ -9,5 +9,5 @@ class ProductoAdmin(admin.ModelAdmin):
 
 @admin.register(Almacenero)
 class AlmaceneroAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'rut', 'usuario', 'comuna')
-    search_fields = ('nombre', 'rut', 'usuario__username')
+    list_display = ('nombre', 'run', 'usuario', 'comuna')
+    search_fields = ('nombre', 'run', 'usuario__username')

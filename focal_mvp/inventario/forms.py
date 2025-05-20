@@ -11,7 +11,7 @@ class RegistroUsuarioForm(forms.ModelForm):
     snombre = forms.CharField(label="Segundo nombre")
     apellido = forms.CharField(label="Apellido paterno")
     sapellido = forms.CharField(label="Apellido materno")
-    rut = forms.CharField(label="RUT")
+    run = forms.CharField(label="RUN")
     telefono = forms.CharField(required=False)
     direccion = forms.CharField(required=False)
     comuna = forms.CharField(required=False)
