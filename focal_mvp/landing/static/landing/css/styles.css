@@ -1,0 +1,40 @@
+/* InterTight – títulos y botones */
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+  font-weight: 300;
+}
+
+/* HankenGrotesk – párrafos y contenido */
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
+}
+
+body {
+  font-family: 'HankenGrotesk', sans-serif;
+  font-weight: 400;
+}
+
+h1, h2, h3, .navbar-brand, .btn, .card-title {
+  font-family: 'InterTight', sans-serif;
+  font-weight: 700;
+}
+
+p, label, input, textarea, .card-text {
+  font-family: 'HankenGrotesk', sans-serif;
+  font-weight: 300;
+}
