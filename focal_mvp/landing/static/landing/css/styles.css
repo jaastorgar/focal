@@ -25,16 +25,16 @@
 }
 
 body {
-  font-family: 'HankenGrotesk', sans-serif;
+  font-family: 'HankenGrotesk', sans-serif !important;
   font-weight: 400;
 }
 
 h1, h2, h3, .navbar-brand, .btn, .card-title {
-  font-family: 'InterTight', sans-serif;
+  font-family: 'InterTight', sans-serif !important;
   font-weight: 700;
 }
 
 p, label, input, textarea, .card-text {
-  font-family: 'HankenGrotesk', sans-serif;
+  font-family: 'HankenGrotesk', sans-serif !important;
   font-weight: 300;
 }
