@@ -18,12 +18,16 @@ def vista_registro(request):
             Almacenero.objects.create(
                 usuario=user,
                 nombre=form.cleaned_data['nombre'],
+                snombre=form.cleaned_data['snombre'],
+                apellido=form.cleaned_data['apellido'],
+                sapellido=form.cleaned_data['sapellido'],
                 rut=form.cleaned_data['rut'],
                 telefono=form.cleaned_data['telefono'],
                 direccion=form.cleaned_data['direccion'],
                 comuna=form.cleaned_data['comuna'],
                 fecha_nacimiento=form.cleaned_data['fecha_nacimiento'],
             )
+            
             # Redirigir al login tras registro exitoso
             return redirect('/login/')
     else:

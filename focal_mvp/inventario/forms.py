@@ -7,7 +7,10 @@ class RegistroUsuarioForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(label="Confirmar contraseña", widget=forms.PasswordInput)
 
-    nombre = forms.CharField(label="Nombre completo")
+    nombre = forms.CharField(label="Primer nombre")
+    snombre = forms.CharField(label="Segundo nombre")
+    apellido = forms.CharField(label="Apellido paterno")
+    sapellido = forms.CharField(label="Apellido materno")
     rut = forms.CharField(label="RUT")
     telefono = forms.CharField(required=False)
     direccion = forms.CharField(required=False)
