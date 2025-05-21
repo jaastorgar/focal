@@ -25,6 +25,9 @@ class Empresa(models.Model):
     giro_negocio = models.CharField(max_length=100)
     tipo_sociedad = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.nombre_almacen
+
 class Almacenero(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=25)

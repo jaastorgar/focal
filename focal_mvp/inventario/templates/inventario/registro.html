@@ -4,24 +4,72 @@
 <head>
   <meta charset="UTF-8">
   <title>Registro | FOCAL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  {# Asegúrate de que esta ruta sea correcta para tu archivo CSS principal #}
+  <link rel="stylesheet" href="{% static 'inventario/css/registro.css' %}">
 </head>
 <body class="bg-light">
   <div class="container mt-5">
-    <h2 class="mb-4">Registro de Almacenero</h2>
-    <form method="post" class="row g-3 bg-white p-4 rounded shadow">
+    <h2 class="mb-4 text-center">Registro de Almacenero y Empresa</h2>
+
+    <form method="post" class="bg-white p-4 rounded shadow">
       {% csrf_token %}
-      {% for field in form %}
-        <div class="col-md-6">
-          <label class="form-label">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <div class="text-danger small">{{ field.errors }}</div>
+
+      {# Sección del Formulario del Almacenero #}
+      <div class="form-section mb-5"> {# Clase para agrupar y añadir margen inferior #}
+        <h3 class="section-title">Datos del Almacenero</h3> {# Título de sección #}
+        <div class="row g-3"> {# Grid de Bootstrap para campos en columnas #}
+          {# Iterar sobre los campos del formulario de almacenero #}
+          {% for field in almacenero_form %}
+            {# Excluir la empresa si es un campo de almacenero, aunque ya lo manejamos en el save() de la vista #}
+            {# Esto asume que 'empresa' no está en la lista de campos para renderizar en el HTML directamente #}
+            {# Si tu form model Almacenero incluyera empresa y no quieres renderizarlo aquí, usa: #}
+            {# {% if field.name != 'empresa' %} #}
+            <div class="col-md-6">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+            {# {% endif %} #}
+          {% endfor %}
+          {# Errores no relacionados con un campo específico del formulario de almacenero #}
+          {% if almacenero_form.non_field_errors %}
+            <div class="col-12">
+              <div class="alert alert-danger">{{ almacenero_form.non_field_errors }}</div>
+            </div>
           {% endif %}
         </div>
-      {% endfor %}
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary">Registrarse</button>
+      </div>
+
+      {# Sección del Formulario de la Empresa #}
+      <div class="form-section mb-5">
+        <h3 class="section-title">Datos de la Empresa</h3>
+        <div class="row g-3">
+          {# Iterar sobre los campos del formulario de empresa #}
+          {% for field in empresa_form %}
+            <div class="col-md-6">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          {# Errores no relacionados con un campo específico del formulario de empresa #}
+          {% if empresa_form.non_field_errors %}
+            <div class="col-12">
+              <div class="alert alert-danger">{{ empresa_form.non_field_errors }}</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Botón de registro #}
+      <div class="col-12 text-center"> {# Centra el botón #}
+        <button type="submit" class="btn btn-primary btn-lg">Registrarse</button> {# Botón más grande #}
       </div>
     </form>
   </div>

@@ -1,39 +1,48 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
-from .forms import RegistroUsuarioForm, LoginForm
-from .models import Almacenero
+from django.db import transaction
+
+# Importa tus formularios actualizados
+from .forms import AlmaceneroForm, EmpresaForm, LoginForm
 
 # Create your views here.
 def vista_registro(request):
     if request.method == 'POST':
-        form = RegistroUsuarioForm(request.POST)
-        if form.is_valid():
-            # Crear usuario
-            user = User.objects.create_user(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
-            # Crear perfil del almacenero
-            Almacenero.objects.create(
-                usuario=user,
-                nombre=form.cleaned_data['nombre'],
-                snombre=form.cleaned_data['snombre'],
-                apellido=form.cleaned_data['apellido'],
-                sapellido=form.cleaned_data['sapellido'],
-                run=form.cleaned_data['run'],
-                telefono=form.cleaned_data['telefono'],
-                direccion=form.cleaned_data['direccion'],
-                comuna=form.cleaned_data['comuna'],
-                fecha_nacimiento=form.cleaned_data['fecha_nacimiento'],
-            )
-            
-            # Redirigir al login tras registro exitoso
-            return redirect('/login/')
-    else:
-        form = RegistroUsuarioForm()
+        almacenero_form = AlmaceneroForm(request.POST)
+        empresa_form = EmpresaForm(request.POST)
 
-    return render(request, 'inventario/registro.html', {'form': form})
+        # Usamos transaction.atomic para asegurar que ambas creaciones (Almacenero y Empresa)
+        # se completen con éxito o que ninguna de ellas se guarde si hay un error en cualquiera.
+        try:
+            with transaction.atomic():
+                if almacenero_form.is_valid() and empresa_form.is_valid():
+                    # 1. Guardar la Empresa primero
+                    empresa = empresa_form.save()
+
+                    # 2. Guardar el Almacenero (que también crea el User)
+                    almacenero = almacenero_form.save(commit=False)
+                    almacenero.empresa = empresa # Asigna la empresa recién creada al almacenero
+                    almacenero.save() # Guarda el almacenero con la relación a la empresa
+
+                    # Redirigir al login tras registro exitoso
+                    return redirect('/login/')
+                else:
+                    # Si alguno de los formularios no es válido, se re-renderiza con los errores
+                    pass # La vista renderizará los errores automáticamente
+        except Exception as e:
+            # Aquí podrías loggear el error o añadir un mensaje global al formulario
+            print(f"Error durante el registro: {e}")
+            almacenero_form.add_error(None, "Hubo un error en el registro. Por favor, inténtalo de nuevo.")
+
+    else:
+        almacenero_form = AlmaceneroForm()
+        empresa_form = EmpresaForm()
+
+    return render(request, 'inventario/registro.html', {
+        'almacenero_form': almacenero_form,
+        'empresa_form': empresa_form
+    })
 
 
 def vista_login(request):

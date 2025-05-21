@@ -1,0 +1,147 @@
+/* --- Definiciones de fuentes personalizadas --- */
+
+/* HankenGrotesk Light */
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+    font-weight: 300; /* Peso para Light */
+    font-style: normal;
+}
+
+/* HankenGrotesk Regular */
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+    font-weight: 400; /* Peso para Regular */
+    font-style: normal;
+}
+
+/* InterTight */
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+    font-weight: 700; /* Peso para Bold */
+    font-style: normal;
+}
+
+
+/* --- Estilos generales para el body y centrado --- */
+body {
+    font-family: 'HankenGrotesk', sans-serif;
+    background-color: #f8f9fa; /* Fondo blanco muy claro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* --- Estilos para el contenedor principal del formulario de Login --- */
+.container.mt-5 {
+    max-width: 450px; /* Ancho específico para el login */
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+}
+
+/* --- Estilo para el título principal del formulario de Login --- */
+h2 {
+    font-family: 'InterTight', sans-serif;
+    color: #4A008B; /* Color morado de tu branding */
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* --- Estilos para las etiquetas (labels) de los campos --- */
+label.form-label {
+    font-family: 'HankenGrotesk', sans-serif;
+    color: #343a40;
+    font-weight: 500;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* --- Estilos para los campos de entrada de formulario (inputs) --- */
+.form-control {
+    border: 1px solid #ced4da;
+    border-radius: 0.35rem;
+    padding: 0.85rem 1.25rem;
+    font-family: 'HankenGrotesk', sans-serif;
+    font-size: 1rem;
+    color: #495057;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #4A008B;
+    box-shadow: 0 0 0 0.2rem rgba(74, 0, 139, 0.25);
+    outline: 0;
+}
+
+/* --- Estilo para el botón de "Ingresar" --- */
+.btn-primary {
+    background-color: #4A008B;
+    border-color: #4A008B;
+    font-family: 'InterTight', sans-serif;
+    font-weight: bold;
+    padding: 0.95rem 2rem;
+    border-radius: 0.35rem;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    margin-top: 1.5rem; /* Ajustado para el login, quizás menos que el registro */
+    width: 100%; /* El botón de login a menudo ocupa todo el ancho */
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    background-color: #38006B;
+    border-color: #38006B;
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    background-color: #2b0051 !important;
+    border-color: #2b0051 !important;
+    transform: translateY(0);
+}
+
+/* --- Estilos para mensajes de error --- */
+.text-danger.small {
+    font-family: 'HankenGrotesk', sans-serif;
+    font-size: 0.9em;
+    margin-top: 0.5rem;
+    text-align: left;
+    color: #dc3545;
+    display: block;
+}
+
+.text-danger.mb-2 { /* Para los non_field_errors */
+    font-family: 'HankenGrotesk', sans-serif;
+    font-size: 1em;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    color: #dc3545;
+}
+
+/* --- Media Queries para Responsividad (Opcional, pero recomendado) --- */
+@media (max-width: 767.98px) {
+    .container.mt-5 {
+        padding: 1.5rem;
+    }
+    h2 {
+        font-size: 2rem;
+    }
+    .btn-primary {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
