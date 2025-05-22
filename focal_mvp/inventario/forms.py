@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Almacenero, Empresa 
+from .models import Empresa, Producto
+from django.forms.widgets import DateInput
 
 # Clase para aplicar 'form-control' a los widgets
 class BootstrapFormMixin(forms.Form):
@@ -68,3 +69,39 @@ class EmpresaForm(BootstrapFormMixin, forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(label="Nombre de usuario", max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = [
+            'nombre',
+            'codigo',
+            'categoria',
+            'stock',
+            'precio_unitario',
+            'fecha_vencimiento',
+        ]
+        widgets = {
+            'fecha_vencimiento': DateInput(attrs={'type': 'date'}),
+        }
+        labels = {
+            'nombre': 'Nombre del Producto',
+            'codigo': 'Código',
+            'categoria': 'Categoría',
+            'stock': 'Stock Disponible',
+            'precio_unitario': 'Precio Unitario ($)',
+            'fecha_vencimiento': 'Fecha de Vencimiento',
+        }
+    
+    # Validación personalizada opcional (por ejemplo, stock o precio negativos)
+    def clean_stock(self):
+        stock = self.cleaned_data.get('stock')
+        if stock < 0:
+            raise forms.ValidationError("El stock no puede ser negativo.")
+        return stock
+
+    def clean_precio_unitario(self):
+        precio = self.cleaned_data.get('precio_unitario')
+        if precio < 0:
+            raise forms.ValidationError("El precio no puede ser negativo.")
+        return precio

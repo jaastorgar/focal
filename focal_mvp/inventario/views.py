@@ -2,12 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.db import transaction
-from .forms import AlmaceneroForm, LoginForm, EmpresaForm 
+from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm
 from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction
 from .decorators import plan_requerido, caracteristica_requerida
+from django.contrib.auth import logout
+from datetime import date, timedelta
 import datetime
 
 # Create your views here.
@@ -94,8 +96,59 @@ def vista_login(request):
 
     return render(request, 'inventario/login.html', {'form': form})
 
+@login_required
 def home(request):
     return render(request, 'inventario/home.html')
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('/')
+
+@login_required
+def perfil(request):
+    return render(request, 'perfil.html', {'user': request.user})
+
+# Listar productos
+@login_required
+def inventario_view(request):
+    productos = Producto.objects.all()
+    hoy = date.today()
+    hoy_mas_15dias = int(datetime.datetime.combine(hoy + timedelta(days=15), datetime.datetime.min.time()).timestamp())
+
+    context = {
+        'productos': productos,
+        'today': hoy,
+        'hoy_mas_15dias': hoy_mas_15dias,
+    }
+    return render(request, 'inventario/inventario.html', context)
+
+# Registrar nuevo producto
+@login_required
+def agregar_producto(request):
+    if request.method == 'POST':
+        form = ProductoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Producto agregado correctamente.')
+            return redirect('inventario')
+    else:
+        form = ProductoForm()
+    return render(request, 'inventario/agregar-producto.html', {'form': form})
+
+# Editar producto existente
+@login_required
+def editar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, instance=producto)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Producto actualizado correctamente.')
+            return redirect('inventario')
+    else:
+        form = ProductoForm(instance=producto)
+    return render(request, 'inventario/editar-producto.html', {'form': form, 'producto': producto})
 
 def vista_planes(request):
     planes = PlanSuscripcion.objects.all().order_by('precio')
@@ -160,19 +213,3 @@ def vista_reportes_avanzados(request):
 def vista_soporte_premium(request):
     # Aquí iría la lógica para la interfaz de soporte premium
     return render(request, 'inventario/soporte_premium.html')
-
-@login_required
-def crear_producto(request):
-    empresa = request.user.almacenero.empresa
-    suscripcion = SuscripcionUsuario.objects.get(empresa=empresa, activa=True)
-    plan = suscripcion.plan
-
-    # Contar productos actuales de la empresa
-    productos_actuales = Producto.objects.filter(empresa=empresa).count() # Asumiendo que Producto tiene una FK a Empresa
-
-    if plan.max_productos > 0 and productos_actuales >= plan.max_productos:
-        messages.error(request, f"Has alcanzado el límite de {plan.max_productos} productos para tu plan {plan.get_nombre_display()}. Considera actualizar tu plan.")
-        return redirect('/home/') # O a una página de actualización
-
-    # ... (resto de la lógica para crear producto)
-    return render(request, 'inventario/crear_producto.html')

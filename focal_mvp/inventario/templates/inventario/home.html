@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio | FOCAL</title>
+    <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="#" class="logo">FOCAL</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'inventario' %}">Inventario</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="dropdown">
+                            <button class="dropdown-toggle" onclick="toggleDropdown()">Hola, {{ user.username }} ▼</button>
+                            <ul class="dropdown-menu" id="dropdownMenu">
+                                <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                                <!-- Puedes añadir más opciones aquí -->
+                            </ul>
+                        </li>
+                        <li><a href="{% url 'logout' %}" class="btn-logout">Cerrar Sesión</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}" class="btn-login">Iniciar Sesión</a></li>
+                        <li><a href="{% url 'registro' %}" class="btn-register">Registrarse</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Bienvenido a FOCAL</h1>
+                <p>Tu plataforma integral para la gestión de inventario.</p>
+                <a href="{% url 'inventario' %}" class="btn-cta">Ir al Inventario</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 FOCAL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript para menú con clic -->
+    <script>
+        function toggleDropdown() {
+            const menu = document.getElementById("dropdownMenu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        }
+
+        // Cierra el menú si haces clic fuera
+        document.addEventListener("click", function(event) {
+            const button = document.querySelector(".dropdown-toggle");
+            const menu = document.getElementById("dropdownMenu");
+            if (!button.contains(event.target) && !menu.contains(event.target)) {
+                menu.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+/* --- Variables de FOCAL --- */
+:root {
+    --primary-purple: #4A008B;
+    --secondary-purple: #7B1FA2;
+    --light-purple: #F3E8FF;
+    --dark-text: #343A40;
+    --muted-text: #555555;
+    --white: #FFFFFF;
+    --navbar-footer-bg: #2C0140;
+    --hover-dark-purple: #38006B;
+    --hover-light-purple: #E0B3FF;
+    --stock-low: #ffe0b2;
+    --vencido: #ffcccc;
+    --proximo-vencer: #fff3cd;
+}
+
+/* --- Tipografías Personalizadas --- */
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+    font-weight: 300;
+}
+
+/* --- Estilos Generales --- */
+body {
+    font-family: 'HankenGrotesk', sans-serif;
+    background-color: var(--light-purple);
+    color: var(--dark-text);
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+/* --- Header --- */
+header {
+    background-color: var(--navbar-footer-bg);
+    padding: 1rem 2rem;
+}
+
+header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header nav a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 1rem;
+    transition: color 0.3s;
+}
+
+header nav a:hover {
+    color: var(--hover-light-purple);
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: var(--navbar-footer-bg);
+    color: var(--white);
+    margin-top: 4rem;
+    font-size: 0.9rem;
+}
+
+/* --- Encabezado del módulo --- */
+h1 {
+    font-family: 'InterTight', sans-serif;
+    color: var(--primary-purple);
+    margin-top: 2rem;
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+/* --- Tabla de inventario --- */
+.tabla-inventario {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2rem;
+    background-color: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.tabla-inventario thead {
+    background-color: var(--primary-purple);
+    color: var(--white);
+}
+
+.tabla-inventario th, .tabla-inventario td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.tabla-inventario tbody tr:hover {
+    background-color: var(--hover-light-purple);
+}
+
+/* --- Estados especiales --- */
+.vencido {
+    background-color: var(--vencido) !important;
+}
+
+.proximo-vencer {
+    background-color: var(--proximo-vencer) !important;
+}
+
+.stock-bajo {
+    background-color: var(--stock-low) !important;
+}
+
+/* --- Botones de acción --- */
+.btn-editar {
+    background-color: var(--primary-purple);
+    color: var(--white);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    font-family: 'InterTight', sans-serif;
+}
+
+.btn-editar:hover {
+    background-color: var(--hover-dark-purple);
+}
+
+/* --- Mensaje si no hay productos --- */
+main p {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-top: 2rem;
+    color: var(--muted-text);
+}

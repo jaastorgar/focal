@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventario | FOCAL</title>
+  <link rel="stylesheet" href="{% static 'inventario/css/inventario.css' %}">
+</head>
+<body>
+
+  <header style="background-color: var(--navbar-footer-bg); padding: 1rem;">
+    <nav style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <a href="{% url 'home' %}" style="color: var(--white); text-decoration: none; font-weight: bold; font-size: 1.2rem;">FOCAL</a>
+      </div>
+      <div>
+        <a href="{% url 'home' %}" style="margin-right: 1rem; color: var(--white); text-decoration: none;">Inicio</a>
+        <a href="{% url 'inventario' %}" style="margin-right: 1rem; color: var(--white); text-decoration: none;">Inventario</a>
+        <a href="{% url 'agregar-producto' %}" class="btn-editar">Agregar Producto</a>
+      </div>
+    </nav>
+  </header>
+
+  <main style="max-width: 1000px; margin: 2rem auto; padding: 1rem;">
+    <h1>Inventario de Productos</h1>
+
+    {% if productos %}
+      <table class="tabla-inventario">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Fecha Vencimiento</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for producto in productos %}
+            <tr
+              {% if producto.stock <= 5 %}class="stock-bajo"
+              {% elif producto.fecha_vencimiento < today %}class="vencido"
+              {% elif producto.fecha_vencimiento|date:"U" <= hoy_mas_15dias %}class="proximo-vencer"
+              {% endif %}
+            >
+              <td>{{ producto.nombre }}</td>
+              <td>{{ producto.tipo }}</td>
+              <td>${{ producto.precio }}</td>
+              <td>{{ producto.stock }}</td>
+              <td>{{ producto.fecha_vencimiento|date:"d-m-Y" }}</td>
+              <td>
+                <a href="{% url 'editar-producto' producto.id %}" class="btn-editar">Editar</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p style="text-align: center; margin-top: 2rem;">No hay productos registrados.</p>
+    {% endif %}
+  </main>
+
+  <footer style="text-align: center; padding: 1rem; background-color: var(--navbar-footer-bg); color: var(--white); margin-top: 3rem;">
+    © 2025 FOCAL. Todos los derechos reservados.
+  </footer>
+
+</body>
+</html>

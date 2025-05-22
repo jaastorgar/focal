@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar Producto | FOCAL</title>
+  <link rel="stylesheet" href="{% static 'inventario/css/agregar-producto.css' %}">
+</head>
+<body>
+
+  <main class="form-container">
+    <h1>Agregar Nuevo Producto</h1>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        {% for field in form %}
+          <div class="form-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="error">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">Guardar Producto</button>
+        <a href="{% url 'inventario' %}" class="btn-cancelar">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+</body>
+</html>

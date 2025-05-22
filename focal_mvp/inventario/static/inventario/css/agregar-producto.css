@@ -1,0 +1,130 @@
+/* === Paleta FOCAL y tipografía === */
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #F3E8FF;
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --white: #FFFFFF;
+  --navbar-footer-bg: #2C0140;
+  --hover-dark-purple: #38006B;
+  --hover-light-purple: #E0B3FF;
+  --danger: #D32F2F;
+  --input-border: #ccc;
+}
+
+/* === Tipografías Personalizadas === */
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
+}
+
+/* === Estructura General === */
+body {
+  font-family: 'HankenGrotesk', sans-serif;
+  background-color: var(--light-purple);
+  margin: 0;
+  padding: 0;
+  color: var(--dark-text);
+}
+
+.form-container {
+  max-width: 600px;
+  margin: 4rem auto;
+  background-color: var(--white);
+  padding: 2.5rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1 {
+  font-family: 'InterTight', sans-serif;
+  color: var(--primary-purple);
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* === Formulario === */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--primary-purple);
+  font-weight: 600;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'HankenGrotesk', sans-serif;
+  transition: border-color 0.3s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+}
+
+/* === Errores === */
+.error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+/* === Botones === */
+.form-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-submit {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 0.6rem 1.6rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'InterTight', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+}
+
+.btn-cancelar {
+  text-decoration: none;
+  color: var(--primary-purple);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
