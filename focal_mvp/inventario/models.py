@@ -14,6 +14,37 @@ class Producto(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.codigo})"
 
+class PlanSuscripcion(models.Model):
+    NOMBRE_PLANES = [
+        ('FREE', 'Gratuito'),
+        ('BASIC', 'Básico'),
+        ('PREMIUM', 'Premium'),
+    ]
+    nombre = models.CharField(max_length=50, choices=NOMBRE_PLANES, unique=True)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) # Precio mensual
+    descripcion = models.TextField(blank=True)
+    max_productos = models.IntegerField(default=0, help_text="Número máximo de productos. 0 para ilimitado.")
+    max_almacenes = models.IntegerField(default=1, help_text="Número máximo de almacenes. 1 para gratuito.")
+    soporte_prioritario = models.BooleanField(default=False)
+    # Puedes añadir más campos para otras características (ej. reportes avanzados, usuarios extra, etc.)
+
+    def __str__(self):
+        return self.get_nombre_display()
+    
+class SuscripcionUsuario(models.Model):
+    empresa = models.OneToOneField('Empresa', on_delete=models.CASCADE, related_name='suscripcion')
+    plan = models.ForeignKey(PlanSuscripcion, on_delete=models.SET_NULL, null=True)
+    fecha_inicio = models.DateField(auto_now_add=True)
+    fecha_fin = models.DateField(null=True, blank=True) # Para suscripciones de duración limitada o manuales
+    activa = models.BooleanField(default=True)
+    # Aquí podrías añadir campos para ID de transacción de pasarela de pago, etc.
+
+    def __str__(self):
+        return f"Suscripción de {self.empresa.nombre_almacen} al plan {self.plan.get_nombre_display()}"
+
+    class Meta:
+        verbose_name_plural = "Suscripciones de Usuarios"
+
 class Empresa(models.Model):
     nombre_almacen = models.CharField(max_length=100)
     rut = models.CharField(max_length=12, unique=True)
@@ -24,6 +55,11 @@ class Empresa(models.Model):
     nivel_venta_uf = models.CharField(max_length=100, blank=True)
     giro_negocio = models.CharField(max_length=100)
     tipo_sociedad = models.CharField(max_length=100)
+    # Añade el campo para el plan de suscripción
+    # Si la empresa no tiene un plan activo en SuscripcionUsuario, por defecto usará el plan gratuito.
+    # Este campo no es estrictamente necesario si usas SuscripcionUsuario.activa, pero puede ser útil
+    # para un acceso rápido al plan actual. Sin embargo, la lógica de SuscripcionUsuario.activa es más robusta.
+    # Por ahora, nos basaremos en SuscripcionUsuario para el estado activo.
 
     def __str__(self):
         return self.nombre_almacen

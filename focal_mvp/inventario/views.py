@@ -1,40 +1,71 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.db import transaction
-
-# Importa tus formularios actualizados
-from .forms import AlmaceneroForm, EmpresaForm, LoginForm
+from .forms import AlmaceneroForm, LoginForm, EmpresaForm 
+from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db import transaction
+from .decorators import plan_requerido, caracteristica_requerida
+import datetime
 
 # Create your views here.
 def vista_registro(request):
     if request.method == 'POST':
         almacenero_form = AlmaceneroForm(request.POST)
-        empresa_form = EmpresaForm(request.POST)
+        empresa_form = EmpresaForm(request.POST) # Necesitarás crear este formulario
 
-        # Usamos transaction.atomic para asegurar que ambas creaciones (Almacenero y Empresa)
-        # se completen con éxito o que ninguna de ellas se guarde si hay un error en cualquiera.
-        try:
+        if almacenero_form.is_valid() and empresa_form.is_valid():
             with transaction.atomic():
-                if almacenero_form.is_valid() and empresa_form.is_valid():
-                    # 1. Guardar la Empresa primero
-                    empresa = empresa_form.save()
+                # Crear usuario
+                user = User.objects.create_user(
+                    username=almacenero_form.cleaned_data['username'],
+                    password=almacenero_form.cleaned_data['password']
+                )
 
-                    # 2. Guardar el Almacenero (que también crea el User)
-                    almacenero = almacenero_form.save(commit=False)
-                    almacenero.empresa = empresa # Asigna la empresa recién creada al almacenero
-                    almacenero.save() # Guarda el almacenero con la relación a la empresa
+                # Crear empresa
+                empresa = Empresa.objects.create(
+                    nombre_almacen=empresa_form.cleaned_data['nombre_almacen'],
+                    rut=empresa_form.cleaned_data['rut'],
+                    direccion_tributaria=empresa_form.cleaned_data['direccion_tributaria'],
+                    comuna=empresa_form.cleaned_data['comuna'],
+                    run_representante=empresa_form.cleaned_data['run_representante'],
+                    inicio_actividades=empresa_form.cleaned_data['inicio_actividades'],
+                    nivel_venta_uf=empresa_form.cleaned_data['nivel_venta_uf'],
+                    giro_negocio=empresa_form.cleaned_data['giro_negocio'],
+                )
 
-                    # Redirigir al login tras registro exitoso
-                    return redirect('/login/')
-                else:
-                    # Si alguno de los formularios no es válido, se re-renderiza con los errores
-                    pass # La vista renderizará los errores automáticamente
-        except Exception as e:
-            # Aquí podrías loggear el error o añadir un mensaje global al formulario
-            print(f"Error durante el registro: {e}")
-            almacenero_form.add_error(None, "Hubo un error en el registro. Por favor, inténtalo de nuevo.")
+                # Crear perfil del almacenero y asociarlo a la empresa
+                Almacenero.objects.create(
+                    usuario=user,
+                    nombre=almacenero_form.cleaned_data['nombre'],
+                    snombre=almacenero_form.cleaned_data['snombre'],
+                    apellido=almacenero_form.cleaned_data['apellido'],
+                    sapellido=almacenero_form.cleaned_data['sapellido'],
+                    run=almacenero_form.cleaned_data['run'],
+                    telefono=almacenero_form.cleaned_data['telefono'],
+                    direccion=almacenero_form.cleaned_data['direccion'],
+                    comuna=almacenero_form.cleaned_data['comuna'],
+                    fecha_nacimiento=almacenero_form.cleaned_data['fecha_nacimiento'],
+                    empresa=empresa
+                )
 
+                # Asignar suscripción gratuita por defecto
+                # Asegúrate de que el plan 'FREE' exista en tu base de datos
+                try:
+                    plan_gratuito = PlanSuscripcion.objects.get(nombre='FREE')
+                    SuscripcionUsuario.objects.create(
+                        empresa=empresa,
+                        plan=plan_gratuito,
+                        activa=True
+                    )
+                except PlanSuscripcion.DoesNotExist:
+                    # Manejar el caso en que el plan gratuito no existe (ej. loggear error)
+                    print("ERROR: El plan 'FREE' no se encontró en la base de datos. Asegúrate de crearlo en el admin.")
+                    # Opcional: Podrías redirigir a una página de error o mostrar un mensaje.
+
+            return redirect('/login/') # Redirigir al login tras registro exitoso
     else:
         almacenero_form = AlmaceneroForm()
         empresa_form = EmpresaForm()
@@ -43,7 +74,6 @@ def vista_registro(request):
         'almacenero_form': almacenero_form,
         'empresa_form': empresa_form
     })
-
 
 def vista_login(request):
     if request.method == 'POST':
@@ -63,3 +93,86 @@ def vista_login(request):
         form = LoginForm()
 
     return render(request, 'inventario/login.html', {'form': form})
+
+def home(request):
+    return render(request, 'inventario/home.html')
+
+def vista_planes(request):
+    planes = PlanSuscripcion.objects.all().order_by('precio')
+    context = {
+        'planes': planes
+    }
+    return render(request, 'inventario/planes.html', context)
+
+@login_required
+def seleccionar_plan(request, plan_id):
+    plan = get_object_or_404(PlanSuscripcion, id=plan_id)
+
+    # Asegúrate de que el usuario logeado tenga una empresa asociada
+    try:
+        empresa_usuario = request.user.almacenero.empresa
+    except Almacenero.DoesNotExist:
+        messages.error(request, "Tu cuenta no está asociada a una empresa. Contacta a soporte.")
+        return redirect('vista_planes')
+    except Empresa.DoesNotExist:
+        messages.error(request, "La empresa asociada a tu cuenta no existe. Contacta a soporte.")
+        return redirect('vista_planes')
+
+    if request.method == 'POST':
+        if plan.nombre == 'FREE':
+            messages.warning(request, "No es posible seleccionar el plan gratuito directamente de esta forma.")
+            return redirect('vista_planes')
+
+        # Lógica para planes de pago
+        # En un escenario real, aquí integrarías con una pasarela de pago (Stripe, PayPal, Mercado Pago, etc.)
+        # Después de un pago exitoso, actualizarías la suscripción del usuario.
+
+        # *** SIMULACIÓN DE PAGO EXITOSO ***
+        with transaction.atomic():
+            # Desactivar suscripción actual de la empresa (si existe)
+            SuscripcionUsuario.objects.filter(empresa=empresa_usuario, activa=True).update(activa=False)
+
+            # Crear nueva suscripción
+            fecha_inicio = datetime.date.today()
+            # Ejemplo: Suscripción válida por 1 mes
+            fecha_fin = fecha_inicio + datetime.timedelta(days=30) # O calcula según el período del plan
+
+            SuscripcionUsuario.objects.create(
+                empresa=empresa_usuario,
+                plan=plan,
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
+                activa=True
+            )
+            messages.success(request, f"¡Has seleccionado exitosamente el plan {plan.get_nombre_display()}!")
+            return redirect('/home/') # O a una página de confirmación
+
+    return redirect('vista_planes')
+
+@login_required
+@plan_requerido('PREMIUM')
+def vista_reportes_avanzados(request):
+    # Aquí iría la lógica para mostrar reportes avanzados
+    return render(request, 'inventario/reportes_avanzados.html')
+
+@login_required
+@caracteristica_requerida('soporte_prioritario') # Solo usuarios con soporte prioritario pueden acceder
+def vista_soporte_premium(request):
+    # Aquí iría la lógica para la interfaz de soporte premium
+    return render(request, 'inventario/soporte_premium.html')
+
+@login_required
+def crear_producto(request):
+    empresa = request.user.almacenero.empresa
+    suscripcion = SuscripcionUsuario.objects.get(empresa=empresa, activa=True)
+    plan = suscripcion.plan
+
+    # Contar productos actuales de la empresa
+    productos_actuales = Producto.objects.filter(empresa=empresa).count() # Asumiendo que Producto tiene una FK a Empresa
+
+    if plan.max_productos > 0 and productos_actuales >= plan.max_productos:
+        messages.error(request, f"Has alcanzado el límite de {plan.max_productos} productos para tu plan {plan.get_nombre_display()}. Considera actualizar tu plan.")
+        return redirect('/home/') # O a una página de actualización
+
+    # ... (resto de la lógica para crear producto)
+    return render(request, 'inventario/crear_producto.html')

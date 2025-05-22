@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestros Planes | FOCAL</title>
+    <link rel="stylesheet" href="{% static 'inventario/css/planes.css' %}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">FOCAL</a>
+            <nav class="navbar-nav">
+                <a class="nav-link" href="/">Inicio</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="plans-section">
+        <div class="container">
+            <h1 class="section-title">Nuestros Planes</h1>
+            <p class="section-subtitle">Elige el plan que mejor se adapte a las necesidades de tu empresa.</p>
+
+            <div class="plans-grid">
+                <div class="plan-card">
+                    <h2 class="plan-title">Plan Básico</h2>
+                    <p class="plan-price">$19.99<span class="period">/mes</span></p>
+                    <ul class="plan-features">
+                        <li>Gestión de productos ilimitados</li>
+                        <li>Control de stock básico</li>
+                        <li>Reportes de ventas mensuales</li>
+                        <li class="unavailable">Soporte 24/7</li>
+                        <li class="unavailable">Integraciones avanzadas</li>
+                    </ul>
+                    <a href="#" class="btn-primary">Elegir Plan Básico</a>
+                </div>
+
+                <div class="plan-card featured">
+                    <h2 class="plan-title">Plan Estándar</h2>
+                    <p class="plan-price">$49.99<span class="period">/mes</span></p>
+                    <ul class="plan-features">
+                        <li>Gestión de productos ilimitados</li>
+                        <li>Control de stock avanzado</li>
+                        <li>Reportes de ventas detallados</li>
+                        <li>Soporte 24/7 (email)</li>
+                        <li class="unavailable">Integraciones avanzadas</li>
+                    </ul>
+                    <a href="#" class="btn-primary">Elegir Plan Estándar</a>
+                </div>
+
+                <div class="plan-card">
+                    <h2 class="plan-title">Plan Premium</h2>
+                    <p class="plan-price">$99.99<span class="period">/mes</span></p>
+                    <ul class="plan-features">
+                        <li>Gestión de productos ilimitados</li>
+                        <li>Control de stock avanzado</li>
+                        <li>Reportes de ventas personalizados</li>
+                        <li>Soporte 24/7 (prioritario)</li>
+                        <li>Integraciones avanzadas</li>
+                    </ul>
+                    <a href="#" class="btn-primary">Elegir Plan Premium</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 FOCAL. Todos los derechos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Términos de Servicio</a>
+                <a href="#">Política de Privacidad</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
