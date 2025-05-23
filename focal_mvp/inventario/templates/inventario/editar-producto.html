@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Producto | FOCAL</title>
+    <link rel="stylesheet" href="{% static 'inventario/css/editar-producto.css' %}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}">Inicio</a></li>
+                    <li><a href="{% url 'inventario' %}">Inventario</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container formulario-container">
+            <h1>Editar Producto</h1>
+            <form method="post" class="formulario-producto">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <small class="error">{{ field.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <div class="botones">
+                    <button type="submit" class="btn-submit">Guardar Cambios</button>
+                    <a href="{% url 'inventario' %}" class="btn-cancelar">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 FOCAL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>
