@@ -4,15 +4,18 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Producto(models.Model):
     nombre = models.CharField(max_length=100)
-    codigo = models.CharField(max_length=50, unique=True)
+    sku = models.CharField(max_length=50, unique=True)
+    marca = models.CharField(max_length=50, blank=True)
     categoria = models.CharField(max_length=50, blank=True)
+    unidad_medida = models.CharField(max_length=50, blank=True)
     stock = models.PositiveIntegerField(default=0)
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    precio_compra = models.IntegerField(default=0)
+    precio_venta = models.IntegerField(default=0)
     fecha_vencimiento = models.DateField(null=True, blank=True)
     creado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.nombre} ({self.codigo})"
+        return f"{self.nombre} ({self.sku})"
 
 class PlanSuscripcion(models.Model):
     NOMBRE_PLANES = [

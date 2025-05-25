@@ -75,10 +75,13 @@ class ProductoForm(forms.ModelForm):
         model = Producto
         fields = [
             'nombre',
-            'codigo',
+            'sku',
+            'marca',
             'categoria',
+            'unidad_medida',
             'stock',
-            'precio_unitario',
+            'precio_compra',
+            'precio_venta',
             'fecha_vencimiento',
         ]
         widgets = {
@@ -86,10 +89,13 @@ class ProductoForm(forms.ModelForm):
         }
         labels = {
             'nombre': 'Nombre del Producto',
-            'codigo': 'Código',
+            'sku': 'Sku (Código Único)',
+            'marca': 'Marca',
             'categoria': 'Categoría',
+            'unidad_medida': 'Unidad de Medida',
             'stock': 'Stock Disponible',
-            'precio_unitario': 'Precio Unitario ($)',
+            'precio_compra': 'Precio de Compra',
+            'precio_venta': 'Precio de Venta',
             'fecha_vencimiento': 'Fecha de Vencimiento',
         }
     
@@ -100,8 +106,8 @@ class ProductoForm(forms.ModelForm):
             raise forms.ValidationError("El stock no puede ser negativo.")
         return stock
 
-    def clean_precio_unitario(self):
-        precio = self.cleaned_data.get('precio_unitario')
+    def clean_precio_venta(self):
+        precio = self.cleaned_data.get('precio_venta')
         if precio < 0:
             raise forms.ValidationError("El precio no puede ser negativo.")
         return precio

@@ -28,9 +28,13 @@
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Precio</th>
+            <th>Sku</th> 
+            <th>Marca</th>
+            <th>Categoria</th>
+            <th>Unidad</th>
             <th>Stock</th>
+            <th>Precio Compra</th>
+            <th>Precio Venta</th>
             <th>Fecha Vencimiento</th>
             <th>Acciones</th>
           </tr>
@@ -44,9 +48,13 @@
               {% endif %}
             >
               <td>{{ producto.nombre }}</td>
-              <td>{{ producto.tipo }}</td>
-              <td>${{ producto.precio }}</td>
+              <td>{{ producto.sku }}</td>
+              <td>{{ producto.marca }}</td>
+              <td>{{ producto.categoria }}</td>
+              <td>{{ producto.unidad_medida }}</td>
               <td>{{ producto.stock }}</td>
+              <td>${{ producto.precio_compra }}</td>
+              <td>${{ producto.precio_venta }}</td>
               <td>{{ producto.fecha_vencimiento|date:"d-m-Y" }}</td>
               <td>
                 <a href="{% url 'editar-producto' producto.id %}" class="btn-editar">Editar</a>
