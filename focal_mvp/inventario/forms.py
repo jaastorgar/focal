@@ -1,39 +1,90 @@
+import re
 from django import forms
 from django.contrib.auth.models import User
 from .models import Empresa, Producto
-from django.forms.widgets import DateInput
+from django.forms.widgets import DateInput, TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, CheckboxInput
+
+
+# Función de validación de RUN/RUT
+def validar_run_rut(run_rut):
+    run_rut = str(run_rut).upper().strip()
+    run_rut = re.sub(r'[\.-]', '', run_rut)
+
+    if not run_rut or len(run_rut) < 2:
+        return False
+
+    cuerpo = run_rut[:-1]
+    dv = run_rut[-1]
+
+    if not cuerpo.isdigit():
+        return False
+
+    suma = 0
+    multiplo = 2
+    for d in reversed(cuerpo):
+        suma += int(d) * multiplo
+        multiplo += 1
+        if multiplo == 8:
+            multiplo = 2
+    
+    dv_calculado = 11 - (suma % 11)
+    
+    if dv_calculado == 11:
+        dv_esperado = '0'
+    elif dv_calculado == 10:
+        dv_esperado = 'K'
+    else:
+        dv_esperado = str(dv_calculado)
+    
+    return dv_esperado == dv
+
 
 # Clase para aplicar 'form-control' a los widgets
 class BootstrapFormMixin(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            if not isinstance(field.widget, forms.PasswordInput):
-                field.widget.attrs.update({'class': 'form-control'})
-            elif 'class' not in field.widget.attrs:
-                 field.widget.attrs.update({'class': 'form-control'})
+            # Aplicar 'form-control' a la mayoría de los widgets de texto/número/select
+            if isinstance(field.widget, (TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, DateInput)):
+                # Si no es un PasswordInput o si lo es y no tiene ya una clase asignada (para evitar sobreescribir attrs personalizados)
+                if not isinstance(field.widget, PasswordInput) or 'class' not in field.widget.attrs:
+                    field.widget.attrs['class'] = 'form-control'
+            # Aplicar 'form-check-input' a checkboxes
+            elif isinstance(field.widget, CheckboxInput):
+                field.widget.attrs['class'] = 'form-check-input'
+
 
 class AlmaceneroForm(BootstrapFormMixin, forms.ModelForm):
     username = forms.CharField(label="Nombre de usuario",
-                               widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: usuario.focal'}))
+                               widget=forms.TextInput(attrs={'placeholder': 'Ej: usuario.focal'}))
     password = forms.CharField(label="Contraseña",
-                               widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Mínimo 8 caracteres'}))
+                               widget=forms.PasswordInput(attrs={'placeholder': 'Mínimo 8 caracteres'}))
     confirm_password = forms.CharField(label="Confirmar contraseña",
-                                       widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Repita su contraseña'}))
+                                       widget=forms.PasswordInput(attrs={'placeholder': 'Repita su contraseña'}))
 
-    nombre = forms.CharField(label="Primer nombre", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    snombre = forms.CharField(label="Segundo nombre", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    apellido = forms.CharField(label="Apellido paterno", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    sapellido = forms.CharField(label="Apellido materno", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    run = forms.CharField(label="RUN (sin puntos ni guion)", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 123456789'}))
-    telefono = forms.CharField(label="Teléfono", required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: +56912345678'}))
-    direccion = forms.CharField(label="Dirección", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    comuna = forms.CharField(label="Comuna", required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    fecha_nacimiento = forms.DateField(label="Fecha de nacimiento", required=False, widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
+    nombre = forms.CharField(label="Primer nombre")
+    snombre = forms.CharField(label="Segundo nombre", required=False)
+    apellido = forms.CharField(label="Apellido paterno")
+    sapellido = forms.CharField(label="Apellido materno")
+    run = forms.CharField(label="RUN (sin puntos ni guion)", widget=forms.TextInput(attrs={'placeholder': 'Ej: 123456789'}))
+    telefono = forms.CharField(label="Teléfono", required=False, widget=forms.TextInput(attrs={'placeholder': 'Ej: +56912345678'}))
+    direccion = forms.CharField(label="Dirección", required=False)
+    comuna = forms.CharField(label="Comuna", required=False)
+    fecha_nacimiento = forms.DateField(label="Fecha de nacimiento", required=False, widget=DateInput(attrs={'type': 'date'}))
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'confirm_password')
+        fields = ('username', 'password', 'confirm_password') # Estos son los campos del modelo User
+
+    # Validación para el campo 'run' del AlmaceneroForm
+    def clean_run(self):
+        run = self.cleaned_data['run']
+        run_limpio = re.sub(r'[\.-]', '', run).upper().strip()
+
+        if not validar_run_rut(run_limpio):
+            raise forms.ValidationError("El RUN es inválido. Por favor, verifique el formato y el dígito verificador.")
+        
+        return run_limpio
 
     def clean(self):
         cleaned_data = super().clean()
@@ -52,7 +103,7 @@ class EmpresaForm(BootstrapFormMixin, forms.ModelForm):
             'giro_negocio', 'tipo_sociedad',
         ]
         widgets = {
-            'inicio_actividades': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'inicio_actividades': DateInput(attrs={'type': 'date'}),
         }
         labels = {
             'nombre_almacen': "Nombre del Almacén/Empresa",
@@ -66,11 +117,31 @@ class EmpresaForm(BootstrapFormMixin, forms.ModelForm):
             'tipo_sociedad': "Tipo de Sociedad",
         }
 
-class LoginForm(forms.Form):
-    username = forms.CharField(label="Nombre de usuario", max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    # Validación para el campo 'run_representante' del EmpresaForm
+    def clean_run_representante(self):
+        run = self.cleaned_data['run_representante']
+        run_limpio = re.sub(r'[\.-]', '', run).upper().strip()
 
-class ProductoForm(forms.ModelForm):
+        if not validar_run_rut(run_limpio):
+            raise forms.ValidationError("El RUN del representante es inválido. Por favor, verifique el formato y el dígito verificador.")
+        
+        return run_limpio
+
+    # Validación para el campo 'rut_empresa' del EmpresaForm
+    def clean_rut_empresa(self):
+        rut = self.cleaned_data['rut_empresa']
+        rut_limpio = re.sub(r'[\.-]', '', rut).upper().strip()
+
+        if not validar_run_rut(rut_limpio):
+            raise forms.ValidationError("El RUT de la empresa es inválido. Por favor, verifique el formato y el dígito verificador.")
+        
+        return rut_limpio
+
+class LoginForm(forms.Form):
+    username = forms.CharField(label="Nombre de usuario", max_length=150, widget=TextInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(label="Contraseña", widget=PasswordInput(attrs={'class': 'form-control'}))
+
+class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de BootstrapFormMixin
     class Meta:
         model = Producto
         fields = [
@@ -99,31 +170,30 @@ class ProductoForm(forms.ModelForm):
             'fecha_vencimiento': 'Fecha de Vencimiento',
         }
     
-    # Validación personalizada opcional (por ejemplo, stock o precio negativos)
     def clean_stock(self):
         stock = self.cleaned_data.get('stock')
-        if stock < 0:
+        if stock is not None and stock < 0: # Añadido 'is not None' para evitar error si el campo está vacío
             raise forms.ValidationError("El stock no puede ser negativo.")
         return stock
 
     def clean_precio_venta(self):
         precio = self.cleaned_data.get('precio_venta')
-        if precio < 0:
+        if precio is not None and precio < 0: # Añadido 'is not None'
             raise forms.ValidationError("El precio no puede ser negativo.")
         return precio
     
-class RetirarStockForm(forms.Form):
+class RetirarStockForm(forms.Form): # No hereda de BootstrapFormMixin si ya le pones clases directamente
     producto = forms.ModelChoiceField(
         queryset=Producto.objects.all().order_by('nombre'),
         label="Seleccionar Producto",
         empty_label="--- Seleccione un producto ---",
-        widget=forms.Select(attrs={'class': 'form-control'}) # Añade una clase para estilos si usas CSS
+        widget=Select(attrs={'class': 'form-control'})
     )
     
     cantidad = forms.IntegerField(
         label="Cantidad a Retirar",
         min_value=1,
-        widget=forms.NumberInput(attrs={'class': 'form-control'}) # Añade una clase para estilos
+        widget=NumberInput(attrs={'class': 'form-control'})
     )
 
     def clean(self):

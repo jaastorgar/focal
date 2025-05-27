@@ -18,8 +18,8 @@
                     <li><a href="#features">Características</a></li>
                     <li><a href="#about">Acerca de</a></li>
                     <li><a href="#contact">Contacto</a></li>
-                    <li><a href="{% url 'planes' %}" class="btn btn-planes">Ver Planes</a></li>
-                    <li><a href="{% url 'login' %}" class="btn btn-login">Iniciar Sesión</a></li>
+                    <li><a href="{% url 'planes' %}" class="btn btn-primary">Ver Planes</a></li>
+                    <li><a href="{% url 'login' %}" class="btn btn-secondary">Iniciar Sesión</a></li>
                 </ul>
             </nav>
             <button class="menu-toggle" aria-label="Abrir menú">
@@ -36,8 +36,8 @@
                     Controla tus ventas, inventario y obligaciones desde cualquier dispositivo.
                 </p>
                 <div class="hero-actions">
-                    <a href="{% url 'registro' %}" class="btn btn-primary-hero">Comenzar Ahora</a>
-                    <a href="#features" class="btn btn-secondary-hero">Descubre Más</a>
+                    <a href="{% url 'registro' %}" class="btn btn-primary">Comenzar Ahora</a>
+                    <a href="#features" class="btn btn-secondary">Descubre Más</a>
                 </div>
             </div>
             <div class="hero-image">
@@ -90,7 +90,7 @@
 
     <section class="cta-section">
         <div class="container">
-            <h2 class="section-title">Listo para transformar tu negocio?</h2>
+            <h2 class="section-title">¿Listo para transformar tu negocio?</h2>
             <p class="section-description">
                 Únete a la comunidad de FOCAL y lleva tu gestión al siguiente nivel.
             </p>
@@ -159,7 +159,10 @@
             // Cerrar menú si se hace clic fuera o en un enlace
             document.querySelectorAll('.main-nav a').forEach(link => {
                 link.addEventListener('click', () => {
-                    mainNav.classList.remove('active');
+                    // Solo cerrar si el clic es en un enlace del menú de navegación (no en los botones que tienen una ruta)
+                    if (link.closest('ul') === mainNav.querySelector('ul') && !link.classList.contains('btn')) {
+                        mainNav.classList.remove('active');
+                    }
                 });
             });
         });

@@ -6,12 +6,13 @@
     --dark-text: #343A40; /* Gris Oscuro para texto principal */
     --muted-text: #555555; /* Gris para texto secundario */
     --white: #FFFFFF; /* Blanco */
-    --navbar-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer */
+    --header-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer (nombre unificado) */
     --hover-dark-purple: #38006B; /* Tono más oscuro para hover de botones */
     --hover-light-purple: #E0B3FF; /* Morado claro para hover de enlaces */
     --border-color: #dee2e6;
-    --shadow-light: rgba(0, 0, 0, 0.08); 
+    --shadow-light: rgba(0, 0, 0, 0.08);
     --shadow-medium: rgba(0, 0, 0, 0.15);
+    --shadow-dark: rgba(0, 0, 0, 0.3);
 }
 
 /* --- Definiciones de fuentes personalizadas --- */
@@ -103,10 +104,12 @@ a:hover {
     color: var(--hover-dark-purple);
 }
 
+/* --- ESTILOS DE BOTONES UNIFICADOS --- */
+/* Base para todos los botones */
 .btn {
     display: inline-block;
-    padding: 1rem 2.5rem;
-    border-radius: 50px; /* Botones más redondeados */
+    padding: 1rem 2.5rem; /* Padding base, puede ajustarse si es necesario */
+    border-radius: 50px; /* Bordes redondeados para todos los .btn */
     font-family: 'InterTight', sans-serif;
     font-weight: 700;
     text-align: center;
@@ -115,89 +118,78 @@ a:hover {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-size: 1rem;
+    border: 2px solid; /* Base para el borde */
 }
 
-.btn-primary-hero {
+/* Botón Principal (VER PLANES en header, CTA) */
+.btn-primary {
     background-color: var(--primary-purple);
     color: var(--white);
-    border: 2px solid var(--primary-purple);
+    border-color: var(--primary-purple);
 }
 
-.btn-primary-hero:hover {
+.btn-primary:hover {
     background-color: var(--hover-dark-purple);
     border-color: var(--hover-dark-purple);
     transform: translateY(-3px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-.btn-secondary-hero {
+/* Botón Secundario (INICIAR SESIÓN en header) */
+.btn-secondary {
     background-color: transparent;
-    color: var(--white);
-    border: 2px solid var(--white);
-    margin-left: 1.5rem;
+    color: var(--white); /* Texto blanco para botones secundarios en fondo oscuro */
+    border-color: var(--white); /* Borde blanco para botones secundarios en fondo oscuro */
 }
 
-.btn-secondary-hero:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo sutil al pasar el ratón */
     transform: translateY(-3px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-.btn-login, .btn-register, .btn-planes {
-    padding: 0.7rem 1.8rem;
-    font-size: 0.95rem;
-    border-radius: 8px;
-    margin-left: 10px;
+/* Ajustes específicos para los botones del header (ya que tienen el background oscuro) */
+.main-nav .btn-primary,
+.main-nav .btn-secondary {
+    padding: 0.7rem 1.8rem; /* Padding más compacto para el header */
+    font-size: 0.95rem; /* Fuente más pequeña para el header */
+    border-radius: 8px; /* Menos redondeado para el header */
+    margin-left: 10px; /* Espacio entre ellos */
 }
 
-.btn-login {
-    background-color: transparent;
-    color: var(--light-purple);
-    border: 1px solid var(--light-purple);
+/* Asegurar que el .btn-secondary del header mantenga el color de texto correcto */
+.main-nav .btn-secondary {
+    color: var(--light-purple); /* Color del texto del botón secundario en el header */
+    border-color: var(--light-purple); /* Color del borde del botón secundario en el header */
 }
 
-.btn-login:hover {
+.main-nav .btn-secondary:hover {
     background-color: var(--light-purple);
-    color: var(--primary-purple);
+    color: var(--primary-purple); /* Cambiar a morado al pasar el ratón */
+    border-color: var(--light-purple);
 }
 
-.btn-register {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    border: 1px solid var(--primary-purple);
-}
 
-.btn-register:hover {
-    background-color: var(--hover-dark-purple);
-    border-color: var(--hover-dark-purple);
-}
-
-.btn-planes {
-    background-color: transparent;
-    color: var(--light-purple);
-    border: 1px solid var(--light-purple);
-}
-
-.btn-login:hover {
-    background-color: var(--light-purple);
-    color: var(--primary-purple);
-}
-
+/* Botón CTA (Call to Action) - En la sección CTA */
 .btn-cta {
     background-color: var(--primary-purple);
     color: var(--white);
-    border: none;
+    border-color: var(--primary-purple);
     padding: 1.2rem 3rem;
     font-size: 1.2rem;
     border-radius: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .btn-cta:hover {
     background-color: var(--hover-dark-purple);
+    border-color: var(--hover-dark-purple);
     transform: scale(1.05);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Botón de Submit en formularios */
 .btn-submit {
     background-color: var(--primary-purple);
     color: var(--white);
@@ -206,6 +198,10 @@ a:hover {
     width: 100%;
     border-radius: 8px;
     font-size: 1.1rem;
+    font-family: 'InterTight', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .btn-submit:hover {
@@ -214,9 +210,10 @@ a:hover {
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
+
 /* --- Header / Navbar --- */
 .main-header {
-    background-color: var(--navbar-footer-bg);
+    background-color: var(--header-footer-bg);
     color: var(--light-purple);
     padding: 1rem 0;
     position: fixed;
@@ -242,11 +239,16 @@ a:hover {
     letter-spacing: -0.05em;
 }
 
+.logo:hover {
+    color: var(--hover-light-purple);
+}
+
 .main-nav ul {
     list-style: none;
     display: flex;
     margin: 0;
     padding: 0;
+    align-items: center;
 }
 
 .main-nav ul li {
@@ -259,13 +261,14 @@ a:hover {
     font-size: 1.05rem;
     padding: 5px 0;
     position: relative;
+    text-decoration: none;
 }
 
 .main-nav ul li a:hover {
     color: var(--hover-light-purple);
 }
 
-.main-nav ul li a::after {
+.main-nav ul li a:not(.btn)::after {
     content: '';
     position: absolute;
     left: 0;
@@ -276,12 +279,12 @@ a:hover {
     transition: width 0.3s ease;
 }
 
-.main-nav ul li a:hover::after {
+.main-nav ul li a:not(.btn):hover::after {
     width: 100%;
 }
 
 .menu-toggle {
-    display: none; /* Oculto por defecto en desktop */
+    display: none;
     background: none;
     border: none;
     color: var(--light-purple);
@@ -292,8 +295,8 @@ a:hover {
 /* --- Hero Section --- */
 .hero-section {
     background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
-    color: var(--white);
-    padding: 120px 0 80px 0; /* Ajustar padding superior para el fixed header */
+    color: var(--white); /* Aseguramos que el texto general del hero sea blanco */
+    padding: 120px 0 80px 0;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -306,7 +309,7 @@ a:hover {
     align-items: center;
     justify-content: space-between;
     gap: 40px;
-    padding-top: 50px; /* Espacio adicional para el contenido del hero */
+    padding-top: 50px;
 }
 
 .hero-content {
@@ -318,7 +321,7 @@ a:hover {
 .hero-section h1 {
     font-size: 4.2rem;
     margin-bottom: 1.5rem;
-    color: var(--white);
+    color: var(--white); /* Título del hero en blanco */
     line-height: 1.1;
 }
 
@@ -327,6 +330,7 @@ a:hover {
     margin-bottom: 2.5rem;
     opacity: 0.9;
     font-weight: 300;
+    color: var(--white); /* Subtítulo del hero en blanco */
 }
 
 .hero-actions {
@@ -334,6 +338,34 @@ a:hover {
     justify-content: flex-start;
     gap: 20px;
 }
+
+/* Ajustes específicos para los botones dentro de .hero-actions */
+/* Botón "Comenzar Ahora" en Hero - Blanco con texto morado */
+.hero-actions .btn-primary {
+    background-color: var(--white);
+    color: var(--primary-purple);
+    border-color: var(--white);
+}
+
+.hero-actions .btn-primary:hover {
+    background-color: var(--light-purple);
+    border-color: var(--light-purple);
+    color: var(--primary-purple);
+}
+
+/* Botón "Descubre Más" en Hero - Transparente con borde y texto blanco */
+.hero-actions .btn-secondary {
+    background-color: transparent;
+    color: var(--white);
+    border-color: var(--white);
+}
+
+.hero-actions .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco transparente al pasar el ratón */
+    border-color: var(--white);
+    color: var(--white);
+}
+
 
 .hero-image {
     flex: 1;
@@ -381,7 +413,7 @@ a:hover {
     font-size: 4.5rem;
     color: var(--primary-purple);
     margin-bottom: 1rem;
-    animation: bounceIn 1s ease-out; /* Animación sutil al cargar */
+    animation: bounceIn 1s ease-out;
 }
 
 @keyframes bounceIn {
@@ -459,6 +491,17 @@ a:hover {
     color: var(--dark-text);
 }
 
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group textarea {
@@ -469,6 +512,7 @@ a:hover {
     font-family: 'HankenGrotesk', sans-serif;
     font-size: 1rem;
     color: var(--dark-text);
+    background-color: var(--white);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -485,24 +529,12 @@ a:hover {
     min-height: 120px;
 }
 
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
-
 /* --- Footer --- */
 .main-footer {
-    background-color: var(--navbar-footer-bg);
+    background-color: var(--header-footer-bg);
     color: var(--light-purple);
-    padding: 40px 0;
+    padding: 30px 0;
     text-align: center;
-    font-size: 0.95rem;
 }
 
 .main-footer .container {
@@ -512,141 +544,151 @@ a:hover {
     gap: 15px;
 }
 
+.main-footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
 .footer-links a {
-    color: var(--hover-light-purple);
-    margin: 0 15px;
+    color: var(--light-purple);
     text-decoration: none;
+    margin: 0 15px;
+    font-size: 0.95rem;
     transition: color 0.3s ease;
 }
 
 .footer-links a:hover {
-    color: var(--white);
+    color: var(--hover-light-purple);
 }
 
-/* --- Media Queries (Responsividad) --- */
+/* --- Responsividad --- */
+@media (max-width: 992px) {
+    .main-header .container {
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
 
-/* Para pantallas grandes (desktop) */
-@media (min-width: 992px) {
-    .hero-section .container {
-        padding: 0 40px;
+    .main-nav {
+        flex-basis: 100%;
+        order: 3;
+        background-color: var(--header-footer-bg);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
     }
-}
 
-/* Para tablets y pequeños laptops */
-@media (max-width: 991.98px) {
-    .hero-section .container {
-        flex-direction: column;
-        text-align: center;
+    .main-nav.active {
+        max-height: 300px;
     }
-    .hero-content {
-        max-width: 100%;
-        text-align: center;
-    }
-    .hero-actions {
-        justify-content: center;
-    }
-    .hero-section h1 {
-        font-size: 3.5rem;
-    }
-    .hero-section .subtitle {
-        font-size: 1.25rem;
-    }
+
     .main-nav ul {
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        padding: 1.5rem 0;
+        gap: 1.2rem;
     }
-}
 
-/* Para dispositivos móviles */
-@media (max-width: 767.98px) {
-    .main-header .container {
-        flex-wrap: wrap;
-    }
-    .main-nav {
-        display: none; /* Oculto por defecto en móvil */
-        width: 100%;
-        flex-direction: column;
-        background-color: var(--navbar-footer-bg);
-        position: absolute;
-        top: 100%;
-        left: 0;
-        padding: 20px 0;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    }
-    .main-nav.active {
-        display: flex; /* Mostrar cuando está activo */
-    }
     .main-nav ul li {
         margin: 0;
     }
+
     .main-nav ul li a {
-        display: block;
-        padding: 10px 20px;
-        text-align: center;
+        padding: 0.8rem 0;
+        font-size: 1.1rem;
     }
+
+    .main-nav ul li .btn {
+        width: 80%;
+        text-align: center;
+        margin: 0;
+    }
+    
     .menu-toggle {
-        display: block; /* Mostrar botón de toggle en móvil */
+        display: block;
+        order: 2;
+    }
+
+    .logo {
+        order: 1;
     }
 
     .hero-section {
-        padding: 100px 0 50px 0;
-    }
-    .hero-section h1 {
-        font-size: 2.8rem;
-    }
-    .hero-section .subtitle {
-        font-size: 1.1rem;
-    }
-    .hero-actions {
-        flex-direction: column;
-        gap: 15px;
-    }
-    .btn-secondary-hero {
-        margin-left: 0;
+        padding: 100px 0 60px 0;
     }
 
-    .section-title {
-        font-size: 2.2rem;
+    .hero-section .container {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
     }
+
+    .hero-content {
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .hero-section h1 {
+        font-size: 3rem;
+    }
+
+    .hero-section .subtitle {
+        font-size: 1.2rem;
+    }
+
+    .hero-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .hero-image {
+        padding: 1.5rem;
+    }
+
+    h2.section-title {
+        font-size: 2.5rem;
+    }
+
     .section-description {
         font-size: 1rem;
     }
 
     .features-grid {
-        grid-template-columns: 1fr; /* Una columna en móvil */
+        grid-template-columns: 1fr;
     }
+
     .feature-card {
         padding: 25px;
+    }
+
+    .cta-section {
+        padding: 60px 0;
     }
 
     .contact-form {
         padding: 30px;
     }
-
-    .footer-links {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .footer-links a {
-        margin: 0;
-    }
 }
 
-/* Para pantallas muy pequeñas */
-@media (max-width: 480px) {
-    .hero-section h1 {
-        font-size: 2.2rem;
+@media (max-width: 576px) {
+    h1 {
+        font-size: 2.5rem;
     }
-    .section-title {
-        font-size: 1.8rem;
+
+    h2.section-title {
+        font-size: 2rem;
     }
-    .btn {
-        padding: 0.8rem 2rem;
-        font-size: 0.9rem;
+
+    .hero-actions .btn {
+        width: 100%;
+        margin: 0;
     }
-    .btn-cta {
-        padding: 1rem 2.5rem;
-        font-size: 1rem;
+
+    .contact-form {
+        padding: 20px;
+    }
+    .main-footer .container {
+        padding: 0 15px;
     }
 }
