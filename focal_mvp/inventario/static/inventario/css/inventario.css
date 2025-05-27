@@ -267,18 +267,28 @@ h1 {
 }
 
 /* --- Botones de acción (Editar, Eliminar, Retirar) --- */
+.tabla-inventario td:last-child { /* Apunta a la celda de la columna de acciones */
+    display: flex; /* Convierte la celda en un contenedor flex */
+    flex-wrap: wrap; /* Permite que los botones se envuelvan si no hay espacio */
+    gap: 0.5rem; /* Espacio entre los botones, tanto horizontal como vertical */
+    justify-content: flex-start; /* Alinea los botones al inicio de la celda */
+    align-items: center; /* Centra verticalmente los botones */
+}
+
 .btn-accion {
     background-color: var(--primary-purple);
     color: var(--white);
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem; /* Reducido el padding */
     border-radius: 4px;
-    font-size: 0.85rem;
+    font-size: 0.8rem; /* Reducido el tamaño de la fuente */
     text-decoration: none;
     transition: background-color 0.3s ease, transform 0.2s ease;
     font-family: 'InterTight', sans-serif;
-    margin-right: 0.5rem; /* Espacio entre botones */
-    display: inline-block; /* Para que margin y padding funcionen bien */
+    font-weight: 700;
+    /* margin-right: 0.5rem; <-- Esto se eliminó y ahora lo maneja el 'gap' del flexbox */
+    display: inline-block; /* Se mantiene para que los estilos de padding/margin funcionen bien */
     white-space: nowrap; /* Evita que el texto del botón se rompa */
+    flex-shrink: 0; /* Evita que los botones se encojan si hay poco espacio */
 }
 
 .btn-accion:hover {
@@ -374,6 +384,7 @@ h1 {
     .tabla-inventario td:last-child {
         border-bottom: none;
         text-align: center;
+        justify-content: center;
     }
     .btn-accion {
         margin-right: 0.2rem;

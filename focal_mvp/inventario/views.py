@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.db import transaction
-from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm
+from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, RetirarStockForm
 from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -169,6 +169,66 @@ def editar_producto(request, producto_id):
     else:
         form = ProductoForm(instance=producto)
     return render(request, 'inventario/editar-producto.html', {'form': form, 'producto': producto})
+
+@login_required
+def eliminar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    if request.method == 'POST':
+        producto.delete()
+        messages.success(request, f'Producto "{producto.nombre}" eliminado exitosamente.')
+        return redirect('inventario_view')
+    # Si es GET, se podría mostrar una página de confirmación de eliminación
+    return render(request, 'inventario/eliminar_producto_confirm.html', {'producto': producto}) # Necesitarías crear este template
+
+
+# Vista para retirar stock
+@login_required
+def retirar_stock_view(request):
+    if request.method == 'POST':
+        form = RetirarStockForm(request.POST)
+        if form.is_valid():
+            producto = form.cleaned_data['producto']
+            cantidad = form.cleaned_data['cantidad']
+
+            if cantidad > producto.stock:
+                messages.error(request, f'No hay suficiente stock para retirar. Stock actual: {producto.stock}.')
+            else:
+                producto.stock -= cantidad
+                producto.save()
+                messages.success(request, f'Se retiraron {cantidad} unidades de "{producto.nombre}". Stock actual: {producto.stock}.')
+            return redirect('retirar_stock')
+        else:
+            # Mostrar errores del formulario
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'Error en {field}: {error}')
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
+
+    else:
+        # Si se accede por GET, podemos intentar precargar el producto si se pasa un ID
+        initial_data = {}
+        producto_id = request.GET.get('producto')
+        if producto_id:
+            try:
+                producto = Producto.objects.get(id=producto_id)
+                initial_data['producto'] = producto.id
+                messages.info(request, f'Producto "{producto.nombre}" seleccionado para retiro.')
+            except Producto.DoesNotExist:
+                messages.error(request, 'El producto especificado no existe.')
+        form = RetirarStockForm(initial=initial_data)
+
+    return render(request, 'inventario/retirar_stock.html', {'form': form})
+
+@login_required
+def eliminar_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+
+    if request.method == 'POST':
+        producto.delete()
+        messages.success(request, f'El producto "{producto.nombre}" ha sido eliminado exitosamente.')
+        return redirect('inventario') 
+
+    return render(request, 'inventario/eliminar_producto_confirm.html', {'producto': producto})
 
 def vista_planes(request):
     planes = PlanSuscripcion.objects.all().order_by('precio')

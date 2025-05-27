@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Retirar Stock | FOCAL</title>
+    <link rel="stylesheet" href="{% static 'inventario/css/inventario.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div>
+                <a href="{% url 'home' %}">FOCAL</a>
+            </div>
+            <div>
+                <a href="{% url 'home' %}">Inicio</a>
+                <a href="{% url 'inventario' %}">Inventario</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Retirar Stock</h1>
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" class="form-estilo">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-accion">Retirar</button>
+            <a href="{% url 'inventario' %}" class="btn-accion btn-secundario">Volver al Inventario</a>
+        </form>
+    </main>
+
+    <footer>
+        © 2025 FOCAL. Todos los derechos reservados.
+    </footer>
+</body>
+</html>

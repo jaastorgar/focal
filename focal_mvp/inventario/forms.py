@@ -111,3 +111,27 @@ class ProductoForm(forms.ModelForm):
         if precio < 0:
             raise forms.ValidationError("El precio no puede ser negativo.")
         return precio
+    
+class RetirarStockForm(forms.Form):
+    producto = forms.ModelChoiceField(
+        queryset=Producto.objects.all().order_by('nombre'),
+        label="Seleccionar Producto",
+        empty_label="--- Seleccione un producto ---",
+        widget=forms.Select(attrs={'class': 'form-control'}) # Añade una clase para estilos si usas CSS
+    )
+    
+    cantidad = forms.IntegerField(
+        label="Cantidad a Retirar",
+        min_value=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control'}) # Añade una clase para estilos
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        producto = cleaned_data.get('producto')
+        cantidad = cleaned_data.get('cantidad')
+
+        if producto and cantidad:
+            if cantidad > producto.stock:
+                self.add_error('cantidad', f'No hay suficiente stock. Solo quedan {producto.stock} unidades de {producto.nombre}.')
+        return cleaned_data
