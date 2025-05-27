@@ -10,6 +10,7 @@ from django.db import transaction
 from .decorators import plan_requerido, caracteristica_requerida
 from django.contrib.auth import logout
 from datetime import date, timedelta
+from django.db.models import Q
 import datetime
 
 # Create your views here.
@@ -112,14 +113,33 @@ def perfil(request):
 # Listar productos
 @login_required
 def inventario_view(request):
+    query = request.GET.get('q')
+    
     productos = Producto.objects.all()
-    hoy = date.today()
-    hoy_mas_15dias = int(datetime.datetime.combine(hoy + timedelta(days=15), datetime.datetime.min.time()).timestamp())
 
+    if query:
+        productos = productos.filter(
+            Q(nombre__icontains=query) | 
+            Q(sku__icontains=query) |    
+            Q(marca__icontains=query) |  
+            Q(categoria__icontains=query) 
+        ).distinct()
+
+        if not productos.exists():
+            messages.info(request, f"No se encontraron productos que coincidan con '{query}'.")
+        else:
+            messages.success(request, f"Mostrando resultados para '{query}'.")
+    
+    hoy = date.today()
+    try:
+        hoy_mas_15dias_timestamp = int(datetime.datetime.combine(hoy + timedelta(days=15), datetime.datetime.min.time()).timestamp())
+    except AttributeError: 
+        hoy_mas_15dias_timestamp = None 
     context = {
         'productos': productos,
+        'query': query,
         'today': hoy,
-        'hoy_mas_15dias': hoy_mas_15dias,
+        'hoy_mas_15dias': hoy_mas_15dias_timestamp,
     }
     return render(request, 'inventario/inventario.html', context)
 

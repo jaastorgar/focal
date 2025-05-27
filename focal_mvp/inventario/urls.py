@@ -10,6 +10,8 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('perfil/', perfil, name='perfil'),
     path('inventario/', inventario_view, name='inventario'),
-    path('agregar-producto/', agregar_producto, name='agregar-producto'),
-    path('editar-producto/<int:producto_id>/', editar_producto, name='editar-producto'),
+    path('productos/agregar/', agregar_producto, name='agregar_producto'),
+    path('productos/editar/<int:producto_id>/', editar_producto, name='editar_producto'),
+    #path('productos/eliminar/<int:producto_id>/', eliminar_producto, name='eliminar_producto'),
+    #path('retirar-stock/', retirar_stock_view, name='retirar_stock'),
 ]
