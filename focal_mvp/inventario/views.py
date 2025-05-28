@@ -180,7 +180,7 @@ def agregar_producto(request):
             producto.empresa = empresa_usuario # Asigna la empresa al producto
             producto.save()
             messages.success(request, 'Producto agregado correctamente.')
-            return redirect('inventario_view') # Usar el nombre de la URL aquí
+            return redirect('inventario') # Usar el nombre de la URL aquí
     else:
         form = ProductoForm()
     return render(request, 'inventario/agregar-producto.html', {'form': form})
@@ -202,7 +202,7 @@ def editar_producto(request, producto_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Producto actualizado correctamente.')
-            return redirect('inventario_view') # Usar el nombre de la URL aquí
+            return redirect('inventario') # Usar el nombre de la URL aquí
     else:
         form = ProductoForm(instance=producto)
     return render(request, 'inventario/editar-producto.html', {'form': form, 'producto': producto})
@@ -222,7 +222,7 @@ def eliminar_producto(request, producto_id):
     if request.method == 'POST':
         producto.delete()
         messages.success(request, f'El producto "{producto.nombre}" ha sido eliminado exitosamente.')
-        return redirect('inventario_view') # Usar el nombre de la URL aquí
+        return redirect('inventario') # Usar el nombre de la URL aquí
     
     return render(request, 'inventario/eliminar_producto_confirm.html', {'producto': producto})
 

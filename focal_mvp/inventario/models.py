@@ -2,21 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
-class Producto(models.Model):
-    nombre = models.CharField(max_length=100)
-    sku = models.CharField(max_length=50, unique=True)
-    marca = models.CharField(max_length=50, blank=True)
-    categoria = models.CharField(max_length=50, blank=True)
-    unidad_medida = models.CharField(max_length=50, blank=True)
-    stock = models.PositiveIntegerField(default=0)
-    precio_compra = models.IntegerField(default=0)
-    precio_venta = models.IntegerField(default=0)
-    fecha_vencimiento = models.DateField(null=True, blank=True)
-    creado = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.nombre} ({self.sku})"
-
 class PlanSuscripcion(models.Model):
     NOMBRE_PLANES = [
         ('FREE', 'Gratuito'),
@@ -82,3 +67,19 @@ class Almacenero(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.usuario.username})"
+
+class Producto(models.Model):
+    nombre = models.CharField(max_length=100)
+    sku = models.CharField(max_length=50, unique=True)
+    marca = models.CharField(max_length=50, blank=True)
+    categoria = models.CharField(max_length=50, blank=True)
+    unidad_medida = models.CharField(max_length=50, blank=True)
+    stock = models.PositiveIntegerField(default=0)
+    precio_compra = models.IntegerField(default=0)
+    precio_venta = models.IntegerField(default=0)
+    fecha_vencimiento = models.DateField(null=True, blank=True)
+    creado = models.DateTimeField(auto_now_add=True)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
+
+    def __str__(self):
+        return f"{self.nombre} ({self.sku})"
