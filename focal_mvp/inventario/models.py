@@ -2,6 +2,21 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
+# --- Opciones para el campo 'categoria' de Producto ---
+CATEGORIA_CHOICES = [
+    ('ALIMENTOS', 'Alimentos'),
+    ('BEBIDAS', 'Bebidas'),
+    ('ELECTRONICA', 'Electrónica'),
+    ('HOGAR', 'Hogar'),
+    ('LIMPIEZA', 'Limpieza'),
+    ('ROPA', 'Ropa'),
+    ('OFICINA', 'Oficina'),
+    ('DEPORTES', 'Deportes'),
+    ('JUGUETES', 'Juguetes'),
+    ('FERRETERIA', 'Ferretería'),
+    ('OTRO', 'Otro'),
+]
+
 class PlanSuscripcion(models.Model):
     NOMBRE_PLANES = [
         ('FREE', 'Gratuito'),
@@ -72,7 +87,12 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=100)
     sku = models.CharField(max_length=50, unique=True)
     marca = models.CharField(max_length=50, blank=True)
-    categoria = models.CharField(max_length=50, blank=True)
+    categoria = models.CharField(
+        max_length=50,  
+        choices=CATEGORIA_CHOICES, 
+        default='OTRO',            
+        help_text="Seleccione la categoría del producto." 
+    )
     unidad_medida = models.CharField(max_length=50, blank=True)
     stock = models.PositiveIntegerField(default=0)
     precio_compra = models.IntegerField(default=0)
