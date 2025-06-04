@@ -4,17 +4,19 @@ from django.contrib.auth.models import User
 # Create your models here.
 # --- Opciones para el campo 'categoria' de Producto ---
 CATEGORIA_CHOICES = [
-    ('ALIMENTOS', 'Alimentos'),
-    ('BEBIDAS', 'Bebidas'),
-    ('ELECTRONICA', 'Electrónica'),
-    ('HOGAR', 'Hogar'),
-    ('LIMPIEZA', 'Limpieza'),
-    ('ROPA', 'Ropa'),
-    ('OFICINA', 'Oficina'),
-    ('DEPORTES', 'Deportes'),
-    ('JUGUETES', 'Juguetes'),
-    ('FERRETERIA', 'Ferretería'),
-    ('OTRO', 'Otro'),
+    ('Alimentos', 'Alimentos'),
+    ('Bebidas', 'Bebidas'),
+    ('Salud', 'Salud'),
+    ('Electrónica', 'Electrónica'),
+    ('Belleza', 'Belleza'), 
+    ('Hogar', 'Hogar'),
+    ('Limpieza', 'Limpieza'),
+    ('Ropa', 'Ropa'),
+    ('Oficina', 'Oficina'),
+    ('Deportes', 'Deportes'),
+    ('Juguetes', 'Juguetes'),
+    ('Ferretería', 'Ferretería'),
+    ('Otro', 'Otro'),
 ]
 
 class PlanSuscripcion(models.Model):
@@ -90,7 +92,7 @@ class Producto(models.Model):
     categoria = models.CharField(
         max_length=50,  
         choices=CATEGORIA_CHOICES, 
-        default='OTRO',            
+        default='Otro',            
         help_text="Seleccione la categoría del producto." 
     )
     unidad_medida = models.CharField(max_length=50, blank=True)

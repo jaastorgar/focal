@@ -244,7 +244,7 @@ def retirar_stock_view(request):
             # Asegurarse de que el producto pertenezca a la empresa del usuario
             if producto.empresa != empresa_usuario:
                 messages.error(request, "No tienes permiso para retirar stock de este producto.")
-                return redirect('retirar_stock_view')
+                return redirect('retirar_stock')
 
             if cantidad > producto.stock:
                 messages.error(request, f'No hay suficiente stock para retirar. Stock actual: {producto.stock}.')
@@ -252,7 +252,7 @@ def retirar_stock_view(request):
                 producto.stock -= cantidad
                 producto.save()
                 messages.success(request, f'Se retiraron {cantidad} unidades de "{producto.nombre}". Stock actual: {producto.stock}.')
-            return redirect('retirar_stock_view') # Usar el nombre de la URL aquí
+            return redirect('inventario') # Usar el nombre de la URL aquí
         else:
             for field, errors in form.errors.items():
                 for error in errors:

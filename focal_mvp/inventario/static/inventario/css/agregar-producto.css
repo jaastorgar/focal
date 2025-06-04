@@ -10,7 +10,7 @@
   --hover-dark-purple: #38006B;
   --hover-light-purple: #E0B3FF;
   --danger: #D32F2F;
-  --input-border: #ccc;
+  --input-border: #ccc; /* Color de borde para inputs, selects, textareas */
 }
 
 /* === Tipografías Personalizadas === */
@@ -32,99 +32,187 @@
   font-weight: 300;
 }
 
-/* === Estructura General === */
+/* === Estilos Generales para el Cuerpo del Formulario === */
 body {
   font-family: 'HankenGrotesk', sans-serif;
-  background-color: var(--light-purple);
+  background-color: var(--light-purple); /* Fondo claro para toda la página */
+  color: var(--dark-text);
   margin: 0;
   padding: 0;
-  color: var(--dark-text);
+  display: flex;
+  justify-content: center; /* Centrar el contenido del formulario */
+  align-items: center; /* Centrar verticalmente, si el contenido es más corto que la ventana */
+  min-height: 100vh; /* Asegura que ocupe al menos el alto completo de la ventana */
 }
 
 .form-container {
-  max-width: 600px;
-  margin: 4rem auto;
   background-color: var(--white);
   padding: 2.5rem 3rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada para el contenedor */
+  width: 100%;
+  max-width: 600px; /* Ancho máximo para el formulario */
+  box-sizing: border-box; /* Incluir padding en el ancho */
 }
 
 h1 {
   font-family: 'InterTight', sans-serif;
   color: var(--primary-purple);
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
+  font-size: 2.5rem; /* Ajustado el tamaño de la fuente */
+  margin-bottom: 2.5rem; /* Más espacio debajo del título */
   text-align: center;
 }
 
-/* === Formulario === */
+/* === Estilos para la Cuadrícula del Formulario === */
 .form-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid; /* Cambiado a grid para mejor control */
+  grid-template-columns: 1fr; /* Una columna por defecto */
+  gap: 1.8rem; /* Espacio entre los campos */
+}
+
+/* Si quieres dos columnas en pantallas más grandes: */
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* 2 columnas en pantallas más anchas */
+    gap: 1.8rem 2rem; /* Espacio vertical y horizontal */
+  }
+}
+
+.form-field {
+  margin-bottom: 0; /* Ya el gap del grid maneja el espaciado */
 }
 
 .form-field label {
   display: block;
-  margin-bottom: 0.4rem;
-  color: var(--primary-purple);
+  margin-bottom: 0.6rem; /* Más espacio entre label y campo */
+  color: var(--dark-text); /* Color más neutro para labels */
   font-weight: 600;
+  font-size: 0.95rem; /* Tamaño de fuente ligeramente más pequeño */
 }
 
-.form-field input,
-.form-field select,
+/* === Estilos para INPUT, SELECT y TEXTAREA === */
+.form-field input[type="text"],
+.form-field input[type="number"],
+.form-field input[type="date"],
 .form-field textarea {
   width: 100%;
-  padding: 0.6rem 0.8rem;
+  padding: 0.8rem 1rem; /* Aumentado el padding para un mejor tacto */
   border: 1px solid var(--input-border);
-  border-radius: 6px;
+  border-radius: 8px; /* Bordes más redondeados */
   font-size: 1rem;
   font-family: 'HankenGrotesk', sans-serif;
-  transition: border-color 0.3s ease;
+  color: var(--dark-text);
+  background-color: var(--white);
+  box-sizing: border-box; /* Asegura que padding y borde no aumenten el ancho total */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+/* Estilos específicos para SELECT (para la flecha personalizada y ocultar nativa) */
+.form-field select {
+    width: 100%; /* Asegura que ocupe todo el ancho */
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'HankenGrotesk', sans-serif;
+    color: var(--dark-text);
+    background-color: var(--white);
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    /* --- Clave para ocultar la flecha nativa y añadir la tuya --- */
+    -webkit-appearance: none; /* Chrome, Safari, Edge */
+    -moz-appearance: none;    /* Firefox */
+    appearance: none;         /* Estándar */
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234A008B'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E"); /* Icono de flecha SVG */
+    background-repeat: no-repeat;
+    background-position: right 1rem center; /* Posiciona la flecha a la derecha */
+    background-size: 1.2rem; /* Tamaño de la flecha */
+    padding-right: 2.5rem; /* Deja espacio para la flecha */
+}
+
 
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
   outline: none;
-  border-color: var(--primary-purple);
+  border-color: var(--secondary-purple); /* Cambia el borde al enfocar */
+  box-shadow: 0 0 0 3px rgba(123, 31, 162, 0.2); /* Sombra suave al enfocar */
 }
 
-/* === Errores === */
+/* === Estilos para Errores === */
 .error {
   color: var(--danger);
-  font-size: 0.85rem;
-  margin-top: 0.3rem;
+  font-size: 0.875rem; /* Ajustado el tamaño de la fuente */
+  margin-top: 0.5rem; /* Más espacio encima del error */
+  display: block; /* Asegura que cada error esté en su propia línea */
 }
 
-/* === Botones === */
+/* === Acciones del Formulario (Botones) === */
 .form-actions {
-  margin-top: 2rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-end; /* Alinea los botones a la derecha */
+  gap: 1.2rem; /* Espacio entre botones */
+  margin-top: 3rem; /* Más espacio encima de los botones */
+  padding-top: 1.5rem; /* Padding superior */
+  border-top: 1px solid #eee; /* Línea separadora */
+}
+
+.btn-submit,
+.btn-cancelar {
+  padding: 0.8rem 1.8rem; /* Más padding para botones */
+  border-radius: 8px; /* Bordes más redondeados */
+  font-size: 1.05rem; /* Tamaño de fuente ligeramente más grande */
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  white-space: nowrap; /* Evita que el texto del botón se rompa */
 }
 
 .btn-submit {
   background-color: var(--primary-purple);
   color: var(--white);
-  padding: 0.6rem 1.6rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-family: 'InterTight', sans-serif;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  border: 1px solid var(--primary-purple);
 }
 
 .btn-submit:hover {
   background-color: var(--hover-dark-purple);
+  border-color: var(--hover-dark-purple);
 }
 
 .btn-cancelar {
-  text-decoration: none;
+  background-color: var(--white);
   color: var(--primary-purple);
-  font-weight: 600;
-  font-size: 0.95rem;
+  border: 1px solid var(--primary-purple);
+}
+
+.btn-cancelar:hover {
+  background-color: var(--light-purple);
+  color: var(--primary-purple);
+}
+
+/* === Responsive (Ajustes para pantallas pequeñas) === */
+@media (max-width: 576px) {
+  .form-container {
+    padding: 1.5rem;
+    margin: 1.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-actions {
+    flex-direction: column; /* Apila los botones verticalmente */
+    gap: 1rem;
+  }
+
+  .btn-submit,
+  .btn-cancelar {
+    width: 100%; /* Botones ocupan todo el ancho */
+  }
 }
