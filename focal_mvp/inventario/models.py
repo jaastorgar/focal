@@ -111,7 +111,6 @@ class Producto(models.Model):
     stock = models.PositiveIntegerField(default=0)
     precio_compra = models.IntegerField(default=0)
     precio_venta = models.IntegerField(default=0)
-    fecha_vencimiento = models.DateField(null=True, blank=True)
     creado = models.DateTimeField(auto_now_add=True)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
 
@@ -126,3 +125,12 @@ class Contacto(models.Model):
 
     def __str__(self):
         return f"Mensaje de {self.nombre_completo} ({self.correo_electronico})"
+
+class LoteProducto(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lotes')
+    cantidad = models.PositiveIntegerField()
+    fecha_vencimiento = models.DateField()
+    creado = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.cantidad} un. - Vence: {self.fecha_vencimiento}"

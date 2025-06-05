@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lotes de {{ producto.nombre }} | FOCAL</title>
+  <link rel="stylesheet" href="{% static 'inventario/css/inventario.css' %}">
+</head>
+<body>
+
+<header>
+  <nav>
+    <div>
+      <a href="{% url 'home' %}">FOCAL</a>
+    </div>
+    <div>
+      <a href="{% url 'inventario' %}">← Volver al Inventario</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <h1>Lotes de {{ producto.nombre }}</h1>
+
+  {% if lotes %}
+    <table class="tabla-inventario">
+      <thead>
+        <tr>
+          <th>Cantidad</th>
+          <th>Fecha de Vencimiento</th>
+          <th>Registrado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lote in lotes %}
+          <tr
+            {% if lote.fecha_vencimiento < today %}class="vencido"
+            {% elif lote.fecha_vencimiento|date:"U" <= hoy_mas_15dias %}class="proximo-vencer"
+            {% elif lote.cantidad <= 5 %}class="stock-bajo"
+            {% endif %}
+          >
+            <td>{{ lote.cantidad }}</td>
+            <td>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
+            <td>{{ lote.creado|date:"d-m-Y H:i" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No hay lotes registrados para este producto.</p>
+  {% endif %}
+</main>
+
+<footer>
+  © 2025 FOCAL. Todos los derechos reservados.
+</footer>
+
+</body>
+</html>

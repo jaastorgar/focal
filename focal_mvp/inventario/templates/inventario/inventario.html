@@ -9,92 +9,91 @@
 </head>
 <body>
 
-    <header>
-        <nav>
-            <div>
-                <a href="{% url 'home' %}">FOCAL</a>
-            </div>
-            <div>
-                <a href="{% url 'home' %}">Inicio</a>
-                <a href="{% url 'agregar_producto' %}" class="btn-accion">Agregar Producto</a>
-                <a href="{% url 'retirar_stock' %}" class="btn-accion">Retirar Stock</a>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <h1>Inventario de Productos</h1>
-
-        <div class="search-section">
-            <form method="GET" action="{% url 'inventario' %}" class="search-form"> 
-                <input class="search-input" type="search" placeholder="Buscar por nombre, sku, marca, categoría..." aria-label="Search" name="q" value="{{ query|default_if_none:'' }}">
-                <button class="search-button" type="submit">Buscar</button>
-                {% if query %}
-                    <a href="{% url 'inventario' %}" class="clear-search-button">Limpiar Búsqueda</a> 
-                {% endif %}
-            </form>
+<header>
+    <nav>
+        <div>
+            <a href="{% url 'home' %}">FOCAL</a>
         </div>
+        <div>
+            <a href="{% url 'home' %}">Inicio</a>
+            <a href="{% url 'agregar_producto' %}" class="btn-accion">Agregar Producto</a>
+            <a href="{% url 'agregar_lote' %}" class="btn-accion">Registrar Lote</a>
+        </div>
+    </nav>
+</header>
 
-        {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+<main>
+    <h1>Inventario de productos</h1>
 
-        {% if productos %}
-            <table class="tabla-inventario">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Sku</th>
-                        <th>Marca</th>
-                        <th>Categoría</th>
-                        <th>Unidad</th>
-                        <th>Stock</th>
-                        <th>Precio Compra</th>
-                        <th>Precio Venta</th>
-                        <th>Fecha Vencimiento</th>
-                        <th>Acciones</th>
+    <div class="search-section">
+        <form method="GET" action="{% url 'inventario' %}" class="search-form"> 
+            <input class="search-input" type="search" placeholder="Buscar por nombre, sku, marca, categoría..." aria-label="Search" name="q" value="{{ query|default_if_none:'' }}">
+            <button class="search-button" type="submit">Buscar</button>
+            {% if query %}
+                <a href="{% url 'inventario' %}" class="clear-search-button">Limpiar Búsqueda</a> 
+            {% endif %}
+        </form>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if productos %}
+        <table class="tabla-inventario">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>SKU</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Unidad</th>
+                    <th>Stock</th>
+                    <th>Próximo Vencimiento</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                    <tr
+                        {% if producto.proximo_vencimiento and producto.proximo_vencimiento < today %}
+                            class="vencido"
+                        {% elif producto.proximo_vencimiento and producto.proximo_vencimiento|date:"U" <= hoy_mas_15dias %}
+                            class="proximo-vencer"
+                        {% elif producto.stock and producto.stock <= 5 %}
+                            class="stock-bajo"
+                        {% endif %}
+                    >
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.sku }}</td>
+                        <td>{{ producto.marca }}</td>
+                        <td>{{ producto.categoria }}</td>
+                        <td>{{ producto.unidad_medida }}</td>
+                        <td>{{ producto.stock }}</td>
+                        <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
+                        <td>
+                            <a href="{% url 'editar_producto' producto.id %}" class="btn-accion">Editar</a>
+                            <a href="{% url 'eliminar_producto' producto.id %}" class="btn-accion btn-peligro">Eliminar</a>
+                            <a href="{% url 'detalle_producto' producto.id %}" class="btn-accion">Ver Lotes</a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for producto in productos %}
-                        <tr
-                            {% if producto.stock <= 5 %}class="stock-bajo"
-                            {% elif producto.fecha_vencimiento and producto.fecha_vencimiento < today %}class="vencido"
-                            {% elif producto.fecha_vencimiento and producto.fecha_vencimiento|date:"U" <= hoy_mas_15dias %}class="proximo-vencer"
-                            {% endif %}
-                        >
-                            <td>{{ producto.nombre }}</td>
-                            <td>{{ producto.sku }}</td>
-                            <td>{{ producto.marca }}</td>
-                            <td>{{ producto.categoria }}</td>
-                            <td>{{ producto.unidad_medida }}</td>
-                            <td>{{ producto.stock }}</td>
-                            <td>${{ producto.precio_compra|floatformat:0 }}</td>
-                            <td>${{ producto.precio_venta|floatformat:0 }}</td>
-                            <td>{{ producto.fecha_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
-                            <td>
-                                <a href="{% url 'editar_producto' producto.id %}" class="btn-accion">Editar</a>
-                                <a href="{% url 'eliminar_producto' producto.id %}" class="btn-accion btn-peligro">Eliminar</a>
-                                <a href="{% url 'retirar_stock' %}?producto={{ producto.id }}" class="btn-accion">Retirar</a> 
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p class="no-products-message">No hay productos registrados.</p>
-        {% endif %}
-    </main>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="no-products-message">No hay productos registrados.</p>
+    {% endif %}
+</main>
 
-    <footer>
-        © 2025 FOCAL. Todos los derechos reservados.
-    </footer>
+<footer>
+    © 2025 FOCAL. Todos los derechos reservados.
+</footer>
 
 </body>
 </html>

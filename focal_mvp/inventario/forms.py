@@ -1,7 +1,7 @@
 import re
 from django import forms
 from django.contrib.auth.models import User
-from .models import Empresa, Producto, Contacto
+from .models import Empresa, Producto, Contacto, LoteProducto
 from django.forms.widgets import DateInput, TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, CheckboxInput
 
 
@@ -153,7 +153,6 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             'stock',
             'precio_compra',
             'precio_venta',
-            'fecha_vencimiento',
         ]
         widgets = {
             'fecha_vencimiento': DateInput(attrs={'type': 'date'}),
@@ -167,7 +166,6 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             'stock': 'Stock Disponible',
             'precio_compra': 'Precio de Compra',
             'precio_venta': 'Precio de Venta',
-            'fecha_vencimiento': 'Fecha de Vencimiento',
         }
     
     def clean_stock(self):
@@ -210,3 +208,11 @@ class ContactoForm(forms.ModelForm):
     class Meta:
         model = Contacto
         fields = ['nombre_completo', 'correo_electronico', 'mensaje']
+
+class LoteProductoForm(forms.ModelForm):
+    class Meta:
+        model = LoteProducto
+        fields = ['producto', 'cantidad', 'fecha_vencimiento']
+        widgets = {
+            'fecha_vencimiento': forms.DateInput(attrs={'type': 'date'}),
+        }

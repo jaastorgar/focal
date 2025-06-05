@@ -4,7 +4,7 @@ from .models import Producto, Almacenero, PlanSuscripcion, SuscripcionUsuario, E
 # Register your models here.
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'sku', 'stock', 'precio_compra', 'precio_venta', 'fecha_vencimiento')
+    list_display = ('nombre', 'sku', 'stock', 'precio_compra', 'precio_venta')
     search_fields = ('nombre', 'sku')
 
 @admin.register(Almacenero)

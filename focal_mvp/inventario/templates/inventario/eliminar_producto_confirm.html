@@ -35,8 +35,7 @@
         <div class="product-details-card">
             <p><strong>Nombre:</strong> {{ producto.nombre }}</p>
             <p><strong>SKU:</strong> {{ producto.sku }}</p>
-            <p><strong>Stock Actual:</strong> {{ producto.stock }}</p>
-            <p><strong>Vencimiento:</strong> {{ producto.fecha_vencimiento|date:"d-m-Y"|default:"N/A" }}</p> 
+            <p><strong>Vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y"|default:"N/A" }}</p>
         </div>
         <p class="warning-text">Esta acción no se puede deshacer.</p>
         

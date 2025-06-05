@@ -2,15 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.db import transaction
-from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, RetirarStockForm, ContactoForm
-from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto
+from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, RetirarStockForm, ContactoForm, LoteProductoForm
+from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto, LoteProducto
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .decorators import plan_requerido, caracteristica_requerida
 from django.contrib.auth import logout
 from datetime import date, timedelta
 from django.db.models import Q
+from django.db.models import Min
 import datetime
+import time
 
 def vista_registro(request):
     if request.method == 'POST':
@@ -28,7 +30,7 @@ def vista_registro(request):
                 # Crear empresa
                 empresa = Empresa.objects.create(
                     nombre_almacen=empresa_form.cleaned_data['nombre_almacen'],
-                    rut_empresa=empresa_form.cleaned_data['rut_empresa'], # Corregido: 'rut' a 'rut_empresa'
+                    rut=empresa_form.cleaned_data['rut'], # Corregido: 'rut' a 'rut_empresa'
                     direccion_tributaria=empresa_form.cleaned_data['direccion_tributaria'],
                     comuna=empresa_form.cleaned_data['comuna'],
                     run_representante=empresa_form.cleaned_data['run_representante'],
@@ -118,7 +120,7 @@ def perfil(request):
     try:
         almacenero = request.user.almacenero
     except Almacenero.DoesNotExist:
-        almacenero = None # O redirigir a una página de error si es mandatorio
+        almacenero = None
 
     context = {
         'user': request.user,
@@ -129,38 +131,41 @@ def perfil(request):
 @login_required
 def inventario_view(request):
     query = request.GET.get('q')
-    
-    # Asegúrate de que solo se vean los productos de la empresa del usuario
+
     try:
         empresa_usuario = request.user.almacenero.empresa
-        productos = Producto.objects.filter(empresa=empresa_usuario)
+        productos = (
+            Producto.objects
+            .filter(empresa=empresa_usuario)
+            .annotate(
+                proximo_vencimiento=Min('lotes__fecha_vencimiento')
+            )
+        )
     except (Almacenero.DoesNotExist, Empresa.DoesNotExist):
-        messages.error(request, "Tu cuenta no está asociada a una empresa válida. No se pueden mostrar productos.")
-        productos = Producto.objects.none() # Devuelve un queryset vacío
+        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
+        productos = Producto.objects.none()
 
     if query:
         productos = productos.filter(
-            Q(nombre__icontains=query) | 
-            Q(sku__icontains=query) |    
-            Q(marca__icontains=query) |  
-            Q(categoria__icontains=query) 
+            Q(nombre__icontains=query) |
+            Q(sku__icontains=query) |
+            Q(marca__icontains=query) |
+            Q(categoria__icontains=query)
         ).distinct()
 
         if not productos.exists():
             messages.info(request, f"No se encontraron productos que coincidan con '{query}'.")
         else:
             messages.success(request, f"Mostrando resultados para '{query}'.")
-    
+
     hoy = date.today()
-    # No es necesario convertir a timestamp si solo se usa en el template para comparación de fechas
-    # La comparación de objetos date directamente en Django templates es posible
-    hoy_mas_15dias = hoy + timedelta(days=15) 
-    
+    hoy_mas_15dias = hoy + timedelta(days=15)
+
     context = {
         'productos': productos,
         'query': query,
         'today': hoy,
-        'hoy_mas_15dias': hoy_mas_15dias,
+        'hoy_mas_15dias': int(time.mktime(hoy_mas_15dias.timetuple())),
     }
     return render(request, 'inventario/inventario.html', context)
 
@@ -171,7 +176,7 @@ def agregar_producto(request):
         empresa_usuario = request.user.almacenero.empresa
     except (Almacenero.DoesNotExist, Empresa.DoesNotExist):
         messages.error(request, "Tu cuenta no está asociada a una empresa válida. No puedes agregar productos.")
-        return redirect('home') # O a otra página adecuada
+        return redirect('home') 
 
     if request.method == 'POST':
         form = ProductoForm(request.POST)
@@ -192,7 +197,7 @@ def editar_producto(request, producto_id):
         empresa_usuario = request.user.almacenero.empresa
     except (Almacenero.DoesNotExist, Empresa.DoesNotExist):
         messages.error(request, "Tu cuenta no está asociada a una empresa válida. No puedes editar productos.")
-        return redirect('home')
+        return redirect('inventario')
 
     # Solo permite editar productos de la empresa del usuario
     producto = get_object_or_404(Producto, id=producto_id, empresa=empresa_usuario)
@@ -209,22 +214,26 @@ def editar_producto(request, producto_id):
 
 @login_required
 def eliminar_producto(request, producto_id):
-    # Asegúrate de que el usuario logeado tenga una empresa asociada
     try:
         empresa_usuario = request.user.almacenero.empresa
     except (Almacenero.DoesNotExist, Empresa.DoesNotExist):
         messages.error(request, "Tu cuenta no está asociada a una empresa válida. No puedes eliminar productos.")
-        return redirect('home')
+        return redirect('inventario')
 
-    # Solo permite eliminar productos de la empresa del usuario
     producto = get_object_or_404(Producto, id=producto_id, empresa=empresa_usuario)
-    
+
+    # Obtener el lote más próximo a vencer (si existe)
+    lote_proximo = producto.lotes.order_by('fecha_vencimiento').first()
+
     if request.method == 'POST':
         producto.delete()
         messages.success(request, f'El producto "{producto.nombre}" ha sido eliminado exitosamente.')
-        return redirect('inventario') # Usar el nombre de la URL aquí
+        return redirect('inventario')
     
-    return render(request, 'inventario/eliminar_producto_confirm.html', {'producto': producto})
+    return render(request, 'inventario/eliminar_producto_confirm.html', {
+        'producto': producto,
+        'lote': lote_proximo  # 👈 este será usado en la plantilla
+    })
 
 @login_required
 def retirar_stock_view(request):
@@ -276,6 +285,55 @@ def retirar_stock_view(request):
 
 
     return render(request, 'inventario/retirar_stock.html', {'form': form})
+
+@login_required
+def agregar_lote_producto(request):
+    if request.method == 'POST':
+        form = LoteProductoForm(request.POST)
+        if form.is_valid():
+            lote = form.save(commit=False)
+            producto = lote.producto
+
+            # Actualiza el stock real del producto
+            producto.stock += lote.cantidad
+            producto.save()
+
+            # Guarda el lote finalmente
+            lote.save()
+
+            messages.success(request, "Lote registrado y stock actualizado.")
+            return redirect('inventario')
+    else:
+        form = LoteProductoForm()
+
+    return render(request, 'inventario/agregar_lote.html', {'form': form})
+
+@login_required
+def eliminar_lote(request, lote_id):
+    lote = get_object_or_404(LoteProducto, id=lote_id)
+    producto = lote.producto
+    if request.method == 'POST':
+        producto.stock = max(producto.stock - lote.cantidad, 0)
+        producto.save()
+        lote.delete()
+        messages.success(request, "Lote eliminado y stock ajustado.")
+        return redirect('detalle_producto', producto_id=producto.id)
+    return render(request, 'inventario/eliminar_lote_confirm.html', {'lote': lote})
+
+@login_required
+def detalle_producto(request, producto_id):
+    try:
+        empresa_usuario = request.user.almacenero.empresa
+        producto = get_object_or_404(Producto, id=producto_id, empresa=empresa_usuario)
+        lotes = producto.lotes.all().order_by('fecha_vencimiento')
+    except (Almacenero.DoesNotExist, Empresa.DoesNotExist):
+        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
+        return redirect('inventario')
+
+    return render(request, 'inventario/detalle_producto.html', {
+        'producto': producto,
+        'lotes': lotes
+    })
 
 def vista_planes(request):
     planes = PlanSuscripcion.objects.all().order_by('precio')
