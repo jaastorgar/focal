@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 # --- Opciones para el campo 'categoria' de Producto ---
 CATEGORIA_CHOICES = [
+    ('Seleccione la categoría', 'Seleccione la categoría'),
     ('Alimentos', 'Alimentos'),
     ('Bebidas', 'Bebidas'),
     ('Salud', 'Salud'),
@@ -11,12 +12,18 @@ CATEGORIA_CHOICES = [
     ('Belleza', 'Belleza'), 
     ('Hogar', 'Hogar'),
     ('Limpieza', 'Limpieza'),
-    ('Ropa', 'Ropa'),
-    ('Oficina', 'Oficina'),
-    ('Deportes', 'Deportes'),
-    ('Juguetes', 'Juguetes'),
-    ('Ferretería', 'Ferretería'),
-    ('Otro', 'Otro'),
+]
+
+UNIDAD_MEDIDA_CHOICES = [
+    ('Seleccione la unidad', 'Seleccione la unidad'),
+    ('Litro', 'Litro'),
+    ('Kilogramo', 'Kilogramo'),
+    ('Gramo', 'Gramo'),
+    ('Mililitro', 'Mililitro'),
+    ('Centímetro', 'Centímetro'),
+    ('Caja', 'Caja'),
+    ('Paquete', 'Paquete'),
+    ('Docena', 'Docena'),
 ]
 
 class PlanSuscripcion(models.Model):
@@ -92,10 +99,15 @@ class Producto(models.Model):
     categoria = models.CharField(
         max_length=50,  
         choices=CATEGORIA_CHOICES, 
-        default='Otro',            
+        default='Seleccione la categoría',            
         help_text="Seleccione la categoría del producto." 
     )
-    unidad_medida = models.CharField(max_length=50, blank=True)
+    unidad_medida = models.CharField(
+        max_length=50,
+        choices=UNIDAD_MEDIDA_CHOICES,
+        default='Seleccione la unidad',
+        help_text="Seleccione la unidad de medida del producto."
+    )
     stock = models.PositiveIntegerField(default=0)
     precio_compra = models.IntegerField(default=0)
     precio_venta = models.IntegerField(default=0)
@@ -105,3 +117,12 @@ class Producto(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.sku})"
+    
+class Contacto(models.Model):
+    nombre_completo = models.CharField(max_length=100)
+    correo_electronico = models.EmailField()
+    mensaje = models.TextField()
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Mensaje de {self.nombre_completo} ({self.correo_electronico})"

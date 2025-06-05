@@ -1,7 +1,7 @@
 import re
 from django import forms
 from django.contrib.auth.models import User
-from .models import Empresa, Producto
+from .models import Empresa, Producto, Contacto
 from django.forms.widgets import DateInput, TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, CheckboxInput
 
 
@@ -205,3 +205,8 @@ class RetirarStockForm(forms.Form): # No hereda de BootstrapFormMixin si ya le p
             if cantidad > producto.stock:
                 self.add_error('cantidad', f'No hay suficiente stock. Solo quedan {producto.stock} unidades de {producto.nombre}.')
         return cleaned_data
+
+class ContactoForm(forms.ModelForm):
+    class Meta:
+        model = Contacto
+        fields = ['nombre_completo', 'correo_electronico', 'mensaje']
