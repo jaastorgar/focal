@@ -1,0 +1,114 @@
+:root {
+  --primary-purple: #4A008B;
+  --hover-dark-purple: #38006B;
+  --danger: #D32F2F;
+  --white: #FFFFFF;
+  --light-purple: #F3E8FF;
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --navbar-footer-bg: #2C0140;
+}
+
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+}
+
+body {
+  font-family: 'HankenGrotesk', sans-serif;
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+main.form-container {
+  max-width: 600px;
+  margin: 5rem auto;
+  padding: 2rem;
+  background-color: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1 {
+  font-family: 'InterTight', sans-serif;
+  font-size: 2rem;
+  color: var(--primary-purple);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+p {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-field {
+  margin: 1.5rem 0;
+}
+
+.form-field label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 0.8rem;
+  font-family: 'HankenGrotesk', sans-serif;
+  font-size: 1rem;
+  border: 1px solid var(--muted-text);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(123, 31, 162, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.btn-submit {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-family: 'InterTight', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+}
+
+.btn-cancelar {
+  background-color: var(--danger);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: 'InterTight', sans-serif;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-cancelar:hover {
+  background-color: #b71c1c;
+}

@@ -5,17 +5,26 @@ from django.contrib.auth.models import User
 # --- Opciones para el campo 'categoria' de Producto ---
 CATEGORIA_CHOICES = [
     ('Seleccione la categoría', 'Seleccione la categoría'),
-    ('Alimentos', 'Alimentos'),
+    ('Alimentos Secos', 'Alimentos Secos'),
+    ('Aliemntos Frescos', 'Alimentos Frescos'),
     ('Bebidas', 'Bebidas'),
-    ('Salud', 'Salud'),
-    ('Electrónica', 'Electrónica'),
+    ('Lacteos', 'Lácteos'),
+    ('Congelados', 'Congelados'),
+    ('Dulcería & Confitería', 'Dulcería & Confitería'),
+    ('Mascotas', 'Mascotas'),
     ('Belleza', 'Belleza'), 
-    ('Hogar', 'Hogar'),
-    ('Limpieza', 'Limpieza'),
+    ('Aseo del Hogar', 'Aseo del Hogar'),
+    ('Aseo Personal', 'Aseo Personal'),
+    ('Misceláneos', 'Misceláneos'),
+    ('Papelería & Oficina', 'Papelería & Oficina'),
+    ('Electrónica Menor', 'Electrónica Menor'),
+    ('Temporada / Festivos', 'Temporada / Festivos'),
+    ('Fiambres', 'Fiambres'),
 ]
 
 UNIDAD_MEDIDA_CHOICES = [
     ('Seleccione la unidad', 'Seleccione la unidad'),
+    ('Unidad', 'Unidad'),
     ('Litro', 'Litro'),
     ('Kilogramo', 'Kilogramo'),
     ('Gramo', 'Gramo'),
@@ -24,6 +33,8 @@ UNIDAD_MEDIDA_CHOICES = [
     ('Caja', 'Caja'),
     ('Paquete', 'Paquete'),
     ('Docena', 'Docena'),
+    ('Bolsa', 'Bolsa'),
+    ('Centímetro', 'Centímetro'),
 ]
 
 class PlanSuscripcion(models.Model):
@@ -102,6 +113,7 @@ class Producto(models.Model):
         default='Seleccione la categoría',            
         help_text="Seleccione la categoría del producto." 
     )
+    cantidad =models.PositiveIntegerField(default=0)
     unidad_medida = models.CharField(
         max_length=50,
         choices=UNIDAD_MEDIDA_CHOICES,

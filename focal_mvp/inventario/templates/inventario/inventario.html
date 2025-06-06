@@ -53,6 +53,7 @@
                     <th>SKU</th>
                     <th>Marca</th>
                     <th>Categoría</th>
+                    <th>Cantidad</th>
                     <th>Unidad</th>
                     <th>Stock</th>
                     <th>Próximo Vencimiento</th>
@@ -74,6 +75,7 @@
                         <td>{{ producto.sku }}</td>
                         <td>{{ producto.marca }}</td>
                         <td>{{ producto.categoria }}</td>
+                        <td>{{ producto.cantidad }}</td>
                         <td>{{ producto.unidad_medida }}</td>
                         <td>{{ producto.stock }}</td>
                         <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>

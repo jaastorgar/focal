@@ -192,7 +192,6 @@ def agregar_producto(request):
 
 @login_required
 def editar_producto(request, producto_id):
-    # Asegúrate de que el usuario logeado tenga una empresa asociada
     try:
         empresa_usuario = request.user.almacenero.empresa
     except (Almacenero.DoesNotExist, Empresa.DoesNotExist):
@@ -211,6 +210,45 @@ def editar_producto(request, producto_id):
     else:
         form = ProductoForm(instance=producto)
     return render(request, 'inventario/editar-producto.html', {'form': form, 'producto': producto})
+
+@login_required
+def editar_lote(request, lote_id):
+    lote = get_object_or_404(LoteProducto, id=lote_id)
+    producto = lote.producto
+
+    cantidad_original = lote.cantidad
+
+    if request.method == 'POST':
+        form = LoteProductoForm(request.POST, instance=lote)
+        if form.is_valid():
+            lote_actualizado = form.save(commit=False)
+            diferencia = lote_actualizado.cantidad - cantidad_original
+            lote_actualizado.save()
+            messages.success(request, "Lote actualizado correctamente.")
+            return redirect('detalle_producto', producto_id=producto.id)
+    else:
+        form = LoteProductoForm(instance=lote)
+
+    return render(request, 'inventario/editar_lote.html', {'form': form, 'lote': lote})
+
+@login_required
+def retirar_lote(request, lote_id):
+    lote = get_object_or_404(LoteProducto, id=lote_id)
+    producto = lote.producto
+
+    if request.method == 'POST':
+        cantidad = int(request.POST.get('cantidad', 0))
+        if cantidad <= 0:
+            messages.error(request, "La cantidad debe ser mayor a 0.")
+        elif cantidad > lote.cantidad:
+            messages.error(request, f"No puedes retirar más de {lote.cantidad} unidades.")
+        else:
+            lote.cantidad -= cantidad
+            lote.save()
+            messages.success(request, f"Se retiraron {cantidad} unidades del lote.")
+            return redirect('detalle_producto', producto_id=producto.id)
+
+    return render(request, 'inventario/retirar_lote.html', {'lote': lote})
 
 @login_required
 def eliminar_producto(request, producto_id):
@@ -234,57 +272,6 @@ def eliminar_producto(request, producto_id):
         'producto': producto,
         'lote': lote_proximo  # 👈 este será usado en la plantilla
     })
-
-@login_required
-def retirar_stock_view(request):
-    # Asegúrate de que el usuario logeado tenga una empresa asociada
-    try:
-        empresa_usuario = request.user.almacenero.empresa
-    except (Almacenero.DoesNotExist, Empresa.DoesNotExist):
-        messages.error(request, "Tu cuenta no está asociada a una empresa válida. No puedes retirar stock.")
-        return redirect('home')
-
-    if request.method == 'POST':
-        form = RetirarStockForm(request.POST)
-        if form.is_valid():
-            producto = form.cleaned_data['producto']
-            cantidad = form.cleaned_data['cantidad']
-
-            # Asegurarse de que el producto pertenezca a la empresa del usuario
-            if producto.empresa != empresa_usuario:
-                messages.error(request, "No tienes permiso para retirar stock de este producto.")
-                return redirect('retirar_stock')
-
-            if cantidad > producto.stock:
-                messages.error(request, f'No hay suficiente stock para retirar. Stock actual: {producto.stock}.')
-            else:
-                producto.stock -= cantidad
-                producto.save()
-                messages.success(request, f'Se retiraron {cantidad} unidades de "{producto.nombre}". Stock actual: {producto.stock}.')
-            return redirect('inventario') # Usar el nombre de la URL aquí
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'Error en {field}: {error}')
-            messages.error(request, 'Por favor, corrige los errores en el formulario.')
-    else:
-        initial_data = {}
-        producto_id = request.GET.get('producto')
-        if producto_id:
-            try:
-                # Solo precargar si el producto pertenece a la empresa del usuario
-                producto = Producto.objects.get(id=producto_id, empresa=empresa_usuario)
-                initial_data['producto'] = producto.id
-                messages.info(request, f'Producto "{producto.nombre}" seleccionado para retiro.')
-            except Producto.DoesNotExist:
-                messages.error(request, 'El producto especificado no existe o no pertenece a tu empresa.')
-        
-        # Filtra los productos en el queryset del formulario para que solo muestre los de la empresa del usuario
-        form = RetirarStockForm(initial=initial_data)
-        form.fields['producto'].queryset = Producto.objects.filter(empresa=empresa_usuario).order_by('nombre')
-
-
-    return render(request, 'inventario/retirar_stock.html', {'form': form})
 
 @login_required
 def agregar_lote_producto(request):

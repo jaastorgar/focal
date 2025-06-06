@@ -1,0 +1,142 @@
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #F3E8FF;
+  --hover-dark-purple: #38006B;
+  --hover-light-purple: #E0B3FF;
+  --danger: #D32F2F;
+  --white: #FFFFFF;
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --navbar-footer-bg: #2C0140;
+}
+
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+body {
+  font-family: 'HankenGrotesk', sans-serif;
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+}
+
+header, footer {
+  background-color: var(--navbar-footer-bg);
+  color: var(--white);
+  padding: 1rem 2rem;
+}
+
+header a, footer a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+main {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+h1 {
+  font-family: 'InterTight', sans-serif;
+  font-size: 2rem;
+  color: var(--primary-purple);
+  margin-bottom: 2rem;
+}
+
+.tabla-inventario {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--white);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabla-inventario thead {
+  background-color: var(--primary-purple);
+  color: var(--white);
+}
+
+.tabla-inventario th, .tabla-inventario td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.tabla-inventario tbody tr:nth-child(even) {
+  background-color: var(--light-purple);
+}
+
+.vencido {
+  background-color: #ffd6d6 !important;
+}
+
+.proximo-vencer {
+  background-color: #fff6cc !important;
+}
+
+.stock-bajo {
+  background-color: #ffeabf !important;
+}
+
+.btn-accion {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 0.4rem 0.8rem;
+  font-family: 'InterTight', sans-serif;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-right: 0.4rem;
+  transition: background-color 0.3s;
+}
+
+.btn-accion:hover {
+  background-color: var(--hover-dark-purple);
+}
+
+.btn-peligro {
+  background-color: var(--danger);
+}
+
+.btn-peligro:hover {
+  background-color: #b71c1c;
+}
+
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--navbar-footer-bg);
+  padding: 1rem 2rem;
+}
+
+.logo a {
+  font-family: 'InterTight', sans-serif;
+  font-size: 1.2rem;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.volver-inventario {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.volver-inventario:hover {
+  text-decoration: underline;
+}

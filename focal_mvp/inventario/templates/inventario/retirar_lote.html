@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Retirar Stock del Lote</title>
+  <link rel="stylesheet" href="{% static 'inventario/css/retirar_lote.css' %}">
+</head>
+<body>
+
+  <main class="form-container">
+    <h1>Retirar Stock</h1>
+
+    <p>Producto: <strong>{{ lote.producto.nombre }}</strong></p>
+    <p>Cantidad disponible en lote: <strong>{{ lote.cantidad }}</strong></p>
+    <p>Fecha de vencimiento: <strong>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</strong></p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="cantidad">Cantidad a retirar:</label>
+        <input type="number" name="cantidad" id="cantidad" min="1" max="{{ lote.cantidad }}" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">Confirmar Retiro</button>
+        <a href="{% url 'detalle_producto' lote.producto.id %}" class="btn-cancelar">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+</body>
+</html>

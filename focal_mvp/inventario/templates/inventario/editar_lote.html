@@ -3,12 +3,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Agregar Lote de Producto</title>
-  <link rel="stylesheet" href="{% static 'inventario/css/agregar-lote.css' %}">
+  <title>Editar Lote de Producto</title>
+  <link rel="stylesheet" href="{% static 'inventario/css/editar_lote.css' %}">
 </head>
 <body>
+
   <main class="form-container">
-    <h1>Registrar Lote de Producto</h1>
+    <h1>Editar Lote</h1>
+
     <form method="post">
       {% csrf_token %}
       <div class="form-grid">
@@ -22,11 +24,13 @@
           </div>
         {% endfor %}
       </div>
+
       <div class="form-actions">
-        <button type="submit" class="btn-submit">Guardar Lote</button>
-        <a href="{% url 'inventario' %}" class="btn-cancelar">Cancelar</a>
+        <button type="submit" class="btn-submit">Guardar Cambios</button>
+        <a href="{% url 'detalle_producto' lote.producto.id %}" class="btn-cancelar">Cancelar</a>
       </div>
     </form>
   </main>
+
 </body>
 </html>

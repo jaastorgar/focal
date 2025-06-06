@@ -162,6 +162,7 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             'sku': 'Sku (Código Único)',
             'marca': 'Marca',
             'categoria': 'Categoría',
+            'cantidad': 'Cantidad',
             'unidad_medida': 'Unidad de Medida',
             'stock': 'Stock Disponible',
             'precio_compra': 'Precio de Compra',
