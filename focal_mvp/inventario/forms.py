@@ -149,8 +149,8 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             'sku',
             'marca',
             'categoria',
+            'cantidad',
             'unidad_medida',
-            'stock',
             'precio_compra',
             'precio_venta',
         ]
@@ -164,7 +164,6 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             'categoria': 'Categoría',
             'cantidad': 'Cantidad',
             'unidad_medida': 'Unidad de Medida',
-            'stock': 'Stock Disponible',
             'precio_compra': 'Precio de Compra',
             'precio_venta': 'Precio de Venta',
         }

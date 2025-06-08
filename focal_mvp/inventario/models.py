@@ -120,7 +120,6 @@ class Producto(models.Model):
         default='Seleccione la unidad',
         help_text="Seleccione la unidad de medida del producto."
     )
-    stock = models.PositiveIntegerField(default=0)
     precio_compra = models.IntegerField(default=0)
     precio_venta = models.IntegerField(default=0)
     creado = models.DateTimeField(auto_now_add=True)

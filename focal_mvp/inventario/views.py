@@ -11,6 +11,7 @@ from django.contrib.auth import logout
 from datetime import date, timedelta
 from django.db.models import Q
 from django.db.models import Min
+from django.db import models
 import datetime
 import time
 
@@ -138,6 +139,7 @@ def inventario_view(request):
             Producto.objects
             .filter(empresa=empresa_usuario)
             .annotate(
+                stock_total=models.Sum('lotes__cantidad'),
                 proximo_vencimiento=Min('lotes__fecha_vencimiento')
             )
         )
@@ -279,16 +281,8 @@ def agregar_lote_producto(request):
         form = LoteProductoForm(request.POST)
         if form.is_valid():
             lote = form.save(commit=False)
-            producto = lote.producto
-
-            # Actualiza el stock real del producto
-            producto.stock += lote.cantidad
-            producto.save()
-
-            # Guarda el lote finalmente
-            lote.save()
-
-            messages.success(request, "Lote registrado y stock actualizado.")
+            lote.save()  # Guardar directamente el lote
+            messages.success(request, "Lote registrado correctamente.")
             return redirect('inventario')
     else:
         form = LoteProductoForm()
