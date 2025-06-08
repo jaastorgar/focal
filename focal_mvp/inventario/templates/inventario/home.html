@@ -37,7 +37,9 @@
             <div class="hero-content">
                 <h1>Bienvenido a FOCAL</h1>
                 <p>Tu plataforma integral para la gestión de inventario.</p>
+                
                 <a href="{% url 'inventario' %}" class="btn-cta">Ir al Inventario</a>
+                <a href="{% url 'historial_movimientos' %}" class="btn-cta" style="margin-top: 1rem;">Ver Historial de Movimientos</a>
             </div>
         </section>
     </main>
@@ -55,7 +57,6 @@
             menu.style.display = menu.style.display === "block" ? "none" : "block";
         }
 
-        // Cierra el menú si haces clic fuera
         document.addEventListener("click", function(event) {
             const button = document.querySelector(".dropdown-toggle");
             const menu = document.getElementById("dropdownMenu");

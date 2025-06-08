@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Historial de Movimientos | FOCAL</title>
+  <link rel="stylesheet" href="{% static 'inventario/css/historial_movimientos.css' %}">
+</head>
+<body>
+
+  <main class="contenedor">
+    <h1>Historial de Movimientos de Stock</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Lote ID</th>
+          <th>Cantidad Retirada</th>
+          <th>Fecha</th>
+          <th>Usuario</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in movimientos %}
+        <tr>
+          <td>{{ m.producto.nombre }}</td>
+          <td>{{ m.lote.id }}</td>
+          <td>{{ m.cantidad_retirada }}</td>
+          <td>{{ m.fecha|date:"d/m/Y H:i" }}</td>
+          <td>{{ m.usuario.username|default:"-" }}</td>
+          <td>{{ m.nota }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">No hay movimientos registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="{% url 'inventario' %}">← Volver al inventario</a>
+  </main>
+
+</body>
+</html>

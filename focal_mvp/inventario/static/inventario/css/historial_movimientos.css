@@ -1,0 +1,108 @@
+/* === Paleta FOCAL y Tipografías === */
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #F3E8FF;
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --white: #FFFFFF;
+  --navbar-footer-bg: #2C0140;
+  --hover-dark-purple: #38006B;
+  --hover-light-purple: #E0B3FF;
+  --danger: #D32F2F;
+  --input-border: #ccc;
+}
+
+/* === Tipografías Personalizadas === */
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
+}
+
+/* === Estilos Generales === */
+body {
+  background-color: var(--light-purple);
+  font-family: 'HankenGrotesk', sans-serif;
+  color: var(--dark-text);
+  margin: 0;
+  padding: 2rem;
+}
+
+h1 {
+  font-family: 'InterTight', sans-serif;
+  color: var(--primary-purple);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--white);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.95rem;
+}
+
+thead {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  font-family: 'InterTight', sans-serif;
+}
+
+thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  color: var(--muted-text);
+}
+
+tbody tr:hover {
+  background-color: var(--hover-light-purple);
+}
+
+td:nth-child(3) {
+  font-weight: bold;
+  color: var(--primary-purple);
+}
+
+td:nth-child(5) {
+  font-style: italic;
+  color: var(--muted-text);
+}
+
+/* Botón */
+a {
+  display: inline-block;
+  margin-top: 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+  font-family: 'InterTight', sans-serif;
+  color: var(--white);
+  background-color: var(--primary-purple);
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+a:hover {
+  background-color: var(--hover-dark-purple);
+}

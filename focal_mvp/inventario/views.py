@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.db import transaction
-from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, RetirarStockForm, ContactoForm, LoteProductoForm
-from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto, LoteProducto
+from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, ContactoForm, LoteProductoForm
+from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto, LoteProducto, MovimientoStock
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .decorators import plan_requerido, caracteristica_requerida
@@ -12,6 +12,7 @@ from datetime import date, timedelta
 from django.db.models import Q
 from django.db.models import Min
 from django.db import models
+from django.shortcuts import render
 import datetime
 import time
 
@@ -380,3 +381,11 @@ def contactanos(request):
     else:
         form = ContactoForm()
     return render(request, 'contacto.html', {'form': form})
+
+@login_required
+def historial_movimientos_view(request):
+    movimientos = MovimientoStock.objects.select_related('producto', 'lote').order_by('-fecha')
+
+    return render(request, 'inventario/historial_movimientos.html', {
+        'movimientos': movimientos
+    })

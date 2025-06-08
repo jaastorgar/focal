@@ -145,3 +145,31 @@ class LoteProducto(models.Model):
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.cantidad} un. - Vence: {self.fecha_vencimiento}"
+
+class MovimientoStock(models.Model):
+    lote = models.ForeignKey('LoteProducto', on_delete=models.CASCADE, related_name='movimientos')
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
+    cantidad_retirada = models.PositiveIntegerField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    nota = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.cantidad_retirada} unidades el {self.fecha.strftime('%d/%m/%Y %H:%M')}"
+
+class OrdenVenta(models.Model):
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    total_productos = models.PositiveIntegerField(default=0)
+    observacion = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"Venta #{self.id} - {self.fecha.strftime('%d/%m/%Y %H:%M')}"
+    
+class DetalleOrden(models.Model):
+    orden = models.ForeignKey(OrdenVenta, related_name='detalles', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.cantidad} x {self.producto.nombre}"
