@@ -1,0 +1,280 @@
+/* --- Variables de FOCAL --- */
+:root {
+    --primary-purple: #4A008B;
+    --secondary-purple: #7B1FA2;
+    --light-purple: #F3E8FF;
+    --dark-text: #343A40;
+    --muted-text: #555555;
+    --white: #FFFFFF;
+    --navbar-footer-bg: #2C0140;
+    --hover-dark-purple: #38006B;
+    --hover-light-purple: #E0B3FF;
+    --shadow-light: 0 4px 10px rgba(0,0,0,0.1); /* Sombra para tarjetas/formularios */
+    --danger-color: #dc3545; /* Rojo para errores y acciones peligrosas */
+    --danger-hover: #c82333; /* Rojo más oscuro al pasar el ratón */
+}
+
+/* --- Tipografías Personalizadas --- */
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+    font-weight: 300;
+}
+
+/* --- Estilos Generales del Body y Contenedores --- */
+body {
+    font-family: 'HankenGrotesk', sans-serif;
+    background-color: var(--light-purple);
+    color: var(--dark-text);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    max-width: 700px; /* Un poco más ancho para los detalles del producto */
+    margin: 3rem auto;
+    padding: 2.5rem;
+    flex-grow: 1;
+    background-color: var(--white);
+    border-radius: 10px;
+    box-shadow: var(--shadow-light);
+    text-align: center; /* Centrar el contenido general */
+}
+
+/* --- Header (Copiar de tus otros CSS para consistencia) --- */
+header {
+    background-color: var(--navbar-footer-bg);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header nav div:first-child a {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'InterTight', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    transition: color 0.3s;
+}
+
+header nav div:first-child a:hover {
+    color: var(--hover-light-purple);
+}
+
+header nav div:last-child a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 400;
+    margin-left: 1.5rem;
+    transition: color 0.3s;
+}
+
+header nav div:last-child a:hover {
+    color: var(--hover-light-purple);
+}
+
+
+/* --- Footer (Copiar de tus otros CSS para consistencia) --- */
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: var(--navbar-footer-bg);
+    color: var(--white);
+    margin-top: 4rem;
+    font-size: 0.9rem;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+/* --- Título de la Página --- */
+h1 {
+    font-family: 'InterTight', sans-serif;
+    color: var(--primary-purple);
+    font-size: 2.2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* --- Contenedor de Mensajes (Django Messages) --- */
+.messages-container {
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    font-family: 'HankenGrotesk', sans-serif;
+    font-size: 1rem;
+    line-height: 1.4;
+    border: 1px solid transparent;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-color: #bee5eb;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-color: #ffeeba;
+}
+
+.alert-error, .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+/* --- Detalles del Producto --- */
+main > p { /* Párrafo principal antes de los detalles */
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    color: var(--dark-text);
+}
+
+.product-details-card {
+    background-color: var(--light-purple);
+    border: 1px solid var(--secondary-purple);
+    border-radius: 8px;
+    padding: 1.8rem;
+    margin: 0 auto 2.5rem auto; /* Centrar y más espacio inferior */
+    text-align: left; /* Alinear el texto de los detalles a la izquierda */
+    max-width: 450px; /* Ancho específico para la tarjeta de detalles */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.product-details-card p {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    color: var(--dark-text);
+}
+
+.product-details-card p:last-child {
+    margin-bottom: 0;
+}
+
+.product-details-card strong {
+    color: var(--primary-purple);
+}
+
+.warning-text {
+    color: var(--danger-color);
+    font-weight: bold;
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+}
+
+/* --- Botones de Acción --- */
+.delete-form-actions {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center; /* Centrar los botones */
+    gap: 1.5rem; /* Espacio entre los botones */
+    flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+}
+
+.btn-accion {
+    background-color: var(--primary-purple);
+    color: var(--white);
+    padding: 0.8rem 1.8rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-family: 'InterTight', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-block;
+    white-space: nowrap; /* Evita que el texto del botón se rompa */
+}
+
+.btn-accion:hover {
+    background-color: var(--hover-dark-purple);
+    transform: translateY(-2px);
+}
+
+.btn-accion.btn-peligro {
+    background-color: var(--danger-color);
+}
+
+.btn-accion.btn-peligro:hover {
+    background-color: var(--danger-hover);
+}
+
+.btn-accion.btn-secundario {
+    background-color: var(--muted-text);
+    color: var(--white);
+}
+
+.btn-accion.btn-secundario:hover {
+    background-color: #4a545e;
+}
+
+/* --- Responsividad --- */
+@media (max-width: 768px) {
+    main {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+    }
+    h1 {
+        font-size: 1.8rem;
+    }
+    .delete-form-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .btn-accion {
+        width: 100%;
+        margin-right: 0;
+    }
+    header nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    header nav div:last-child {
+        margin-top: 1rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    header nav div:last-child a {
+        margin: 0.5rem 0;
+        width: 80%;
+        text-align: center;
+    }
+}

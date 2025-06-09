@@ -118,7 +118,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [ BASE_DIR / "landing" / "static", BASE_DIR / "inventario" / "static" ]
 
 # Para producción, necesitarás esto:
-# STATIC_ROOT = BASE_DIR / 'staticfiles' # Descomentar en producción
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

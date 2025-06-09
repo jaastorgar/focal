@@ -1,0 +1,398 @@
+/* --- Variables de Colores de la Empresa --- */
+:root {
+    --primary-purple: #4A008B; /* Morado Oscuro / Principal */
+    --secondary-purple: #7B1FA2; /* Morado Intermedio / Degradado */
+    --light-purple: #F3E8FF; /* Morado Claro / Accent */
+    --dark-text: #343A40; /* Gris Oscuro para texto principal */
+    --muted-text: #555555; /* Gris para texto secundario */
+    --white: #FFFFFF; /* Blanco */
+    --navbar-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer */
+    --hover-dark-purple: #38006B; /* Tono más oscuro para hover de botones */
+    --hover-light-purple: #E0B3FF; /* Morado claro para hover de enlaces */
+    --border-color: #dee2e6; /* Color de borde general */
+    --shadow-light: rgba(0, 0, 0, 0.05); /* Sombra suave */
+    --shadow-medium: rgba(0, 0, 0, 0.15); /* Sombra media para mayor profundidad */
+}
+
+/* --- Definiciones de fuentes personalizadas --- */
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* --- Estilos Generales --- */
+body {
+    font-family: 'HankenGrotesk', sans-serif;
+    line-height: 1.6;
+    color: var(--dark-text);
+    margin: 0;
+    background-color: var(--light-purple); /* Un fondo suave para toda la página */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+h1, h2, h3, .navbar-brand, .btn-primary, .plan-title {
+    font-family: 'InterTight', sans-serif;
+    font-weight: 700;
+    color: var(--dark-text);
+}
+
+p, a, li, label, input, textarea {
+    font-family: 'HankenGrotesk', sans-serif;
+    font-weight: 400;
+    color: var(--dark-text);
+}
+
+/* --- Navbar --- */
+.navbar {
+    background-color: var(--navbar-footer-bg);
+    padding: 1rem 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar-brand {
+    color: var(--light-purple) !important;
+    font-size: 1.8rem;
+    text-decoration: none;
+    padding-right: 20px; /* Espacio entre marca y enlaces */
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    list-style: none; /* Eliminar viñetas de lista */
+    padding: 0;
+    margin: 0;
+}
+
+.nav-link {
+    color: var(--light-purple) !important;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+    margin-left: 10px; /* Espacio entre enlaces */
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--hover-light-purple) !important;
+}
+
+.btn-navbar-primary,
+.btn-navbar-outline {
+    text-decoration: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.35rem;
+    font-family: 'InterTight', sans-serif;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    margin-left: 15px;
+    white-space: nowrap; /* Evita que el texto del botón se rompa */
+}
+
+.btn-navbar-primary {
+    background-color: var(--primary-purple);
+    color: var(--white) !important;
+    border: 1px solid var(--primary-purple);
+}
+
+.btn-navbar-primary:hover {
+    background-color: var(--hover-dark-purple);
+    border-color: var(--hover-dark-purple);
+}
+
+.btn-navbar-outline {
+    background-color: transparent;
+    color: var(--light-purple) !important;
+    border: 1px solid var(--light-purple);
+}
+
+.btn-navbar-outline:hover {
+    background-color: var(--light-purple);
+    color: var(--primary-purple) !important;
+}
+
+
+/* --- Planes Section --- */
+.plans-section {
+    padding: 8rem 0 5rem; /* Espacio para el navbar fijo y abajo */
+    text-align: center;
+    background-color: var(--white);
+    min-height: calc(100vh - 120px); /* Ajusta para que ocupe casi toda la altura */
+}
+
+.section-title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-purple);
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: var(--muted-text);
+    margin-bottom: 4rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.plan-card {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 4px 15px var(--shadow-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.plan-card.featured {
+    border-color: var(--primary-purple);
+    box-shadow: 0 6px 20px rgba(74, 0, 139, 0.2);
+    transform: scale(1.03);
+}
+
+.plan-card.featured:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(74, 0, 139, 0.3);
+}
+
+
+.plan-title {
+    font-size: 2rem;
+    color: var(--primary-purple);
+    margin-bottom: 1.5rem;
+}
+
+.plan-price {
+    font-family: 'InterTight', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 1.5rem;
+}
+
+.plan-price .period {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--muted-text);
+    margin-left: 5px;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    text-align: left;
+    width: 100%;
+    max-width: 250px; /* Ancho máximo para la lista de características */
+}
+
+.plan-features li {
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed var(--border-color);
+    color: var(--dark-text);
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+}
+
+.plan-features li:last-child {
+    border-bottom: none;
+}
+
+.plan-features li:before {
+    content: '✓'; /* Checkmark para características disponibles */
+    color: var(--primary-purple);
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.plan-features li.unavailable {
+    color: var(--muted-text);
+    text-decoration: line-through;
+}
+
+.plan-features li.unavailable:before {
+    content: '✗'; /* Crossmark para características no disponibles */
+    color: #dc3545; /* Rojo para no disponible */
+}
+
+
+.btn-primary {
+    display: inline-block;
+    background-color: var(--primary-purple);
+    color: var(--white) !important;
+    padding: 1rem 2.5rem;
+    border-radius: 0.35rem;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: auto; /* Empuja el botón hacia abajo si las características son de diferentes alturas */
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-dark-purple);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:active {
+    background-color: #2b0051; /* Tono aún más oscuro al hacer clic */
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Footer --- */
+.footer {
+    background-color: var(--navbar-footer-bg);
+    color: var(--light-purple);
+    padding: 2.5rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.footer .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.footer-links {
+    margin-top: 1rem;
+}
+
+.footer-links a {
+    color: var(--hover-light-purple);
+    text-decoration: none;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--white);
+}
+
+/* --- Media Queries para Responsividad --- */
+@media (max-width: 768px) {
+    .navbar .container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .nav-link, .btn-navbar-primary, .btn-navbar-outline {
+        margin-left: 0;
+        margin-bottom: 0.5rem;
+        width: 100%;
+        text-align: center;
+    }
+
+    .plans-section {
+        padding: 6rem 0 3rem; /* Ajustar padding para móviles */
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+    }
+
+    .plan-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .plan-title {
+        font-size: 1.8rem;
+    }
+
+    .plan-price {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-title {
+        font-size: 2rem;
+    }
+    .plan-price {
+        font-size: 2.5rem;
+    }
+    .btn-primary {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+}
