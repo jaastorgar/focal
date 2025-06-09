@@ -18,8 +18,8 @@ import time
 
 def vista_registro(request):
     if request.method == 'POST':
-        almacenero_form = AlmaceneroForm(request.POST)
-        empresa_form = EmpresaForm(request.POST)
+        almacenero_form = AlmaceneroForm(request.POST, prefix='almacenero')
+        empresa_form = EmpresaForm(request.POST, prefix='empresa')
 
         if almacenero_form.is_valid() and empresa_form.is_valid():
             with transaction.atomic():
@@ -32,7 +32,7 @@ def vista_registro(request):
                 # Crear empresa
                 empresa = Empresa.objects.create(
                     nombre_almacen=empresa_form.cleaned_data['nombre_almacen'],
-                    rut=empresa_form.cleaned_data['rut'], # Corregido: 'rut' a 'rut_empresa'
+                    rut=empresa_form.cleaned_data['rut'],
                     direccion_tributaria=empresa_form.cleaned_data['direccion_tributaria'],
                     comuna=empresa_form.cleaned_data['comuna'],
                     run_representante=empresa_form.cleaned_data['run_representante'],
@@ -75,8 +75,8 @@ def vista_registro(request):
             # No es necesario agregar mensajes explícitos aquí, Django se encarga
             pass
     else:
-        almacenero_form = AlmaceneroForm()
-        empresa_form = EmpresaForm()
+        almacenero_form = AlmaceneroForm(prefix='almacenero')
+        empresa_form = EmpresaForm(prefix='empresa')
 
     return render(request, 'inventario/registro.html', {
         'almacenero_form': almacenero_form,

@@ -5,20 +5,16 @@ from .models import Empresa, Producto, Contacto, LoteProducto
 from django.forms.widgets import DateInput, TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, CheckboxInput
 
 
-# Función de validación de RUN/RUT
+# Validación de RUN/RUT
 def validar_run_rut(run_rut):
     run_rut = str(run_rut).upper().strip()
     run_rut = re.sub(r'[\.-]', '', run_rut)
-
     if not run_rut or len(run_rut) < 2:
         return False
-
     cuerpo = run_rut[:-1]
     dv = run_rut[-1]
-
     if not cuerpo.isdigit():
         return False
-
     suma = 0
     multiplo = 2
     for d in reversed(cuerpo):
@@ -26,19 +22,16 @@ def validar_run_rut(run_rut):
         multiplo += 1
         if multiplo == 8:
             multiplo = 2
-    
     dv_calculado = 11 - (suma % 11)
-    
     if dv_calculado == 11:
         dv_esperado = '0'
     elif dv_calculado == 10:
         dv_esperado = 'K'
     else:
         dv_esperado = str(dv_calculado)
-    
     return dv_esperado == dv
 
-# --- NUEVA FUNCIÓN DE VALIDACIÓN DE CONTRASEÑA ---
+# Validación personalizada para contraseñas seguras
 def validar_password_segura(password):
     if not (8 <= len(password) <= 12):
         return False
@@ -52,19 +45,15 @@ def validar_password_segura(password):
         return False
     return True
 
-
-# --- CLASE PARA WIDGETS CON ESTILO ---
 class BootstrapFormMixin(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             if isinstance(field.widget, (TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, DateInput)):
-                if not isinstance(field.widget, PasswordInput) or 'class' not in field.widget.attrs:
-                    field.widget.attrs['class'] = 'form-control'
+                field.widget.attrs.setdefault('class', 'form-control')
             elif isinstance(field.widget, CheckboxInput):
-                field.widget.attrs['class'] = 'form-check-input'
+                field.widget.attrs.setdefault('class', 'form-check-input')
 
-# --- FORMULARIO DE ALMACENERO CON LAS VALIDACIONES NECESARIAS ---
 class AlmaceneroForm(BootstrapFormMixin, forms.ModelForm):
     username = forms.CharField(label="Nombre de usuario", widget=forms.TextInput(attrs={'placeholder': 'Ej: focal'}))
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'placeholder': 'Mínimo 8 caracteres'}))
@@ -95,7 +84,6 @@ class AlmaceneroForm(BootstrapFormMixin, forms.ModelForm):
         cleaned_data = super().clean()
         p1 = cleaned_data.get("password")
         p2 = cleaned_data.get("confirm_password")
-
         if p1 and p2:
             if p1 != p2:
                 self.add_error("confirm_password", "Las contraseñas no coinciden.")
