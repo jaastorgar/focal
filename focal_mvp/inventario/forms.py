@@ -38,29 +38,37 @@ def validar_run_rut(run_rut):
     
     return dv_esperado == dv
 
+# --- NUEVA FUNCIÓN DE VALIDACIÓN DE CONTRASEÑA ---
+def validar_password_segura(password):
+    if not (8 <= len(password) <= 12):
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[a-z]", password):
+        return False
+    if not re.search(r"[0-9]", password):
+        return False
+    if not re.search(r"[_\W]", password):
+        return False
+    return True
 
-# Clase para aplicar 'form-control' a los widgets
+
+# --- CLASE PARA WIDGETS CON ESTILO ---
 class BootstrapFormMixin(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            # Aplicar 'form-control' a la mayoría de los widgets de texto/número/select
             if isinstance(field.widget, (TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, DateInput)):
-                # Si no es un PasswordInput o si lo es y no tiene ya una clase asignada (para evitar sobreescribir attrs personalizados)
                 if not isinstance(field.widget, PasswordInput) or 'class' not in field.widget.attrs:
                     field.widget.attrs['class'] = 'form-control'
-            # Aplicar 'form-check-input' a checkboxes
             elif isinstance(field.widget, CheckboxInput):
                 field.widget.attrs['class'] = 'form-check-input'
 
-
+# --- FORMULARIO DE ALMACENERO CON LAS VALIDACIONES NECESARIAS ---
 class AlmaceneroForm(BootstrapFormMixin, forms.ModelForm):
-    username = forms.CharField(label="Nombre de usuario",
-                               widget=forms.TextInput(attrs={'placeholder': 'Ej: usuario.focal'}))
-    password = forms.CharField(label="Contraseña",
-                               widget=forms.PasswordInput(attrs={'placeholder': 'Mínimo 8 caracteres'}))
-    confirm_password = forms.CharField(label="Confirmar contraseña",
-                                       widget=forms.PasswordInput(attrs={'placeholder': 'Repita su contraseña'}))
+    username = forms.CharField(label="Nombre de usuario", widget=forms.TextInput(attrs={'placeholder': 'Ej: focal'}))
+    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'placeholder': 'Mínimo 8 caracteres'}))
+    confirm_password = forms.CharField(label="Confirmar contraseña", widget=forms.PasswordInput(attrs={'placeholder': 'Repita su contraseña'}))
 
     nombre = forms.CharField(label="Primer nombre")
     snombre = forms.CharField(label="Segundo nombre", required=False)
@@ -74,24 +82,25 @@ class AlmaceneroForm(BootstrapFormMixin, forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'confirm_password') # Estos son los campos del modelo User
+        fields = ('username', 'password', 'confirm_password')
 
-    # Validación para el campo 'run' del AlmaceneroForm
     def clean_run(self):
         run = self.cleaned_data['run']
         run_limpio = re.sub(r'[\.-]', '', run).upper().strip()
-
         if not validar_run_rut(run_limpio):
-            raise forms.ValidationError("El RUN es inválido. Por favor, verifique el formato y el dígito verificador.")
-        
+            raise forms.ValidationError("El RUN es inválido.")
         return run_limpio
 
     def clean(self):
         cleaned_data = super().clean()
         p1 = cleaned_data.get("password")
         p2 = cleaned_data.get("confirm_password")
-        if p1 and p2 and p1 != p2:
-            self.add_error("confirm_password", "Las contraseñas no coinciden.")
+
+        if p1 and p2:
+            if p1 != p2:
+                self.add_error("confirm_password", "Las contraseñas no coinciden.")
+            elif not validar_password_segura(p1):
+                self.add_error("password", "La contraseña debe tener entre 8 y 12 caracteres, incluyendo al menos una mayúscula, una minúscula, un número y un símbolo.")
         return cleaned_data
 
 class EmpresaForm(BootstrapFormMixin, forms.ModelForm):
