@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import status
-from inventario.models import LoteProducto, MovimientoStock
+from inventario.models import MovimientoStock, Producto, LoteProducto
 from .serializers import DescontarStockSerializer
+from django.db import models
 
 class DescontarStockView(APIView):
     """
@@ -53,3 +55,27 @@ class DescontarStockView(APIView):
 
         # Si hay errores de validación
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def dashboard_metrics_api(request):
+    productos = Producto.objects.all()
+    data = []
+
+    for producto in productos:
+        stock = producto.lotes.aggregate(total=models.Sum('cantidad'))['total'] or 0
+        data.append({
+            'nombre': producto.nombre,
+            'stock': stock
+        })
+
+    total_productos = productos.count()
+    total_stock = sum(item['stock'] for item in data)
+    total_lotes = LoteProducto.objects.count()
+
+    return JsonResponse({
+        'data': data,
+        'totales': {
+            'productos': total_productos,
+            'stock': total_stock,
+            'lotes': total_lotes
+        }
+    })

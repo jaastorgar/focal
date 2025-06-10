@@ -2,69 +2,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio | FOCAL</title>
-    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
+  <meta charset="UTF-8">
+  <title>Dashboard | FOCAL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a href="#" class="logo">FOCAL</a>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="{% url 'inventario' %}">Inventario</a></li>
-                    {% if user.is_authenticated %}
-                        <li class="dropdown">
-                            <button class="dropdown-toggle" onclick="toggleDropdown()">Hola, {{ user.username }} ▼</button>
-                            <ul class="dropdown-menu" id="dropdownMenu">
-                                <li><a href="{% url 'perfil' %}">Perfil</a></li>
-                                <!-- Puedes añadir más opciones aquí -->
-                            </ul>
-                        </li>
-                        <li><a href="{% url 'logout' %}" class="btn-logout">Cerrar Sesión</a></li>
-                    {% else %}
-                        <li><a href="{% url 'login' %}" class="btn-login">Iniciar Sesión</a></li>
-                        <li><a href="{% url 'registro' %}" class="btn-register">Registrarse</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    </header>
+  <nav class="navbar">
+    <div class="navbar-brand">FOCAL</div>
+    <ul class="navbar-menu">
+      <li><a href="{% url 'inventario' %}" class="btn-accion">Inventario</a></li>
+      <li><a href="#">Reportes</a></li>
+      <li><a href="#">Cerrar sesión</a></li>
+    </ul>
+  </nav>
 
-    <main class="main-content">
-        <section class="hero-section">
-            <div class="hero-content">
-                <h1>Bienvenido a FOCAL</h1>
-                <p>Tu plataforma integral para la gestión de inventario.</p>
-                
-                <a href="{% url 'inventario' %}" class="btn-cta">Ir al Inventario</a>
-                <a href="{% url 'historial_movimientos' %}" class="btn-cta" style="margin-top: 1rem;">Ver Historial de Movimientos</a>
-            </div>
-        </section>
-    </main>
+  <main class="dashboard-container">
+    <h1 class="dashboard-title">Resumen General</h1>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 FOCAL. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+    <section class="dashboard-metrics">
+      <div class="metric-card">
+        <h2>Productos Totales</h2>
+        <p id="total-productos">0</p>
+      </div>
+      <div class="metric-card">
+        <h2>Stock Disponible</h2>
+        <p id="stock-total">0</p>
+      </div>
+      <div class="metric-card">
+        <h2>Lotes Activos</h2>
+        <p id="lotes-activos">0</p>
+      </div>
+    </section>
 
-    <!-- JavaScript para menú con clic -->
-    <script>
-        function toggleDropdown() {
-            const menu = document.getElementById("dropdownMenu");
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
-        }
+    <section class="dashboard-graphs">
+      <h2 class="section-title">Distribución de Stock por Categoría</h2>
+      <canvas id="graficoStockPorCategoria"></canvas>
+    </section>
+  </main>
 
-        document.addEventListener("click", function(event) {
-            const button = document.querySelector(".dropdown-toggle");
-            const menu = document.getElementById("dropdownMenu");
-            if (!button.contains(event.target) && !menu.contains(event.target)) {
-                menu.style.display = "none";
-            }
-        });
-    </script>
+  <!-- JS del Dashboard -->
+  <script src="{% static 'inventario/js/home.js' %}"></script>
 </body>
 </html>

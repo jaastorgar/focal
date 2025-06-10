@@ -10,9 +10,10 @@ from .decorators import plan_requerido, caracteristica_requerida
 from django.contrib.auth import logout
 from datetime import date, timedelta
 from django.db.models import Q
-from django.db.models import Min
+from django.db.models import Min, Sum
 from django.db import models
 from django.shortcuts import render
+from django.http import JsonResponse
 import datetime
 import time
 
@@ -389,3 +390,16 @@ def historial_movimientos_view(request):
     return render(request, 'inventario/historial_movimientos.html', {
         'movimientos': movimientos
     })
+    
+def inventario_dashboard_data(request):
+    productos = Producto.objects.all()
+    datos = []
+
+    for producto in productos:
+        total_stock = LoteProducto.objects.filter(producto=producto).aggregate(total=Sum('cantidad'))['total'] or 0
+        datos.append({
+            'nombre': producto.nombre,
+            'stock': total_stock
+        })
+
+    return JsonResponse({'data': datos})
