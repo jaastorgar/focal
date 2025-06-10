@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'inventario/css/inventario.css' %}">
 </head>
 <body>
@@ -55,6 +56,8 @@
                     <th>Categoría</th>
                     <th>Cantidad</th>
                     <th>Unidad</th>
+                    <th>Precio Compra</th>
+                    <th>Precio Venta</th>
                     <th>Stock</th>
                     <th>Próximo Vencimiento</th>
                     <th>Acciones</th>
@@ -77,6 +80,8 @@
                         <td>{{ producto.categoria }}</td>
                         <td>{{ producto.cantidad }}</td>
                         <td>{{ producto.unidad_medida }}</td>
+                        <td>${{ producto.precio_compra }}</td>
+                        <td>${{ producto.precio_venta }}</td>
                         <td class="{% if producto.stock_total <= 5 %}stock-bajo{% endif %}">
                             {{ producto.stock_total|default:"0" }}
                         </td>
