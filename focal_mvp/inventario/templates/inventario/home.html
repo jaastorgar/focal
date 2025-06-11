@@ -14,8 +14,12 @@
     <div class="navbar-brand">FOCAL</div>
     <ul class="navbar-menu">
       <li><a href="{% url 'inventario' %}" class="btn-accion">Inventario</a></li>
-      <li><a href="#">Reportes</a></li>
-      <li><a href="#">Cerrar sesión</a></li>
+      <li>
+        <a href="#" class="disabled-link" onClick="return false;" title="Disponible próximamente">
+          Reportes
+        </a>
+      </li>
+      <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
     </ul>
   </nav>
 
