@@ -177,7 +177,7 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             raise forms.ValidationError("El precio no puede ser negativo.")
         return precio
     
-class RetirarStockForm(forms.Form): # No hereda de BootstrapFormMixin si ya le pones clases directamente
+class RetirarStockForm(forms.Form): 
     producto = forms.ModelChoiceField(
         queryset=Producto.objects.all().order_by('nombre'),
         label="Seleccionar Producto",

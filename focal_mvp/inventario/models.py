@@ -24,17 +24,17 @@ CATEGORIA_CHOICES = [
 
 UNIDAD_MEDIDA_CHOICES = [
     ('Seleccione la unidad', 'Seleccione la unidad'),
-    ('Unidad', 'Unidad'),
-    ('Litro', 'Litro'),
-    ('Kilogramo', 'Kilogramo'),
-    ('Gramo', 'Gramo'),
-    ('Mililitro', 'Mililitro'),
-    ('Centímetro', 'Centímetro'),
-    ('Caja', 'Caja'),
-    ('Paquete', 'Paquete'),
-    ('Docena', 'Docena'),
-    ('Bolsa', 'Bolsa'),
-    ('Centímetro', 'Centímetro'),
+    ('Unidad', 'und'),
+    ('Litro', 'lt'),
+    ('Kilogramo', 'kg'),
+    ('Gramo', 'gm'),
+    ('Milimetro', 'ml'),
+    ('Centímetro', 'cm'),
+    ('Caja', 'cj'),
+    ('Paquete', 'pqt'),
+    ('Docena', 'dz'),
+    ('Bolsa', 'bs'),
+    ('Centimetro cúbico', 'cc'),
 ]
 
 class PlanSuscripcion(models.Model):

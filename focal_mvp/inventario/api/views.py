@@ -5,13 +5,15 @@ from rest_framework import status
 from inventario.models import MovimientoStock, Producto, LoteProducto
 from .serializers import DescontarStockSerializer
 from django.db import models
+from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
 
 class DescontarStockView(APIView):
     """
     API que descuenta stock por lote y continúa con otros si no alcanza.
     Registra cada retiro en el historial MovimientoStock.
     """
-
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = DescontarStockSerializer(data=request.data)
         if serializer.is_valid():
@@ -56,6 +58,7 @@ class DescontarStockView(APIView):
         # Si hay errores de validación
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@login_required
 def dashboard_metrics_api(request):
     productos = Producto.objects.all()
     data = []
