@@ -1,62 +1,81 @@
-from rest_framework.views import APIView
 from django.http import JsonResponse
-from rest_framework.response import Response
-from rest_framework import status
 from inventario.models import MovimientoStock, Producto, LoteProducto
-from .serializers import DescontarStockSerializer
 from django.db import models
 from django.contrib.auth.decorators import login_required
-from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from inventario.forms import ArchivoVentasForm
+from inventario.models import Producto, MovimientoStock
+import pandas as pd
 
-class DescontarStockView(APIView):
-    """
-    API que descuenta stock por lote y continúa con otros si no alcanza.
-    Registra cada retiro en el historial MovimientoStock.
-    """
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        serializer = DescontarStockSerializer(data=request.data)
-        if serializer.is_valid():
-            cantidad = serializer.validated_data['cantidad']
-            lotes = serializer.validated_data['lotes_ordenados']
+@login_required
+def procesar_ventas_archivo(request):
+    if request.method == 'POST':
+        form = ArchivoVentasForm(request.POST, request.FILES)
+        if form.is_valid():
+            archivo = form.cleaned_data['archivo']
+            extension = archivo.name.split('.')[-1]
 
-            cantidad_restante = cantidad
-            movimientos = []
+            # Leer archivo
+            try:
+                if extension == 'csv':
+                    df = pd.read_csv(archivo)
+                elif extension in ['xlsx', 'xls']:
+                    df = pd.read_excel(archivo)
+                else:
+                    messages.error(request, "Formato no válido. Usa .csv o .xlsx")
+                    return redirect('procesar_ventas_archivo')
+            except Exception as e:
+                messages.error(request, f"Error al leer el archivo: {e}")
+                return redirect('procesar_ventas_archivo')
 
-            for lote in lotes:
-                if cantidad_restante == 0:
-                    break
+            errores = []
 
-                retirar = min(lote.cantidad, cantidad_restante)
-                lote.cantidad -= retirar
-                lote.save()
+            for _, fila in df.iterrows():
+                sku = str(fila.get('sku')).strip()
+                cantidad = int(fila.get('cantidad', 0))
 
-                # Registro del movimiento
-                MovimientoStock.objects.create(
-                    lote=lote,
-                    producto=lote.producto,
-                    cantidad_retirada=retirar,
-                    usuario=request.user if request.user.is_authenticated else None,
-                    nota="Retiro automático por API"
-                )
+                try:
+                    producto = Producto.objects.get(sku=sku)
+                except Producto.DoesNotExist:
+                    errores.append(f"Producto con SKU {sku} no encontrado.")
+                    continue
 
-                movimientos.append({
-                    "lote_id": lote.id,
-                    "producto": lote.producto.nombre,
-                    "retirado": retirar,
-                    "stock_restante_en_lote": lote.cantidad
-                })
+                lotes = producto.lotes.filter(cantidad__gt=0).order_by('fecha_vencimiento')
+                cantidad_restante = cantidad
 
-                cantidad_restante -= retirar
+                for lote in lotes:
+                    if cantidad_restante <= 0:
+                        break
 
-            return Response({
-                "success": True,
-                "mensaje": f"Se retiraron {cantidad} unidades del producto '{lotes[0].producto.nombre}'.",
-                "lotes_afectados": movimientos
-            }, status=status.HTTP_200_OK)
+                    retirar = min(lote.cantidad, cantidad_restante)
+                    lote.cantidad -= retirar
+                    lote.save()
 
-        # Si hay errores de validación
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    MovimientoStock.objects.create(
+                        lote=lote,
+                        producto=producto,
+                        cantidad_retirada=retirar,
+                        usuario=request.user,
+                        nota="Descuento automático por carga de archivo"
+                    )
+
+                    cantidad_restante -= retirar
+
+                if cantidad_restante > 0:
+                    errores.append(f"Stock insuficiente para SKU {sku}. Faltaron {cantidad_restante} unidades.")
+
+            if errores:
+                for err in errores:
+                    messages.warning(request, err)
+            else:
+                messages.success(request, "Descuento de productos completado correctamente.")
+
+            return redirect('inventario')
+    else:
+        form = ArchivoVentasForm()
+
+    return render(request, 'inventario/procesar_ventas_archivo.html', {'form': form})
 
 @login_required
 def dashboard_metrics_api(request):

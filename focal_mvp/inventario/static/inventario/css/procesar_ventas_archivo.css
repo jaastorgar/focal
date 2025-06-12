@@ -1,0 +1,106 @@
+/* === Variables FOCAL === */
+:root {
+    --primary-purple: #4A008B;
+    --secondary-purple: #7B1FA2;
+    --light-purple: #F3E8FF;
+    --dark-text: #343A40;
+    --muted-text: #555555;
+    --white: #FFFFFF;
+    --navbar-footer-bg: #2C0140;
+    --hover-dark-purple: #38006B;
+    --hover-light-purple: #E0B3FF;
+    --shadow-light: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* === Tipografías === */
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+    font-weight: 300;
+}
+
+/* === Estilos generales === */
+body {
+    font-family: 'HankenGrotesk', sans-serif;
+    background-color: var(--light-purple);
+    color: var(--dark-text);
+    margin: 0;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h2 {
+    font-family: 'InterTight', sans-serif;
+    color: var(--primary-purple);
+    margin-bottom: 2rem;
+}
+
+/* === Formulario === */
+form {
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+    width: 100%;
+    max-width: 500px;
+}
+
+form p {
+    margin-bottom: 1.5rem;
+}
+
+input[type="file"] {
+    width: 100%;
+    font-family: 'HankenGrotesk', sans-serif;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+button[type="submit"] {
+    background-color: var(--primary-purple);
+    color: var(--white);
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'InterTight', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--hover-dark-purple);
+}
+
+/* === Mensajes === */
+ul {
+    margin-top: 2rem;
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    max-width: 500px;
+}
+
+li {
+    background-color: #ffe0b2;
+    border-left: 5px solid #f57c00;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}

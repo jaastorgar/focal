@@ -213,3 +213,6 @@ class LoteProductoForm(forms.ModelForm):
         widgets = {
             'fecha_vencimiento': forms.DateInput(attrs={'type': 'date'}),
         }
+        
+class ArchivoVentasForm(forms.Form):
+    archivo = forms.FileField(label="Archivo de ventas (.csv o .xlsx)")
