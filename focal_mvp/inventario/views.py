@@ -10,10 +10,11 @@ from .decorators import plan_requerido, caracteristica_requerida
 from django.contrib.auth import logout
 from datetime import date, timedelta
 from django.db.models import Q
-from django.db.models import Min, Sum
+from django.db.models import Min
 from django.db import models
 from django.shortcuts import render
-from django.http import JsonResponse
+from openpyxl import Workbook
+from django.http import HttpResponse
 import datetime
 import time
 
@@ -390,3 +391,24 @@ def historial_movimientos_view(request):
     return render(request, 'inventario/historial_movimientos.html', {
         'movimientos': movimientos
     })
+
+@login_required
+def descargar_plantilla_ventas(request):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Plantilla Ventas"
+
+    # Encabezados
+    ws.append(['sku', 'cantidad'])
+
+    # Productos del usuario
+    productos = Producto.objects.filter(empresa=request.user.almacenero.empresa)
+
+    for producto in productos:
+        ws.append([producto.sku, ''])  # Columna vacía para ventas
+
+    # Respuesta HTTP con archivo .xlsx
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=plantilla_ventas.xlsx'
+    wb.save(response)
+    return response

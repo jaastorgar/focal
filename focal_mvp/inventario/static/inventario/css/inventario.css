@@ -397,3 +397,17 @@ h1 {
   color: var(--danger);
   font-weight: bold;
 }
+
+.btn-descargar {
+  background-color: var(--primary-purple);
+  color: white;
+  padding: 10px 7px;
+  border-radius: 8px;
+  font-family: 'HankenGrotesk';
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-descargar:hover {
+  background-color: var(--hover-dark-purple);
+}

@@ -31,15 +31,18 @@ def procesar_ventas_archivo(request):
 
             errores = []
 
-            for _, fila in df.iterrows():
+            for idx, fila in df.iterrows():
                 sku = str(fila.get('sku')).strip()
                 cantidad = int(fila.get('cantidad', 0))
 
                 try:
                     producto = Producto.objects.get(sku=sku)
                 except Producto.DoesNotExist:
-                    errores.append(f"Producto con SKU {sku} no encontrado.")
+                    errores.append(f"Fila {idx+2}: Producto con SKU {sku} no encontrado.")
                     continue
+
+                # 👉 Añadir nombre del producto al DataFrame (en memoria)
+                df.at[idx, 'nombre_producto'] = producto.nombre
 
                 lotes = producto.lotes.filter(cantidad__gt=0).order_by('fecha_vencimiento')
                 cantidad_restante = cantidad
@@ -63,7 +66,7 @@ def procesar_ventas_archivo(request):
                     cantidad_restante -= retirar
 
                 if cantidad_restante > 0:
-                    errores.append(f"Stock insuficiente para SKU {sku}. Faltaron {cantidad_restante} unidades.")
+                    errores.append(f"Fila {idx+2}: Stock insuficiente para SKU {sku}. Faltaron {cantidad_restante} unidades.")
 
             if errores:
                 for err in errores:
