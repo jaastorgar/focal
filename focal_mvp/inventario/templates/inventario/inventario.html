@@ -19,7 +19,7 @@
             <a href="{% url 'home' %}">Inicio</a>
             <a href="{% url 'agregar_producto' %}" class="btn-accion">Agregar Producto</a>
             <a href="{% url 'agregar_lote' %}" class="btn-accion">Registrar Lote</a>
-            <a href="{% url 'descargar_plantilla' %}" class="btn-descargar">Descargar Plantilla de Ventas</a>
+            <a href="{% url 'descargar_plantilla' %}" class="btn-accion">Descargar Plantilla de Ventas</a>
             <a href="{% url 'procesar_ventas_archivo' %}" class="btn-accion">Descontar Productos</a>
         </div>
     </nav>
@@ -39,11 +39,9 @@
     </div>
 
     {% if messages %}
-        <div class="messages-container">
+        <div id="mensajes">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
+                <div class="alert {{ message.tags }}">{{ message }}</div>
             {% endfor %}
         </div>
     {% endif %}
@@ -72,7 +70,7 @@
                             class="vencido"
                         {% elif producto.proximo_vencimiento and producto.proximo_vencimiento|date:"U" <= hoy_mas_15dias %}
                             class="proximo-vencer"
-                        {% elif producto.stock and producto.stock <= 5 %}
+                        {% elif producto.stock_total and producto.stock_total <= 5 %}
                             class="stock-bajo"
                         {% endif %}
                     >
@@ -84,7 +82,7 @@
                         <td>{{ producto.unidad_medida }}</td>
                         <td>${{ producto.precio_compra }}</td>
                         <td>${{ producto.precio_venta }}</td>
-                        <td class="{% if producto.stock_total <= 5 %}stock-bajo{% endif %}">
+                        <td>
                             {{ producto.stock_total|default:"0" }}
                         </td>
                         <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
@@ -105,6 +103,8 @@
 <footer>
     © 2025 FOCAL. Todos los derechos reservados.
 </footer>
+
+<script src="{% static 'inventario/js/inventario.js' %}"></script>
 
 </body>
 </html>

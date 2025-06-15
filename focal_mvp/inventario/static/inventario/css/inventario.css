@@ -285,7 +285,6 @@ h1 {
     transition: background-color 0.3s ease, transform 0.2s ease;
     font-family: 'InterTight', sans-serif;
     font-weight: 700;
-    /* margin-right: 0.5rem; <-- Esto se eliminó y ahora lo maneja el 'gap' del flexbox */
     display: inline-block; /* Se mantiene para que los estilos de padding/margin funcionen bien */
     white-space: nowrap; /* Evita que el texto del botón se rompa */
     flex-shrink: 0; /* Evita que los botones se encojan si hay poco espacio */
@@ -394,20 +393,44 @@ h1 {
 }
 
 .stock-bajo {
-  color: var(--danger);
-  font-weight: bold;
+  background-color: var(--stock-low) !important;
 }
 
-.btn-descargar {
-  background-color: var(--primary-purple);
-  color: white;
-  padding: 10px 7px;
+/* ---- Estilos para mensajes flash ---- */
+#mensajes {
+  margin: 20px auto;
+  max-width: 900px;
+  padding: 0 20px;
+}
+
+.alert {
+  padding: 14px 20px;
   border-radius: 8px;
-  font-family: 'HankenGrotesk';
-  text-decoration: none;
-  transition: background 0.2s;
+  font-family: 'HankenGrotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-light);
+  transition: all 0.4s ease;
 }
 
-.btn-descargar:hover {
-  background-color: var(--hover-dark-purple);
+/* Éxito */
+.alert.success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-left: 5px solid #0f5132;
+}
+
+/* Error */
+.alert.error {
+  background-color: #f8d7da;
+  color: #842029;
+  border-left: 5px solid #842029;
+}
+
+/* Advertencia */
+.alert.warning {
+  background-color: #fff3cd;
+  color: #664d03;
+  border-left: 5px solid #664d03;
 }
