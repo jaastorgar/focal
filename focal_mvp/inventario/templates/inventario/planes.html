@@ -2,78 +2,42 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuestros Planes | FOCAL</title>
-    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/planes.css' %}">
+  <meta charset="UTF-8">
+  <title>Planes de Suscripción | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/planes.css' %}">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a class="navbar-brand" href="/">FOCAL</a>
-            <nav class="navbar-nav">
-                <a class="nav-link" href="/">Inicio</a>
-            </nav>
+
+  <section class="plans-section">
+    <h1 class="section-title">Elige tu Plan de Suscripción</h1>
+    <p class="section-subtitle">Escoge el plan que mejor se adapte a tu negocio. Mejora tus capacidades con un solo clic.</p>
+
+    <div class="plans-grid">
+      {% for plan in planes %}
+        <div class="plan-card {% if plan.nombre == 'PREMIUM' %}featured{% endif %}">
+          <h2 class="plan-title">{{ plan.get_nombre_display }}</h2>
+          <p class="plan-price">${{ plan.precio|floatformat:0 }}</p>
+
+          <ul class="plan-features">
+            <li>Productos: {% if plan.max_productos == 0 %}Ilimitado{% else %}{{ plan.max_productos }}{% endif %}</li>
+            <li>Almacenes: {{ plan.max_almacenes }}</li>
+            <li>Soporte: {{ plan.soporte_prioritario|yesno:"Prioritario,Estándar" }}</li>
+            <li>{{ plan.descripcion|default:"Incluye las herramientas esenciales para tu pyme." }}</li>
+          </ul>
+
+          {% if plan.nombre != "FREE" %}
+            <form action="{% url 'seleccionar_plan' plan.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn-primary">Seleccionar</button>
+            </form>
+          {% else %}
+            <p class="plan-free-msg">Plan asignado por defecto</p>
+          {% endif %}
         </div>
-    </header>
+      {% endfor %}
+    </div>
+  </section>
 
-    <main class="plans-section">
-        <div class="container">
-            <h1 class="section-title">Nuestros Planes</h1>
-            <p class="section-subtitle">Elige el plan que mejor se adapte a las necesidades de tu empresa.</p>
-
-            <div class="plans-grid">
-                <div class="plan-card">
-                    <h2 class="plan-title">Plan Básico</h2>
-                    <p class="plan-price">$19.99<span class="period">/mes</span></p>
-                    <ul class="plan-features">
-                        <li>Gestión de productos ilimitados</li>
-                        <li>Control de stock básico</li>
-                        <li>Reportes de ventas mensuales</li>
-                        <li class="unavailable">Soporte 24/7</li>
-                        <li class="unavailable">Integraciones avanzadas</li>
-                    </ul>
-                    <a href="#" class="btn-primary">Elegir Plan Básico</a>
-                </div>
-
-                <div class="plan-card featured">
-                    <h2 class="plan-title">Plan Estándar</h2>
-                    <p class="plan-price">$49.99<span class="period">/mes</span></p>
-                    <ul class="plan-features">
-                        <li>Gestión de productos ilimitados</li>
-                        <li>Control de stock avanzado</li>
-                        <li>Reportes de ventas detallados</li>
-                        <li>Soporte 24/7 (email)</li>
-                        <li class="unavailable">Integraciones avanzadas</li>
-                    </ul>
-                    <a href="#" class="btn-primary">Elegir Plan Estándar</a>
-                </div>
-
-                <div class="plan-card">
-                    <h2 class="plan-title">Plan Premium</h2>
-                    <p class="plan-price">$99.99<span class="period">/mes</span></p>
-                    <ul class="plan-features">
-                        <li>Gestión de productos ilimitados</li>
-                        <li>Control de stock avanzado</li>
-                        <li>Reportes de ventas personalizados</li>
-                        <li>Soporte 24/7 (prioritario)</li>
-                        <li>Integraciones avanzadas</li>
-                    </ul>
-                    <a href="#" class="btn-primary">Elegir Plan Premium</a>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 FOCAL. Todos los derechos reservados.</p>
-            <div class="footer-links">
-                <a href="#">Términos de Servicio</a>
-                <a href="#">Política de Privacidad</a>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>

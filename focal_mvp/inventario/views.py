@@ -335,32 +335,28 @@ def seleccionar_plan(request, plan_id):
     except Almacenero.DoesNotExist:
         messages.error(request, "Tu cuenta no está asociada a una empresa. Contacta a soporte.")
         return redirect('vista_planes')
-    except Empresa.DoesNotExist:
-        messages.error(request, "La empresa asociada a tu cuenta no existe. Contacta a soporte.")
-        return redirect('vista_planes')
 
     if request.method == 'POST':
         if plan.nombre == 'FREE':
             messages.warning(request, "No es posible seleccionar el plan gratuito directamente de esta forma.")
             return redirect('vista_planes')
 
-        with transaction.atomic():
-            # Desactivar suscripción actual de la empresa (si existe)
-            SuscripcionUsuario.objects.filter(empresa=empresa_usuario, activa=True).update(activa=False)
+        # Desactivar suscripciones activas
+        SuscripcionUsuario.objects.filter(empresa=empresa_usuario, activa=True).update(activa=False)
 
-            # Crear nueva suscripción
-            fecha_inicio = datetime.date.today()
-            fecha_fin = fecha_inicio + datetime.timedelta(days=30) 
+        # Crear nueva suscripción
+        fecha_inicio = datetime.date.today()
+        fecha_fin = fecha_inicio + datetime.timedelta(days=30)
 
-            SuscripcionUsuario.objects.create(
-                empresa=empresa_usuario,
-                plan=plan,
-                fecha_inicio=fecha_inicio,
-                fecha_fin=fecha_fin,
-                activa=True
-            )
-            messages.success(request, f"¡Has seleccionado exitosamente el plan {plan.get_nombre_display()}!")
-            return redirect('/home/') 
+        SuscripcionUsuario.objects.create(
+            empresa=empresa_usuario,
+            plan=plan,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            activa=True
+        )
+        messages.success(request, f"¡Has seleccionado exitosamente el plan {plan.get_nombre_display()}!")
+        return redirect('/home/')
 
     return redirect('vista_planes')
 
