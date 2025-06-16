@@ -24,115 +24,142 @@
   font-weight: 400;
 }
 
-/* --- Estilo Global --- */
-body {
+/* --- Reset básico --- */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- Estilo Global --- */
+body {
   font-family: 'HankenGrotesk', sans-serif;
   background-color: var(--light-purple);
   color: var(--dark-text);
+  padding: 2rem 1rem;
 }
 
+/* --- Títulos --- */
 h1, h2 {
   font-family: 'InterTight', sans-serif;
   color: var(--primary-purple);
 }
 
-/* --- Contenedor principal --- */
-.planes-container {
+/* --- Contenedor de la sección --- */
+.plans-section {
   max-width: 1200px;
-  margin: 3rem auto;
-  padding: 2rem;
+  margin: 0 auto;
   text-align: center;
 }
 
-.titulo-principal {
-  font-size: 2.5rem;
-  margin-bottom: 3rem;
+.section-title {
+  font-size: 2.3rem;
+  margin-bottom: 0.5rem;
 }
 
-/* --- Grid de planes --- */
-.planes-grid {
+.section-subtitle {
+  font-size: 1rem;
+  color: var(--muted-text);
+  margin-bottom: 2rem;
+}
+
+/* --- Grid de tarjetas --- */
+.plans-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 /* --- Tarjeta de plan --- */
 .plan-card {
   background-color: var(--white);
-  border-radius: 10px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px var(--shadow-light);
-  transition: transform 0.3s ease;
+  border-radius: 12px;
+  padding: 1.4rem 1rem;
+  box-shadow: 0 3px 10px var(--shadow-light);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: left;
+  min-height: 400px;
 }
 
 .plan-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
 }
 
-/* --- Colores específicos por plan --- */
+/* --- Estilos por plan --- */
 .plan-free {
   border: 2px dashed var(--muted-text);
 }
+
 .plan-basic {
   border: 2px solid var(--secondary-purple);
 }
+
 .plan-premium {
   border: 2px solid var(--primary-purple);
+  background-color: #f9f0ff;
 }
 
-/* --- Texto de plan --- */
-.nombre-plan {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-}
-
-.precio-plan {
-  font-size: 2rem;
+/* --- Contenido de plan --- */
+.plan-title {
+  font-size: 1.4rem;
   font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.plan-price {
+  font-size: 1.6rem;
+  font-weight: bold;
   margin-bottom: 1rem;
+  color: var(--primary-purple);
 }
 
-.descripcion {
-  font-size: 1rem;
-  color: var(--muted-text);
-  margin-bottom: 1.5rem;
-}
-
-/* --- Lista de características --- */
-.caracteristicas {
+.plan-features {
   list-style: none;
-  padding: 0;
-  margin-bottom: 1.5rem;
-  text-align: left;
-}
-.caracteristicas li {
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #eee;
-  font-size: 0.95rem;
+  padding-left: 0;
+  margin-bottom: 1.2rem;
 }
 
-/* --- Botón seleccionar --- */
-form button {
+.plan-features li {
+  font-size: 0.9rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* --- Botón Seleccionar --- */
+form button,
+.btn-primary {
   background-color: var(--primary-purple);
   color: var(--white);
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 5px;
-  cursor: pointer;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
   font-family: 'InterTight', sans-serif;
   font-weight: 700;
+  cursor: pointer;
   transition: background-color 0.3s ease;
+  font-size: 0.9rem;
 }
 
 form button:hover {
   background-color: var(--hover-dark-purple);
 }
 
-/* --- Mensaje del plan gratuito --- */
+/* --- Mensaje de plan gratuito --- */
 .plan-free-msg {
-  font-size: 0.95rem;
-  color: var(--muted-text);
   font-style: italic;
+  font-size: 0.9rem;
+  color: var(--muted-text);
+}
+
+/* --- Responsive --- */
+@media (max-width: 480px) {
+  .plan-title {
+    font-size: 1.2rem;
+  }
+
+  .plan-price {
+    font-size: 1.4rem;
+  }
 }
