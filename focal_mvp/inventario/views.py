@@ -45,7 +45,7 @@ def vista_registro(request):
                 )
 
                 # Crear perfil del almacenero y asociarlo a la empresa
-                Almacenero.objects.create(
+                almacenero = Almacenero.objects.create(
                     usuario=user,
                     nombre=almacenero_form.cleaned_data['nombre'],
                     snombre=almacenero_form.cleaned_data['snombre'],
@@ -56,7 +56,7 @@ def vista_registro(request):
                     direccion=almacenero_form.cleaned_data['direccion'],
                     comuna=almacenero_form.cleaned_data['comuna'],
                     fecha_nacimiento=almacenero_form.cleaned_data['fecha_nacimiento'],
-                    empresa=empresa
+                    empresa=empresa  # Asociación de la empresa
                 )
 
                 # Asignar suscripción gratuita por defecto
@@ -74,7 +74,6 @@ def vista_registro(request):
             return redirect('/login/')
         else:
             # Si uno de los formularios no es válido, se mostrarán los errores en el template
-            # No es necesario agregar mensajes explícitos aquí, Django se encarga
             pass
     else:
         almacenero_form = AlmaceneroForm(prefix='almacenero')
