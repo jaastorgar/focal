@@ -75,11 +75,14 @@ h1, h2 {
 .plan-card {
   background-color: var(--white);
   border-radius: 12px;
-  padding: 1.4rem 1rem;
+  padding: 2rem 1rem;
   box-shadow: 0 3px 10px var(--shadow-light);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: left;
+  text-align: center;  /* CENTRADO */
   min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .plan-card:hover {
@@ -119,6 +122,7 @@ h1, h2 {
   list-style: none;
   padding-left: 0;
   margin-bottom: 1.2rem;
+  text-align: left;  /* Alinea el texto de las características */
 }
 
 .plan-features li {
