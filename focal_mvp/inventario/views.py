@@ -119,17 +119,29 @@ def logout_view(request):
 @login_required
 def perfil(request):
     # Obtener el objeto Almacenero asociado al usuario logeado
-    # Esto asume que cada User tiene un Almacenero relacionado
     try:
         almacenero = request.user.almacenero
     except Almacenero.DoesNotExist:
         almacenero = None
 
+    # Obtener los datos de la empresa asociada al almacenero
+    empresa = almacenero.empresa if almacenero else None
+
+    # Obtener los datos de la suscripción y el plan activo de la empresa
+    suscripcion = None
+    plan = None
+    if empresa:
+        suscripcion = SuscripcionUsuario.objects.filter(empresa=empresa, activa=True).first()
+        if suscripcion:
+            plan = suscripcion.plan
+
     context = {
-        'user': request.user,
         'almacenero': almacenero,
+        'empresa': empresa,
+        'plan': plan,
     }
-    return render(request, 'perfil.html', context)
+
+    return render(request, 'inventario/perfil.html', context)
 
 @login_required
 def inventario_view(request):
@@ -182,16 +194,29 @@ def agregar_producto(request):
         messages.error(request, "Tu cuenta no está asociada a una empresa válida. No puedes agregar productos.")
         return redirect('home') 
 
+    # Obtener la suscripción activa de la empresa
+    suscripcion = SuscripcionUsuario.objects.get(empresa=empresa_usuario, activa=True)
+    plan = suscripcion.plan  # El plan de suscripción asociado a la empresa
+
+    # Verificar el número de productos actuales de la empresa
+    productos_actuales = Producto.objects.filter(empresa=empresa_usuario).count()
+
+    if plan.max_productos != 0 and productos_actuales >= plan.max_productos:
+        # Si el número de productos excede el límite, mostrar un mensaje de error
+        messages.error(request, f"Has alcanzado el límite de productos para el plan '{plan.get_nombre_display()}' ({plan.max_productos} productos).")
+        return redirect('inventario')  # O redirigir donde prefieras
+
     if request.method == 'POST':
         form = ProductoForm(request.POST)
         if form.is_valid():
             producto = form.save(commit=False)
-            producto.empresa = empresa_usuario # Asigna la empresa al producto
+            producto.empresa = empresa_usuario  # Asigna la empresa al producto
             producto.save()
             messages.success(request, 'Producto agregado correctamente.')
-            return redirect('inventario') # Usar el nombre de la URL aquí
+            return redirect('inventario')  # Usar el nombre de la URL aquí
     else:
         form = ProductoForm()
+
     return render(request, 'inventario/agregar-producto.html', {'form': form})
 
 @login_required

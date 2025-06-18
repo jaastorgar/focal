@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Perfil de Almacenero | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/perfil.css' %}">
+</head>
+<body>
+
+  <div class="perfil-container">
+    <h1>Perfil de Almacenero</h1>
+
+    <div class="perfil-datos">
+      <h2>Datos del Almacenero</h2>
+      <ul>
+        <li><strong>Nombre:</strong> {{ almacenero.nombre }} {{ almacenero.snombre }}</li>
+        <li><strong>Apellido:</strong> {{ almacenero.apellido }} {{ almacenero.sapellido }}</li>
+        <li><strong>RUN:</strong> {{ almacenero.run }}</li>
+        <li><strong>Teléfono:</strong> {{ almacenero.telefono }}</li>
+        <li><strong>Dirección:</strong> {{ almacenero.direccion }}</li>
+        <li><strong>Comuna:</strong> {{ almacenero.comuna }}</li>
+        <li><strong>Fecha de Nacimiento:</strong> {{ almacenero.fecha_nacimiento }}</li>
+      </ul>
+    </div>
+
+    <div class="perfil-empresa">
+      <h2>Datos de la Empresa</h2>
+      {% if empresa %}
+        <ul>
+          <li><strong>Nombre del Almacén:</strong> {{ empresa.nombre_almacen }}</li>
+          <li><strong>RUT:</strong> {{ empresa.rut }}</li>
+          <li><strong>Dirección Tributaria:</strong> {{ empresa.direccion_tributaria }}</li>
+          <li><strong>Comuna:</strong> {{ empresa.comuna }}</li>
+          <li><strong>Giro de Negocio:</strong> {{ empresa.giro_negocio }}</li>
+          <li><strong>Tipo de Sociedad:</strong> {{ empresa.tipo_sociedad }}</li>
+        </ul>
+      {% else %}
+        <p>No se ha asociado una empresa a este almacenero.</p>
+      {% endif %}
+    </div>
+
+    <div class="perfil-plan">
+      <h2>Plan Activo</h2>
+      {% if plan %}
+        <ul>
+          <li><strong>Nombre del Plan:</strong> {{ plan.get_nombre_display }}</li>
+          <li><strong>Precio:</strong> ${{ plan.precio }}</li>
+          <li><strong>Productos Permitidos:</strong> {{ plan.max_productos|default:"Ilimitado" }}</li>
+          <li><strong>Almacenes Permitidos:</strong> {{ plan.max_almacenes }}</li>
+          <li><strong>Soporte:</strong> {% if plan.soporte_prioritario %} Prioritario {% else %} Estándar {% endif %}</li>
+        </ul>
+      {% else %}
+        <p>No tienes un plan activo en este momento.</p>
+      {% endif %}
+    </div>
+
+  </div>
+
+</body>
+</html>

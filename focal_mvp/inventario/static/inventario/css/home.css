@@ -137,6 +137,101 @@ canvas {
   height: auto;
 }
 
+/* === Estilo para el menú desplegable === */
+.navbar-menu .dropdown {
+  position: relative;
+}
+
+.navbar-menu .dropdown-toggle {
+  cursor: pointer;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.navbar-menu .dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--primary-purple);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.navbar-menu .dropdown-menu li {
+  padding: 10px;
+}
+
+.navbar-menu .dropdown-menu li a {
+  color: var(--white);
+  text-decoration: none;
+  display: block;
+}
+
+.navbar-menu .dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.navbar-menu .dropdown:hover .dropdown-toggle {
+  color: var(--hover-light-purple);
+}
+
+/* === Planes - Mejora en la visualización de las tarjetas === */
+.plan-card {
+  background-color: var(--white);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  height: 100%;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+}
+
+.plan-card .plan-title {
+  font-family: 'InterTight', sans-serif;
+  font-size: 1.5rem;
+  color: var(--primary-purple);
+  margin-bottom: 0.5rem;
+}
+
+.plan-card .plan-price {
+  font-size: 2rem;
+  color: var(--secondary-purple);
+  margin-bottom: 1rem;
+}
+
+.plan-card .plan-features {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1.5rem;
+}
+
+.plan-card .plan-features li {
+  font-size: 1rem;
+  color: var(--dark-text);
+}
+
+.plan-card .btn-primary {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.plan-card .btn-primary:hover {
+  background-color: var(--hover-dark-purple);
+}
+
 /* === Responsive === */
 @media (max-width: 768px) {
   .dashboard-metrics {
@@ -148,11 +243,9 @@ canvas {
     width: 100%;
     max-width: 400px;
   }
-}
 
-.disabled-link {
-  color: gray;
-  pointer-events: none;
-  text-decoration: line-through;
-  cursor: not-allowed;
+  .plan-card {
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
 }
