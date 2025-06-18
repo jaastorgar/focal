@@ -12,7 +12,16 @@
   <div class="perfil-container">
     <h1>Perfil de Almacenero</h1>
 
-    <div class="perfil-datos">
+    <!-- Botones para cada sección -->
+    <div class="perfil-buttons">
+      <button onclick="toggleSection('almacenero')">Datos del Almacenero</button>
+      <button onclick="toggleSection('empresa')">Datos de la Empresa</button>
+      <button onclick="toggleSection('plan')">Plan Activo</button>
+      <button onclick="toggleSection('pago')">Método de Pago</button>
+    </div>
+
+    <!-- Sección Datos del Almacenero -->
+    <section id="almacenero" class="perfil-datos">
       <h2>Datos del Almacenero</h2>
       <ul>
         <li><strong>Nombre:</strong> {{ almacenero.nombre }} {{ almacenero.snombre }}</li>
@@ -23,9 +32,10 @@
         <li><strong>Comuna:</strong> {{ almacenero.comuna }}</li>
         <li><strong>Fecha de Nacimiento:</strong> {{ almacenero.fecha_nacimiento }}</li>
       </ul>
-    </div>
+    </section>
 
-    <div class="perfil-empresa">
+    <!-- Sección Datos de la Empresa -->
+    <section id="empresa" class="perfil-empresa">
       <h2>Datos de la Empresa</h2>
       {% if empresa %}
         <ul>
@@ -39,9 +49,10 @@
       {% else %}
         <p>No se ha asociado una empresa a este almacenero.</p>
       {% endif %}
-    </div>
+    </section>
 
-    <div class="perfil-plan">
+    <!-- Sección Datos del Plan Activo -->
+    <section id="plan" class="perfil-plan">
       <h2>Plan Activo</h2>
       {% if plan %}
         <ul>
@@ -54,9 +65,24 @@
       {% else %}
         <p>No tienes un plan activo en este momento.</p>
       {% endif %}
-    </div>
+    </section>
+
+    <!-- Sección de Método de Pagos -->
+    <section id="pago" class="perfil-pago">
+      <h2>Método de Pago</h2>
+      {% if empresa and empresa.suscripcion %}
+        <ul>
+          <li><strong>Último Método de Pago:</strong> {{ empresa.suscripcion.plan.nombre }} ({{ empresa.suscripcion.fecha_inicio }} - {{ empresa.suscripcion.fecha_fin }})</li>
+        </ul>
+      {% else %}
+        <p>No se ha asociado un método de pago a esta empresa.</p>
+      {% endif %}
+    </section>
 
   </div>
+
+  <!-- Referencia al archivo JS para la interacción -->
+  <script src="{% static 'inventario/js/perfil.js' %}"></script>
 
 </body>
 </html>
