@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Producto, Almacenero, PlanSuscripcion, SuscripcionUsuario, Empresa, Contacto
+from .models import Producto, Almacenero, PlanSuscripcion, SuscripcionUsuario, Empresa
 
 # Register your models here.
 @admin.register(Producto)
@@ -27,9 +27,3 @@ class EmpresaAdmin(admin.ModelAdmin):
     list_display = ('nombre_almacen', 'rut', 'direccion_tributaria', 'comuna', 'run_representante', 'inicio_actividades', 'nivel_venta_uf', 'giro_negocio', 'tipo_sociedad')
     search_fields = ('nombre_almacen', 'rut', 'run_representante')
     list_filter = ('tipo_sociedad',)
-
-@admin.register(Contacto)
-class ContactoAdmin(admin.ModelAdmin):
-    list_display = ('nombre_completo', 'correo_electronico', 'fecha_envio')
-    search_fields = ('nombre_completo', 'correo_electronico')
-    list_filter = ('fecha_envio',)

@@ -77,7 +77,7 @@
                 </div>
                 <div class="feature-card">
                     <i class="fas fa-box-open feature-icon"></i>
-                    <h3>Inventario en Tiempo Real</h3>
+                    <h3>Inventario</h3>
                     <p>Conoce el estado exacto de tu stock en cualquier momento y lugar.</p>
                 </div>
                 <div class="feature-card">
@@ -103,9 +103,10 @@
         <div class="container">
             <h2 class="section-title">¿Quiénes Somos?</h2>
             <p class="section-description">
-                En FOCAL, creemos en el poder de la tecnología para simplificar la gestión empresarial.
-                Nuestro equipo está dedicado a crear soluciones intuitivas y potentes que permitan
-                a las empresas crecer y prosperar sin complicaciones.
+                En FOCAL, creemos en el poder de la tecnología 
+                para simplificar y optimizar la gestión de inventarios y ventas de los almaceneros. 
+                Nuestro equipo está dedicado a crear soluciones intuitivas y potentes que permitan 
+                a los almaceneros gestionar sus productos, stock y ventas de manera eficiente y sin complicaciones.
             </p>
             <p class="section-description">
                 Nos apasiona la innovación y la eficiencia, y trabajamos constantemente
@@ -120,18 +121,19 @@
             <p class="section-description">
                 ¿Tienes preguntas o quieres saber más? Envíanos un mensaje y te responderemos a la brevedad.
             </p>
-            <form class="contact-form" onsubmit="event.preventDefault(); alert('¡Mensaje enviado!');">
+            <form class="contact-form" method="POST" action="{% url 'contacto' %}">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="contactName" class="visually-hidden">Nombre</label>
-                    <input type="text" id="contactName" placeholder="Tu Nombre Completo" required />
+                    <input type="text" id="contactName" name="nombre_completo" placeholder="Tu Nombre Completo" required />
                 </div>
                 <div class="form-group">
                     <label for="contactEmail" class="visually-hidden">Correo electrónico</label>
-                    <input type="email" id="contactEmail" placeholder="Tu Correo Electrónico" required />
+                    <input type="email" id="contactEmail" name="correo_electronico" placeholder="Tu Correo Electrónico" required />
                 </div>
                 <div class="form-group">
                     <label for="contactMessage" class="visually-hidden">Mensaje</label>
-                    <textarea id="contactMessage" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
+                    <textarea id="contactMessage" name="mensaje" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
                 </div>
                 <button type="submit" class="btn btn-submit">Enviar Mensaje</button>
             </form>
@@ -148,25 +150,6 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const mainNav = document.querySelector('.main-nav');
-
-            menuToggle.addEventListener('click', () => {
-                mainNav.classList.toggle('active');
-            });
-
-            // Cerrar menú si se hace clic fuera o en un enlace
-            document.querySelectorAll('.main-nav a').forEach(link => {
-                link.addEventListener('click', () => {
-                    // Solo cerrar si el clic es en un enlace del menú de navegación (no en los botones que tienen una ruta)
-                    if (link.closest('ul') === mainNav.querySelector('ul') && !link.classList.contains('btn')) {
-                        mainNav.classList.remove('active');
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="{% static 'landing/js/index.js' %}"></script>
 </body>
 </html>

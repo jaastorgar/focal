@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.db import transaction
-from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, ContactoForm, LoteProductoForm
+from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, LoteProductoForm
 from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto, LoteProducto, MovimientoStock
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -393,16 +393,6 @@ def vista_reportes_avanzados(request):
 @caracteristica_requerida('soporte_prioritario')
 def vista_soporte_premium(request):
     return render(request, 'inventario/soporte_premium.html')
-
-def contactanos(request):
-    if request.method == 'POST':
-        form = ContactoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('contacto_exito')
-    else:
-        form = ContactoForm()
-    return render(request, 'contacto.html', {'form': form})
 
 @login_required
 def historial_movimientos_view(request):

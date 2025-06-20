@@ -127,15 +127,6 @@ class Producto(models.Model):
 
     def __str__(self):
         return f"{self.nombre} ({self.sku})"
-    
-class Contacto(models.Model):
-    nombre_completo = models.CharField(max_length=100)
-    correo_electronico = models.EmailField()
-    mensaje = models.TextField()
-    fecha_envio = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Mensaje de {self.nombre_completo} ({self.correo_electronico})"
 
 class LoteProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lotes')
