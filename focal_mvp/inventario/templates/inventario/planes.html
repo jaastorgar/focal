@@ -10,32 +10,24 @@
 <body>
 
   <section class="plans-section">
-    <h1 class="section-title">Elige tu Plan de Suscripción</h1>
+    <h1 class="section-title">Planes de Suscripción</h1>
     <p class="section-subtitle">Escoge el plan que mejor se adapte a tu negocio. Mejora tus capacidades con un solo clic.</p>
 
     <div class="plans-grid">
-      {% for plan in planes %}
-        <div class="plan-card {% if plan.nombre == 'PREMIUM' %}featured{% endif %}">
-          <h2 class="plan-title">{{ plan.get_nombre_display }}</h2>
-          <p class="plan-price">${{ plan.precio|floatformat:0 }}</p>
+      <div class="plan-card">
+        <h2 class="plan-title">FOCAL Freemium</h2>
+      </div>
+      <div class="plan-card">
+        <h2 class="plan-title">FOCAL Starter</h2>
+      </div>
+      <div class="plan-card">
+        <h2 class="plan-title">FOCAL Plus</h2>
+      </div>
+    </div>
 
-          <ul class="plan-features">
-            <li>Productos: {% if plan.max_productos == 0 %}Ilimitado{% else %}{{ plan.max_productos }}{% endif %}</li>
-            <li>Almacenes: {{ plan.max_almacenes }}</li>
-            <li>Soporte: {{ plan.soporte_prioritario|yesno:"Prioritario,Estándar" }}</li>
-            <li>{{ plan.descripcion|default:"Incluye las herramientas esenciales para tu pyme." }}</li>
-          </ul>
-
-          {% if plan.nombre != "FREE" %}
-            <form action="{% url 'seleccionar_plan' plan.id %}" method="post">
-              {% csrf_token %}
-              <button type="submit" class="btn-primary">Seleccionar</button>
-            </form>
-          {% else %}
-            <p class="plan-free-msg">Plan asignado por defecto</p>
-          {% endif %}
-        </div>
-      {% endfor %}
+    <div class="contact-info">
+      <p>¿Necesitas más información sobre los planes?</p>
+      <a href="{% url 'landing' %}#contact" class="btn-primary">Contáctanos</a>
     </div>
   </section>
 

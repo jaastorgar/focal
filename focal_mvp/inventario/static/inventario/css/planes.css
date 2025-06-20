@@ -75,95 +75,70 @@ h1, h2 {
 .plan-card {
   background-color: var(--white);
   border-radius: 12px;
-  padding: 2rem 1rem;
-  box-shadow: 0 3px 10px var(--shadow-light);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;  /* CENTRADO */
-  min-height: 400px;
+  padding: 3rem 1rem;
+  box-shadow: 0 4px 12px var(--shadow-light);
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-height: 220px;
 }
 
 .plan-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-/* --- Estilos por plan --- */
-.plan-free {
-  border: 2px dashed var(--muted-text);
-}
-
-.plan-basic {
-  border: 2px solid var(--secondary-purple);
-}
-
-.plan-premium {
-  border: 2px solid var(--primary-purple);
-  background-color: #f9f0ff;
-}
-
-/* --- Contenido de plan --- */
 .plan-title {
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  margin-bottom: 0.4rem;
-}
-
-.plan-price {
-  font-size: 1.6rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
   color: var(--primary-purple);
+  text-transform: uppercase;
 }
 
-.plan-features {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 1.2rem;
-  text-align: left;  /* Alinea el texto de las características */
-}
-
-.plan-features li {
-  font-size: 0.9rem;
-  padding: 0.35rem 0;
-  border-bottom: 1px solid #eee;
-}
-
-/* --- Botón Seleccionar --- */
-form button,
+/* --- Botón reutilizable --- */
 .btn-primary {
   background-color: var(--primary-purple);
   color: var(--white);
   border: none;
-  padding: 0.6rem 1.2rem;
+  padding: 0.6rem 1.5rem;
   border-radius: 6px;
   font-family: 'InterTight', sans-serif;
   font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
   transition: background-color 0.3s ease;
-  font-size: 0.9rem;
 }
 
-form button:hover {
+.btn-primary:hover {
   background-color: var(--hover-dark-purple);
 }
 
-/* --- Mensaje de plan gratuito --- */
-.plan-free-msg {
-  font-style: italic;
-  font-size: 0.9rem;
-  color: var(--muted-text);
+/* --- Bloque final de contacto --- */
+.contact-info {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.contact-info p {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: var(--dark-text);
 }
 
 /* --- Responsive --- */
 @media (max-width: 480px) {
   .plan-title {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
   }
 
-  .plan-price {
-    font-size: 1.4rem;
+  .btn-primary {
+    width: 100%;
+  }
+
+  .plan-card {
+    padding: 2rem 1rem;
   }
 }
