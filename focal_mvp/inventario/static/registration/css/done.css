@@ -1,0 +1,51 @@
+/* === DONE.CSS personalizado para FOCAL === */
+
+:root {
+  --primary-purple: #4A008B;
+  --light-purple: #F3E8FF;
+  --white: #FFFFFF;
+  --dark-text: #343A40;
+  --hover-dark-purple: #38006B;
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
+body {
+  font-family: 'HankenGrotesk', sans-serif;
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+}
+
+.login-container {
+  background-color: var(--white);
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  text-align: center;
+}
+
+h2 {
+  font-family: 'InterTight', sans-serif;
+  color: var(--primary-purple);
+}
+
+.btn-submit {
+  display: inline-block;
+  margin-top: 20px;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  font-family: 'InterTight', sans-serif;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+}

@@ -1,0 +1,74 @@
+/* === COMPLETE.CSS personalizado para FOCAL === */
+
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #F3E8FF;
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --white: #FFFFFF;
+  --header-footer-bg: #2C0140;
+  --hover-dark-purple: #38006B;
+  --hover-light-purple: #E0B3FF;
+  --border-color: #dee2e6;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-dark: rgba(0, 0, 0, 0.3);
+}
+
+/* Tipografías */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'HankenGrotesk', sans-serif;
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+}
+
+/* Contenedor principal */
+.login-container {
+  background-color: var(--white);
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  text-align: center;
+}
+
+/* Título */
+.login-container h2 {
+  font-family: 'InterTight', sans-serif;
+  font-size: 1.8rem;
+  color: var(--primary-purple);
+  margin-bottom: 20px;
+}
+
+/* Botón */
+.btn-submit {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  font-family: 'InterTight', sans-serif;
+  font-weight: 700;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  margin-top: 20px;
+  text-decoration: none;
+}
+
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .login-container {
+    margin: 40px 20px;
+    padding: 30px 20px;
+  }
+}

@@ -94,6 +94,7 @@ class Almacenero(models.Model):
     apellido = models.CharField(max_length=25)
     sapellido = models.CharField(max_length=25)
     run = models.CharField(max_length=12, unique=True)
+    correo = models.EmailField(max_length=100, unique=True)
     telefono = models.CharField(max_length=20, blank=True)
     direccion = models.CharField(max_length=255, blank=True)
     comuna = models.CharField(max_length=100, blank=True)
