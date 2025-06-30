@@ -24,58 +24,46 @@ def vista_registro(request):
         empresa_form = EmpresaForm(request.POST, prefix='empresa')
 
         if almacenero_form.is_valid() and empresa_form.is_valid():
-            with transaction.atomic():
-                # Crear usuario
-                user = User.objects.create_user(
-                    username=almacenero_form.cleaned_data['username'],
-                    password=almacenero_form.cleaned_data['password']
-                )
+            try:
+                with transaction.atomic():
+                    # 1. Crear el objeto User (usuario)
+                    username = almacenero_form.cleaned_data['username']
+                    password = almacenero_form.cleaned_data['password']
+                    user = User.objects.create_user(username=username, password=password)
 
-                # Crear empresa
-                empresa = Empresa.objects.create(
-                    nombre_almacen=empresa_form.cleaned_data['nombre_almacen'],
-                    rut=empresa_form.cleaned_data['rut'],
-                    direccion_tributaria=empresa_form.cleaned_data['direccion_tributaria'],
-                    comuna=empresa_form.cleaned_data['comuna'],
-                    run_representante=empresa_form.cleaned_data['run_representante'],
-                    inicio_actividades=empresa_form.cleaned_data['inicio_actividades'],
-                    nivel_venta_uf=empresa_form.cleaned_data['nivel_venta_uf'],
-                    giro_negocio=empresa_form.cleaned_data['giro_negocio'],
-                    tipo_sociedad=empresa_form.cleaned_data['tipo_sociedad'],
-                )
+                    # 2. Guardar la empresa usando el formulario (ModelForm lo maneja)
+                    empresa = empresa_form.save()
 
-                # Crear perfil del almacenero y asociarlo a la empresa
-                almacenero = Almacenero.objects.create(
-                    usuario=user,
-                    nombre=almacenero_form.cleaned_data['nombre'],
-                    snombre=almacenero_form.cleaned_data['snombre'],
-                    apellido=almacenero_form.cleaned_data['apellido'],
-                    sapellido=almacenero_form.cleaned_data['sapellido'],
-                    run=almacenero_form.cleaned_data['run'],
-                    telefono=almacenero_form.cleaned_data['telefono'],
-                    direccion=almacenero_form.cleaned_data['direccion'],
-                    comuna=almacenero_form.cleaned_data['comuna'],
-                    fecha_nacimiento=almacenero_form.cleaned_data['fecha_nacimiento'],
-                    empresa=empresa  # Asociación de la empresa
-                )
+                    almacenero = almacenero_form.save(commit=False) 
+                    almacenero.usuario = user       # Asocia el usuario creado
+                    almacenero.empresa = empresa    # Asocia la empresa creada
+                    
+                    # CAMBIO AQUÍ: Añadir el campo 'correo' a la instancia del almacenero antes de guardarla
+                    almacenero.correo = almacenero_form.cleaned_data['correo'] # <-- Campo correo añadido
 
-                # Asignar suscripción gratuita por defecto
-                try:
-                    plan_gratuito = PlanSuscripcion.objects.get(nombre='FREE')
-                    SuscripcionUsuario.objects.create(
-                        empresa=empresa,
-                        plan=plan_gratuito,
-                        activa=True
-                    )
-                except PlanSuscripcion.DoesNotExist:
-                    messages.error(request, "ERROR: El plan 'FREE' no se encontró. Contacte al administrador.")
+                    almacenero.save()               # Guarda la instancia final del almacenero
 
-            messages.success(request, 'Registro exitoso. ¡Ahora puedes iniciar sesión!')
-            return redirect('/login/')
+                    # 4. Asignar suscripción gratuita por defecto
+                    try:
+                        plan_gratuito = PlanSuscripcion.objects.get(nombre='FREE')
+                        SuscripcionUsuario.objects.create(
+                            empresa=empresa,
+                            plan=plan_gratuito,
+                            activa=True
+                        )
+                    except PlanSuscripcion.DoesNotExist:
+                        messages.error(request, "ERROR: El plan 'FREE' no se encontró. Contacte al administrador.")
+
+                messages.success(request, 'Registro exitoso. ¡Ahora puedes iniciar sesión!')
+                return redirect('/login/') # Redirige a la página de login
+            except Exception as e:
+                # Captura cualquier error durante la transacción y lo muestra al usuario
+                messages.error(request, f"Hubo un error en el registro: {e}. Por favor, inténtelo de nuevo.")
         else:
-            # Si uno de los formularios no es válido, se mostrarán los errores en el template
+            # Si uno de los formularios no es válido, los errores se mostrarán automáticamente en el template
             pass
     else:
+        # Para solicitudes GET, crea formularios vacíos
         almacenero_form = AlmaceneroForm(prefix='almacenero')
         empresa_form = EmpresaForm(prefix='empresa')
 

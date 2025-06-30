@@ -37,6 +37,65 @@ UNIDAD_MEDIDA_CHOICES = [
     ('Centimetro cúbico', 'cc'),
 ]
 
+# --- NUEVA: Opciones para el campo 'comuna' ---
+# Puedes expandir esta lista con todas las comunas que necesites
+COMUNA_CHOICES = [
+    ('Seleccione la comuna', 'Seleccione la comuna'),
+    ('Alhué', 'Alhué'),
+    ('Buín', 'Buín'),
+    ('Calera de Tango', 'Calera de Tango'),
+    ('Cerrillos', 'Cerrillos'),
+    ('Cerro Navia', 'Cerro Navia'),
+    ('Colina', 'Colina'),
+    ('Conchalí', 'Conchalí'),
+    ('Curacaví', 'Curacaví'),
+    ('El Bosque', 'El Bosque'),
+    ('El Monte', 'El Monte'),
+    ('Estación Central', 'Estación Central'),
+    ('Huechuraba', 'Huechuraba'),
+    ('Independencia', 'Independencia'),
+    ('Isla de Maipo', 'Isla de Maipo'),
+    ('La Cisterna', 'La Cisterna'),
+    ('La Florida', 'La Florida'),
+    ('La Granja', 'La Granja'),
+    ('La Pintana', 'La Pintana'),
+    ('La Reina', 'La Reina'),
+    ('Lampa', 'Lampa'),
+    ('Las Condes', 'Las Condes'),
+    ('Lo Barnechea', 'Lo Barnechea'),
+    ('Lo Espejo', 'Lo Espejo'),
+    ('Lo Prado', 'Lo Prado'),
+    ('Macul', 'Macul'),
+    ('Maipú', 'Maipú'),
+    ('María Pinto', 'María Pinto'),
+    ('Melipilla', 'Melipilla'),
+    ('Ñuñoa', 'Ñuñoa'),
+    ('Padre Hurtado', 'Padre Hurtado'),
+    ('Paine', 'Paine'),
+    ('Pedro Aguirre Cerda', 'Pedro Aguirre Cerda'),
+    ('Peñalolén', 'Peñalolén'),
+    ('Peñaflor', 'Peñaflor'),
+    ('Pirque', 'Pirque'),
+    ('Providencia', 'Providencia'),
+    ('Pudahuel', 'Pudahuel'),
+    ('Puente Alto', 'Puente Alto'),
+    ('Quilicura', 'Quilicura'),
+    ('Quinta Normal', 'Quinta Normal'),
+    ('Recoleta', 'Recoleta'),
+    ('Renca', 'Renca'),
+    ('San Bernardo', 'San Bernardo'),
+    ('San Joaquín', 'San Joaquín'),
+    ('San José de Maipo', 'San José de Maipo'),
+    ('San Miguel', 'San Miguel'),
+    ('San Pedro', 'San Pedro'),
+    ('San Ramón', 'San Ramón'),
+    ('Santiago', 'Santiago'),
+    ('Talagante', 'Talagante'),
+    ('Til Til', 'Til Til'),
+    ('Vitacura', 'Vitacura'),
+]
+
+
 class PlanSuscripcion(models.Model):
     NOMBRE_PLANES = [
         ('FREE', 'Gratuito'),
@@ -71,18 +130,18 @@ class SuscripcionUsuario(models.Model):
 class Empresa(models.Model):
     nombre_almacen = models.CharField(max_length=100)
     rut = models.CharField(max_length=12, unique=True)
-    direccion_tributaria = models.CharField(max_length=255, blank=True)
-    comuna = models.CharField(max_length=100, blank=True)
+    direccion_tributaria = models.CharField(max_length=255, blank=True) # Se mantiene como campo de texto libre
+    comuna = models.CharField(
+        max_length=100, 
+        choices=COMUNA_CHOICES, # Usando las nuevas opciones de comuna
+        default='Seleccione la comuna', # Valor por defecto
+        blank=True # Permite que sea opcional, aunque con default no es estrictamente necesario si tiene un valor
+    )
     run_representante = models.CharField(max_length=12)
     inicio_actividades = models.DateField()
     nivel_venta_uf = models.CharField(max_length=100, blank=True)
     giro_negocio = models.CharField(max_length=100)
     tipo_sociedad = models.CharField(max_length=100)
-    # Añade el campo para el plan de suscripción
-    # Si la empresa no tiene un plan activo en SuscripcionUsuario, por defecto usará el plan gratuito.
-    # Este campo no es estrictamente necesario si usas SuscripcionUsuario.activa, pero puede ser útil
-    # para un acceso rápido al plan actual. Sin embargo, la lógica de SuscripcionUsuario.activa es más robusta.
-    # Por ahora, nos basaremos en SuscripcionUsuario para el estado activo.
 
     def __str__(self):
         return self.nombre_almacen
@@ -96,8 +155,14 @@ class Almacenero(models.Model):
     run = models.CharField(max_length=12, unique=True)
     correo = models.EmailField(max_length=100, unique=True)
     telefono = models.CharField(max_length=20, blank=True)
-    direccion = models.CharField(max_length=255, blank=True)
-    comuna = models.CharField(max_length=100, blank=True)
+    direccion = models.CharField(max_length=255, blank=True) # Se mantiene como campo de texto libre
+    # CAMBIO: Usar COMUNA_CHOICES para el campo 'comuna' en Almacenero
+    comuna = models.CharField(
+        max_length=100,
+        choices=COMUNA_CHOICES,
+        default='Seleccione la comuna',
+        blank=True
+    )
     fecha_nacimiento = models.DateField(null=True, blank=True)
     empresa = models.OneToOneField(Empresa, on_delete=models.CASCADE, null=True, blank=True)
 

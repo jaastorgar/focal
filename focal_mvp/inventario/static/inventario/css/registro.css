@@ -143,7 +143,7 @@ body {
 .form-group input[type="password"],
 .form-group input[type="email"],
 .form-group input[type="date"],
-.form-group select,
+.form-group select, /* Este selector ahora incluye las propiedades adicionales */
 .form-group textarea {
     width: 100%;
     padding: 0.85rem 1.25rem;
@@ -154,6 +154,17 @@ body {
     color: var(--muted-text);
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     box-sizing: border-box; /* Asegura que el padding no añada ancho extra */
+    
+    /* --- PROPIEDADES ADICIONALES PARA PERSONALIZAR EL SELECT --- */
+    -webkit-appearance: none; /* Elimina el estilo por defecto en Webkit (Chrome, Safari) */
+    -moz-appearance: none;    /* Elimina el estilo por defecto en Firefox */
+    appearance: none;         /* Elimina el estilo por defecto en otros navegadores */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.4c-6.5%200-12.2%203.2-15.6%208.1-3.4%204.9-3.2%2011.6.5%2016.3l122.9%20122.9c4.7%204.7%2011.6%206.5%2018.1%205.4s12.2-3.2%2015.6-8.1l122.9-122.9c3.7-4.7%203.9-11.4.5-16.3z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 8px 10px;
+    padding-right: 2.5rem; /* Ajusta el padding derecho para el icono */
+    /* --- FIN PROPIEDADES ADICIONALES --- */
 }
 
 .form-group input[type="text"]:focus,

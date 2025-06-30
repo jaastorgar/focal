@@ -1,7 +1,8 @@
 import re
 from django import forms
 from django.contrib.auth.models import User
-from .models import Empresa, Producto, LoteProducto
+# Asegúrate de importar Almacenero además de Empresa, Producto, LoteProducto
+from .models import Empresa, Producto, LoteProducto, Almacenero # <-- Asegúrate que Almacenero esté aquí
 from django.forms.widgets import DateInput, TextInput, Textarea, Select, EmailInput, NumberInput, PasswordInput, CheckboxInput
 
 
@@ -55,30 +56,61 @@ class BootstrapFormMixin(forms.Form):
                 field.widget.attrs.setdefault('class', 'form-check-input')
 
 class AlmaceneroForm(BootstrapFormMixin, forms.ModelForm):
+    # Estos campos son para el modelo User, no para Almacenero,
+    # por eso los definimos explícitamente y se manejan en la vista.
     username = forms.CharField(label="Nombre de usuario", widget=forms.TextInput(attrs={'placeholder': 'Ej: focal'}))
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'placeholder': 'Mínimo 8 caracteres'}))
     confirm_password = forms.CharField(label="Confirmar contraseña", widget=forms.PasswordInput(attrs={'placeholder': 'Repita su contraseña'}))
 
-    nombre = forms.CharField(label="Primer nombre")
-    snombre = forms.CharField(label="Segundo nombre", required=False)
-    apellido = forms.CharField(label="Apellido paterno")
-    sapellido = forms.CharField(label="Apellido materno")
-    run = forms.CharField(label="RUN (sin puntos ni guion)", widget=forms.TextInput(attrs={'placeholder': 'Ej: 123456789'}))
-    telefono = forms.CharField(label="Teléfono", required=False, widget=forms.TextInput(attrs={'placeholder': 'Ej: +56912345678'}))
-    direccion = forms.CharField(label="Dirección", required=False)
-    comuna = forms.CharField(label="Comuna", required=False)
-    fecha_nacimiento = forms.DateField(label="Fecha de nacimiento", required=False, widget=DateInput(attrs={'type': 'date'}))
-
     class Meta:
-        model = User
-        fields = ('username', 'password', 'confirm_password')
+        model = Almacenero
+        fields = [
+            'nombre', 'snombre', 'apellido', 'sapellido', 'run', 'correo',
+            'telefono', 'direccion', 'comuna', 'fecha_nacimiento'
+        ]
+        widgets = {
+            'fecha_nacimiento': DateInput(attrs={'type': 'date'}),
+        }
+        labels = {
+            'nombre': "Primer nombre",
+            'snombre': "Segundo nombre",
+            'apellido': "Apellido paterno",
+            'sapellido': "Apellido materno",
+            'run': "RUN (sin puntos ni guion)",
+            'correo': "Correo electrónico",
+            'telefono': "Teléfono",
+            'direccion': "Dirección",
+            'comuna': "Comuna",
+            'fecha_nacimiento': "Fecha de nacimiento",
+        }
 
     def clean_run(self):
         run = self.cleaned_data['run']
         run_limpio = re.sub(r'[\.-]', '', run).upper().strip()
         if not validar_run_rut(run_limpio):
             raise forms.ValidationError("El RUN es inválido.")
+        if Almacenero.objects.filter(run=run_limpio).exists():
+            raise forms.ValidationError("Ya existe un Almacenero con este RUN.")
         return run_limpio
+    
+    # CAMBIO AQUÍ: Validación para asegurar que el correo no esté vacío y sea único
+    def clean_correo(self):
+        correo = self.cleaned_data.get('correo')
+        
+        # Primero, verifica si el campo está vacío
+        if not correo:
+            raise forms.ValidationError("El correo electrónico es requerido.")
+
+        # Luego, verifica la unicidad
+        if Almacenero.objects.filter(correo=correo).exists():
+            raise forms.ValidationError("Ya existe un Almacenero con este correo electrónico.")
+        return correo
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Este nombre de usuario ya está en uso.")
+        return username
 
     def clean(self):
         cleaned_data = super().clean()
@@ -124,21 +156,25 @@ class EmpresaForm(BootstrapFormMixin, forms.ModelForm):
         
         return run_limpio
 
-    # Validación para el campo 'rut_empresa' del EmpresaForm
-    def clean_rut_empresa(self):
-        rut = self.cleaned_data['rut_empresa']
+    # CAMBIO: Renombrado de clean_rut_empresa a clean_rut para que Django lo asocie automáticamente al campo 'rut'
+    def clean_rut(self): 
+        rut = self.cleaned_data['rut'] # CAMBIO: Acceder a 'rut' no a 'rut_empresa'
         rut_limpio = re.sub(r'[\.-]', '', rut).upper().strip()
 
         if not validar_run_rut(rut_limpio):
             raise forms.ValidationError("El RUT de la empresa es inválido. Por favor, verifique el formato y el dígito verificador.")
         
+        # Opcional: Asegurarse de que el RUT no exista ya para una Empresa
+        if Empresa.objects.filter(rut=rut_limpio).exists():
+            raise forms.ValidationError("Ya existe una Empresa con este RUT.")
+
         return rut_limpio
 
 class LoginForm(forms.Form):
     username = forms.CharField(label="Nombre de usuario", max_length=150, widget=TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label="Contraseña", widget=PasswordInput(attrs={'class': 'form-control'}))
 
-class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de BootstrapFormMixin
+class ProductoForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Producto
         fields = [
@@ -152,7 +188,9 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             'precio_venta',
         ]
         widgets = {
-            'fecha_vencimiento': DateInput(attrs={'type': 'date'}),
+            # El campo 'fecha_vencimiento' no pertenece al modelo Producto directamente.
+            # Si un campo se va a usar solo en un formulario y no en el modelo, se define directamente como forms.Field.
+            # Si pertenece al modelo, se configura en el modelo o en el widget de Meta.
         }
         labels = {
             'nombre': 'Nombre del Producto',
@@ -165,15 +203,15 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm): # Ahora hereda de Boots
             'precio_venta': 'Precio de Venta',
         }
     
-    def clean_stock(self):
-        stock = self.cleaned_data.get('stock')
-        if stock is not None and stock < 0: # Añadido 'is not None' para evitar error si el campo está vacío
-            raise forms.ValidationError("El stock no puede ser negativo.")
-        return stock
+    def clean_cantidad(self): # CAMBIO: Renombrado de clean_stock a clean_cantidad para Producto
+        cantidad = self.cleaned_data.get('cantidad')
+        if cantidad is not None and cantidad < 0:
+            raise forms.ValidationError("La cantidad no puede ser negativa.")
+        return cantidad
 
     def clean_precio_venta(self):
         precio = self.cleaned_data.get('precio_venta')
-        if precio is not None and precio < 0: # Añadido 'is not None'
+        if precio is not None and precio < 0:
             raise forms.ValidationError("El precio no puede ser negativo.")
         return precio
     
@@ -197,8 +235,11 @@ class RetirarStockForm(forms.Form):
         cantidad = cleaned_data.get('cantidad')
 
         if producto and cantidad:
-            if cantidad > producto.stock:
-                self.add_error('cantidad', f'No hay suficiente stock. Solo quedan {producto.stock} unidades de {producto.nombre}.')
+            # Para obtener el stock total de un producto, debes sumar las cantidades de todos sus lotes.
+            # Tu modelo Producto tiene una relación inversa 'lotes' con LoteProducto.
+            stock_total_producto = sum(lote.cantidad for lote in producto.lotes.all()) 
+            if cantidad > stock_total_producto:
+                self.add_error('cantidad', f'No hay suficiente stock. Solo quedan {stock_total_producto} unidades de {producto.nombre}.')
         return cleaned_data
 
 class LoteProductoForm(forms.ModelForm):
