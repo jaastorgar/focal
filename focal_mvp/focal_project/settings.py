@@ -90,6 +90,18 @@ DATABASES = {
     }
 }
 
+# ==============================================================================
+# CACHE CONFIGURATION
+# ==============================================================================
+# Usamos Redis como backend de caché para un alto rendimiento en producción.
+# El caché es independiente de la base de datos (MySQL, PostgreSQL, etc.).
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'focal-cache-snowflake', # Puede ser cualquier nombre único
+    }
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

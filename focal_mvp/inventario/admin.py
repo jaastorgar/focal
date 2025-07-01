@@ -1,29 +1,67 @@
 from django.contrib import admin
-from .models import Producto, Almacenero, PlanSuscripcion, SuscripcionUsuario, Empresa
+from .models import (
+    PlanSuscripcion, SuscripcionUsuario, Empresa, Almacenero, 
+    Producto, LoteProducto, MovimientoStock, OrdenVenta, DetalleOrden
+)
 
-# Register your models here.
-@admin.register(Producto)
-class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'sku', 'precio_compra', 'precio_venta')
-    search_fields = ('nombre', 'sku')
+# --- Clases Inline para una mejor visualización ---
 
-@admin.register(Almacenero)
-class AlmaceneroAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'run', 'usuario', 'comuna')
-    search_fields = ('nombre', 'run', 'usuario__username')
+class LoteProductoInline(admin.TabularInline):
+    """Permite ver y agregar lotes directamente desde la página de un producto."""
+    model = LoteProducto
+    readonly_fields = ('creado',)
 
-@admin.register(PlanSuscripcion)
-class PlanSuscripcionAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'precio', 'max_productos', 'max_almacenes', 'soporte_prioritario')
-    search_fields = ('nombre',)
-    
-@admin.register(SuscripcionUsuario)
-class SuscripcionUsuarioAdmin(admin.ModelAdmin):
-    list_display = ('empresa', 'plan', 'fecha_inicio', 'fecha_fin', 'activa')
-    search_fields = ('empresa__nombre_almacen', 'plan__nombre')
+class SuscripcionUsuarioInline(admin.StackedInline):
+    """Muestra la suscripción directamente en la página de la empresa."""
+    model = SuscripcionUsuario
+    extra = 0
+    readonly_fields = ('fecha_inicio', 'fecha_fin')
+
+# --- Configuraciones del Panel de Administrador ---
 
 @admin.register(Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
-    list_display = ('nombre_almacen', 'rut', 'direccion_tributaria', 'comuna', 'run_representante', 'inicio_actividades', 'nivel_venta_uf', 'giro_negocio', 'tipo_sociedad')
-    search_fields = ('nombre_almacen', 'rut', 'run_representante')
-    list_filter = ('tipo_sociedad',)
+    list_display = ('nombre_almacen', 'rut', 'giro_negocio')
+    search_fields = ('nombre_almacen', 'rut')
+    inlines = [SuscripcionUsuarioInline]
+
+@admin.register(Almacenero)
+class AlmaceneroAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'apellido', 'correo', 'empresa')
+    search_fields = ('nombre', 'apellido', 'run', 'correo', 'usuario__username')
+    autocomplete_fields = ['usuario', 'empresa']
+
+@admin.register(Producto)
+class ProductoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'sku', 'empresa', 'categoria', 'precio_venta')
+    list_filter = ('categoria', 'empresa')
+    search_fields = ('nombre', 'sku', 'marca')
+    autocomplete_fields = ['empresa']
+    inlines = [LoteProductoInline]
+    list_select_related = ('empresa',)
+
+@admin.register(LoteProducto)
+class LoteProductoAdmin(admin.ModelAdmin):
+    list_display = ('producto', 'cantidad', 'fecha_vencimiento', 'creado')
+    list_filter = ('fecha_vencimiento',)
+    search_fields = ('producto__nombre', 'producto__sku')
+    autocomplete_fields = ['producto']
+    list_select_related = ('producto',)
+
+@admin.register(MovimientoStock)
+class MovimientoStockAdmin(admin.ModelAdmin):
+    list_display = ('producto', 'lote', 'cantidad_retirada', 'fecha', 'usuario')
+    list_filter = ('fecha',)
+    search_fields = ('producto__nombre', 'usuario__username')
+    autocomplete_fields = ['producto', 'lote', 'usuario']
+    readonly_fields = ('producto', 'lote', 'cantidad_retirada', 'fecha', 'usuario')
+    list_select_related = ('producto', 'lote', 'usuario')
+
+    def has_add_permission(self, request):
+        return False
+
+# Registramos los modelos restantes con su configuración por defecto o una simple.
+admin.site.register(PlanSuscripcion)
+admin.site.register(SuscripcionUsuario)
+admin.site.register(OrdenVenta)
+admin.site.register(DetalleOrden)

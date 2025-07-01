@@ -121,7 +121,7 @@
             <p class="section-description">
                 ¿Tienes preguntas o quieres saber más? Envíanos un mensaje y te responderemos a la brevedad.
             </p>
-            <form class="contact-form" method="POST" action="{% url 'contacto' %}">
+            <form class="contact-form" method="POST" action="{% url 'contacto_submit' %}">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="contactName" class="visually-hidden">Nombre</label>
@@ -137,6 +137,13 @@
                 </div>
                 <button type="submit" class="btn btn-submit">Enviar Mensaje</button>
             </form>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </div>
     </section>
 

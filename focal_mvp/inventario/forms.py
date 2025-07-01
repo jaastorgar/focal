@@ -182,38 +182,45 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm):
             'sku',
             'marca',
             'categoria',
-            'cantidad',
             'unidad_medida',
             'precio_compra',
             'precio_venta',
         ]
         widgets = {
-            # El campo 'fecha_vencimiento' no pertenece al modelo Producto directamente.
-            # Si un campo se va a usar solo en un formulario y no en el modelo, se define directamente como forms.Field.
-            # Si pertenece al modelo, se configura en el modelo o en el widget de Meta.
+            'categoria': forms.Select(attrs={'class': 'form-select'}),
+            'unidad_medida': forms.Select(attrs={'class': 'form-select'}),
+            # Añadimos placeholders para una mejor UX
+            'nombre': forms.TextInput(attrs={'placeholder': 'Ej: Leche Entera 1L'}),
+            'sku': forms.TextInput(attrs={'placeholder': 'Ej: LECH-ENT-1L-SOP'}),
+            'marca': forms.TextInput(attrs={'placeholder': 'Ej: Soprole'}),
+            'precio_compra': forms.NumberInput(attrs={'placeholder': 'Costo del producto'}),
+            'precio_venta': forms.NumberInput(attrs={'placeholder': 'Precio al público'}),
         }
         labels = {
             'nombre': 'Nombre del Producto',
-            'sku': 'Sku (Código Único)',
+            'sku': 'SKU (Código Único)',
             'marca': 'Marca',
             'categoria': 'Categoría',
-            'cantidad': 'Cantidad',
             'unidad_medida': 'Unidad de Medida',
             'precio_compra': 'Precio de Compra',
             'precio_venta': 'Precio de Venta',
         }
-    
-    def clean_cantidad(self): # CAMBIO: Renombrado de clean_stock a clean_cantidad para Producto
-        cantidad = self.cleaned_data.get('cantidad')
-        if cantidad is not None and cantidad < 0:
-            raise forms.ValidationError("La cantidad no puede ser negativa.")
-        return cantidad
 
     def clean_precio_venta(self):
-        precio = self.cleaned_data.get('precio_venta')
-        if precio is not None and precio < 0:
-            raise forms.ValidationError("El precio no puede ser negativo.")
-        return precio
+        """
+        Asegura que el precio de venta sea mayor que el precio de compra.
+        """
+        precio_venta = self.cleaned_data.get('precio_venta')
+        precio_compra = self.cleaned_data.get('precio_compra')
+
+        # Es importante verificar que ambos valores existan antes de compararlos
+        if precio_venta is not None and precio_compra is not None:
+            if precio_venta <= precio_compra:
+                raise forms.ValidationError(
+                    "El precio de venta debe ser mayor que el precio de compra para asegurar un margen."
+                )
+        
+        return precio_venta
     
 class RetirarStockForm(forms.Form): 
     producto = forms.ModelChoiceField(
@@ -245,10 +252,25 @@ class RetirarStockForm(forms.Form):
 class LoteProductoForm(forms.ModelForm):
     class Meta:
         model = LoteProducto
-        fields = ['producto', 'cantidad', 'fecha_vencimiento']
+        fields = ['producto', 'cantidad', 'fecha_vencimiento'] 
         widgets = {
             'fecha_vencimiento': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        """
+        Constructor personalizado para aceptar el argumento 'empresa' y filtrar
+        el queryset del campo 'producto'.
+        """
+        # 1. Extraemos el argumento 'empresa' que le pasamos desde la vista.
+        empresa = kwargs.pop('empresa', None)
+        
+        # 2. Llamamos al constructor original del formulario.
+        super(LoteProductoForm, self).__init__(*args, **kwargs)
+
+        # 3. Si se proporcionó una empresa, filtramos la lista de productos.
+        if empresa:
+            self.fields['producto'].queryset = Producto.objects.filter(empresa=empresa)
         
 class ArchivoVentasForm(forms.Form):
     archivo = forms.FileField(label="Archivo de ventas (.csv o .xlsx)")

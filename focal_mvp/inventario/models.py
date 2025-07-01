@@ -130,12 +130,12 @@ class SuscripcionUsuario(models.Model):
 class Empresa(models.Model):
     nombre_almacen = models.CharField(max_length=100)
     rut = models.CharField(max_length=12, unique=True)
-    direccion_tributaria = models.CharField(max_length=255, blank=True) # Se mantiene como campo de texto libre
+    direccion_tributaria = models.CharField(max_length=255, blank=True)
     comuna = models.CharField(
         max_length=100, 
-        choices=COMUNA_CHOICES, # Usando las nuevas opciones de comuna
-        default='Seleccione la comuna', # Valor por defecto
-        blank=True # Permite que sea opcional, aunque con default no es estrictamente necesario si tiene un valor
+        choices=COMUNA_CHOICES, 
+        default='Seleccione la comuna',
+        blank=True 
     )
     run_representante = models.CharField(max_length=12)
     inicio_actividades = models.DateField()
@@ -155,8 +155,7 @@ class Almacenero(models.Model):
     run = models.CharField(max_length=12, unique=True)
     correo = models.EmailField(max_length=100, unique=True)
     telefono = models.CharField(max_length=20, blank=True)
-    direccion = models.CharField(max_length=255, blank=True) # Se mantiene como campo de texto libre
-    # CAMBIO: Usar COMUNA_CHOICES para el campo 'comuna' en Almacenero
+    direccion = models.CharField(max_length=255, blank=True)
     comuna = models.CharField(
         max_length=100,
         choices=COMUNA_CHOICES,
@@ -170,24 +169,22 @@ class Almacenero(models.Model):
         return f"{self.nombre} ({self.usuario.username})"
 
 class Producto(models.Model):
-    nombre = models.CharField(max_length=100)
-    sku = models.CharField(max_length=50, unique=True)
+    nombre = models.CharField(max_length=100, db_index=True)
+    sku = models.CharField(max_length=50, unique=True, db_index=True)
     marca = models.CharField(max_length=50, blank=True)
     categoria = models.CharField(
         max_length=50,  
         choices=CATEGORIA_CHOICES, 
-        default='Seleccione la categoría',            
-        help_text="Seleccione la categoría del producto." 
+        default='Seleccione la categoría',
+        db_index=True 
     )
-    cantidad =models.PositiveIntegerField(default=0)
     unidad_medida = models.CharField(
         max_length=50,
         choices=UNIDAD_MEDIDA_CHOICES,
-        default='Seleccione la unidad',
-        help_text="Seleccione la unidad de medida del producto."
+        default='Seleccione la unidad'
     )
-    precio_compra = models.IntegerField(default=0)
-    precio_venta = models.IntegerField(default=0)
+    precio_compra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     creado = models.DateTimeField(auto_now_add=True)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
 
@@ -197,7 +194,7 @@ class Producto(models.Model):
 class LoteProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lotes')
     cantidad = models.PositiveIntegerField()
-    fecha_vencimiento = models.DateField()
+    fecha_vencimiento = models.DateField(db_index=True)
     creado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
