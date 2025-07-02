@@ -6,22 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmar Eliminación | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/eliminar_producto.css' %}">
+    <link rel="stylesheet" href="{% static 'inventario/css/confirmation-styles.css' %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <div>
-                <a href="{% url 'home' %}">FOCAL</a>
-            </div>
-            <div>
-                <a href="{% url 'home' %}">Inicio</a>
-                <a href="{% url 'inventario' %}">Inventario</a>
-            </div>
+    <header class="app-header">
+        <!-- MEJORA: Usamos una estructura de navegación más semántica. -->
+        <nav class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'inventario' %}">Inventario</a></li>
+            </ul>
         </nav>
     </header>
 
-    <main>
+    <main class="confirmation-container">
         <h1>Confirmar Eliminación de Lote</h1>
 
         {% if messages %}
@@ -34,9 +33,9 @@
             </div>
         {% endif %}
 
-        <p>¿Estás seguro de que deseas eliminar el siguiente lote del producto?</p>
+        <p>¿Estás seguro de que deseas eliminar permanentemente el siguiente lote?</p>
 
-        <div class="product-details-card">
+        <div class="details-card">
             <p><strong>Producto:</strong> {{ lote.producto.nombre }}</p>
             <p><strong>Cantidad:</strong> {{ lote.cantidad }}</p>
             <p><strong>Vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y" }}</p>
@@ -47,12 +46,14 @@
         <form method="post" class="delete-form-actions">
             {% csrf_token %}
             <button type="submit" class="btn-accion btn-peligro">Sí, Eliminar</button>
-            <a href="{% url 'detalle_producto' lote.producto.id %}" class="btn-accion btn-secundario">Cancelar</a>
+            
+            <!-- MEJORA: Añadir role="button" mejora la accesibilidad. -->
+            <a href="{% url 'detalle_producto' lote.producto.id %}" class="btn-accion btn-secundario" role="button">Cancelar</a>
         </form>
     </main>
 
-    <footer>
-        © 2025 FOCAL. Todos los derechos reservados.
+    <footer class="app-footer">
+        <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>

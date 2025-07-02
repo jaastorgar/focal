@@ -1,106 +1,209 @@
-/* === Variables FOCAL === */
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para la Página de Carga de Archivos
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
+   -------------------------------------------------------------------------- */
 :root {
-    --primary-purple: #4A008B;
-    --secondary-purple: #7B1FA2;
-    --light-purple: #F3E8FF;
-    --dark-text: #343A40;
-    --muted-text: #555555;
-    --white: #FFFFFF;
-    --navbar-footer-bg: #2C0140;
-    --hover-dark-purple: #38006B;
-    --hover-light-purple: #E0B3FF;
-    --shadow-light: 0 4px 10px rgba(0, 0, 0, 0.05);
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #f8f0ff;
+  --hover-dark-purple: #38006B;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #dee2e6;
+  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.09);
+  --success-bg: #e8f5e9;
+  --success-text: #2e7d32;
+  --error-bg: #ffebee;
+  --error-text: #c62828;
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
 }
 
-/* === Tipografías === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Las declaraciones @font-face se mantienen igual. */
 @font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-    font-weight: 700;
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
 }
-
 @font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-    font-weight: 400;
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
 }
 
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-    font-weight: 300;
-}
-
-/* === Estilos generales === */
 body {
-    font-family: 'HankenGrotesk', sans-serif;
-    background-color: var(--light-purple);
-    color: var(--dark-text);
-    margin: 0;
-    padding: 2rem;
+  font-family: var(--font-secondary);
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+}
+
+/* 2. Componentes Comunes (Header y Footer)
+   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
+   -------------------------------------------------------------------------- */
+.app-header {
+  width: 100%;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.app-header nav.container {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
 }
-
-h2 {
-    font-family: 'InterTight', sans-serif;
-    color: var(--primary-purple);
-    margin-bottom: 2rem;
+.app-header .logo, .app-header .nav-links a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 700;
 }
-
-/* === Formulario === */
-form {
-    background-color: var(--white);
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: var(--shadow-light);
-    width: 100%;
-    max-width: 500px;
+.app-header .logo {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
 }
-
-form p {
-    margin-bottom: 1.5rem;
-}
-
-input[type="file"] {
-    width: 100%;
-    font-family: 'HankenGrotesk', sans-serif;
-    padding: 0.6rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-
-button[type="submit"] {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    border: none;
-    padding: 0.7rem 1.5rem;
-    border-radius: 8px;
-    font-family: 'InterTight', sans-serif;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-button[type="submit"]:hover {
-    background-color: var(--hover-dark-purple);
-}
-
-/* === Mensajes === */
-ul {
-    margin-top: 2rem;
+.app-header .nav-links {
     list-style: none;
     padding: 0;
-    width: 100%;
-    max-width: 500px;
+    margin: 0;
 }
 
-li {
-    background-color: #ffe0b2;
-    border-left: 5px solid #f57c00;
-    padding: 1rem;
+.app-footer {
+  width: 100%;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+}
+
+/* 3. Contenedor y Tarjeta de Carga de Archivos
+   -------------------------------------------------------------------------- */
+main.upload-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem;
+}
+
+.upload-card {
+  width: 100%;
+  max-width: 550px;
+  background-color: var(--white);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: var(--box-shadow);
+  text-align: center;
+}
+
+.upload-card h2 {
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  color: var(--primary-purple);
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.upload-card .instructions {
+  color: var(--muted-text);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+/* 4. Estilos del Formulario de Carga
+   -------------------------------------------------------------------------- */
+.upload-form p {
+    margin: 0;
+    font-weight: 600;
     margin-bottom: 1rem;
-    border-radius: 6px;
-    font-size: 0.95rem;
+}
+
+/* Estilo para el input de archivo personalizado */
+.upload-form input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.upload-form label[for="id_archivo_ventas"] {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background-color: var(--light-purple);
+    color: var(--primary-purple);
+    border: 2px dashed var(--secondary-purple);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.upload-form label[for="id_archivo_ventas"]:hover {
+    background-color: var(--primary-purple);
+    color: var(--white);
+    border-style: solid;
+}
+
+.form-actions {
+    margin-top: 2rem;
+}
+
+.btn-submit {
+  width: 100%;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  border: none;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* 5. Contenedor de Mensajes
+   -------------------------------------------------------------------------- */
+.messages-container {
+    margin-top: 2rem;
+}
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.alert-success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+}
+.alert-error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
 }

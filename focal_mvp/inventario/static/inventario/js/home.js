@@ -1,58 +1,71 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/dashboard-metrics/')
-        .then(response => response.json())
-        .then(data => {
-            const nombres = data.data.map(item => item.nombre);
-            const stocks = data.data.map(item => item.stock);
+  // 1. Buscamos el elemento canvas para el gráfico.
+  const canvasElement = document.getElementById('graficoStockPorCategoria');
+  if (!canvasElement) {
+    console.error('Error: No se encontró el elemento canvas para el gráfico.');
+    return;
+  }
 
-            const ctx = document.getElementById('graficoStockPorCategoria').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: nombres,
-                    datasets: [{
-                        label: 'Stock Actual',
-                        data: stocks,
-                        backgroundColor: 'rgba(74, 0, 139, 0.6)',
-                        borderColor: 'rgba(74, 0, 139, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: '#343A40',
-                                font: {
-                                    family: 'HankenGrotesk'
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: '#343A40'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#343A40'
-                            }
-                        }
-                    }
-                }
-            });
+  // 2. Buscamos la etiqueta <script> que contiene nuestros datos.
+  const dataScriptElement = document.getElementById('dashboard-data');
+  if (!dataScriptElement) {
+    console.error('Error: No se encontró la etiqueta de datos del dashboard.');
+    return;
+  }
 
-            // También actualizamos las métricas de resumen
-            document.getElementById('total-productos').textContent = data.totales.productos;
-            document.getElementById('stock-total').textContent = data.totales.stock;
-            document.getElementById('lotes-activos').textContent = data.totales.lotes;
-        })
-        .catch(error => {
-            console.error('Error al cargar los datos del dashboard:', error);
-        });
+  try {
+    // 3. Extraemos y parseamos los datos JSON.
+    // La vista de Django ya ha colocado los datos aquí.
+    const dashboardData = JSON.parse(dataScriptElement.textContent);
+
+    // Verificamos que los datos necesarios para el gráfico existan.
+    if (!dashboardData || !dashboardData.labels || !dashboardData.data) {
+        console.warn('Advertencia: Faltan datos para renderizar el gráfico del dashboard.');
+        return;
+    }
+
+    // 4. Creamos el gráfico con los datos obtenidos.
+    const ctx = canvasElement.getContext('2d');
+    new Chart(ctx, {
+      type: 'bar', 
+      data: {
+        labels: dashboardData.labels,
+        datasets: [{
+          label: 'Stock Actual por Producto',
+          data: dashboardData.data,
+          backgroundColor: 'rgba(74, 0, 139, 0.7)',
+          borderColor: 'rgba(74, 0, 139, 1)',
+          borderWidth: 1,
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+          },
+          tooltip: {
+            backgroundColor: '#333',
+            titleFont: { size: 14 },
+            bodyFont: { size: 12 },
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              // Formatear los ticks para que no tengan decimales si son enteros
+              callback: function(value) { if (value % 1 === 0) { return value; } }
+            }
+          }
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error al parsear los datos JSON del dashboard:', error);
+  }
 });

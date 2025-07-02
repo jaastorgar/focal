@@ -2,55 +2,72 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard | FOCAL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <title>Dashboard | FOCAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+
+    <!-- OPTIMIZACIÓN: Pre-conexión al CDN para que el navegador establezca la conexión antes. -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    
+    <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="navbar-brand">FOCAL</div>
-    <ul class="navbar-menu">
-      <li><a href="{% url 'inventario' %}" class="btn-accion">Inventario</a></li>
-      <li><a href="#" class="disabled-link" onClick="return false;" title="Disponible próximamente">Reportes</a></li>
-      <!-- Menú desplegable -->
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle">Mi Cuenta</a>
-        <ul class="dropdown-menu">
-          <li><a href="{% url 'perfil' %}">Perfil</a></li>
-          <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
+    <!-- MEJORA: Envolvemos la navegación en un header para una mejor semántica. -->
+    <header class="app-header">
+        <nav class="navbar">
+            <div class="navbar-brand">FOCAL</div>
+            <ul class="navbar-menu">
+                <li><a href="{% url 'inventario' %}" class="btn-accion">Inventario</a></li>
+                <li><a href="#" class="disabled-link" onClick="return false;" title="Disponible próximamente">Reportes</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Mi Cuenta</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'perfil' %}">Perfil</a></li>
+                        <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
 
-  <main class="dashboard-container">
-    <h1 class="dashboard-title">Resumen General</h1>
+    <main class="dashboard-container">
+        <h1 class="dashboard-title">Resumen General</h1>
 
-    <section class="dashboard-metrics">
-      <div class="metric-card">
-        <h2>Productos Totales</h2>
-        <p id="total-productos">0</p>
-      </div>
-      <div class="metric-card">
-        <h2>Stock Disponible</h2>
-        <p id="stock-total">0</p>
-      </div>
-      <div class="metric-card">
-        <h2>Lotes Activos</h2>
-        <p id="lotes-activos">0</p>
-      </div>
-    </section>
+        <section class="dashboard-metrics">
+            <!-- OPTIMIZACIÓN: Los valores ahora vienen directamente desde la vista de Django. -->
+            <div class="metric-card">
+                <h2>Productos Totales</h2>
+                <p id="total-productos">{{ total_productos|default:"0" }}</p>
+            </div>
+            <div class="metric-card">
+                <h2>Stock Disponible</h2>
+                <p id="stock-total">{{ stock_total|default:"0" }}</p>
+            </div>
+            <div class="metric-card">
+                <h2>Lotes Activos</h2>
+                <p id="lotes-activos">{{ lotes_activos|default:"0" }}</p>
+            </div>
+        </section>
 
-    <section class="dashboard-graphs">
-      <h2 class="section-title">Distribución de Stock por Producto</h2>
-      <canvas id="graficoStockPorCategoria"></canvas>
-    </section>
-  </main>
+        <section class="dashboard-graphs">
+            <h2 class="section-title">Distribución de Stock por Producto</h2>
+            <canvas id="graficoStockPorCategoria"></canvas>
+        </section>
+    </main>
 
-  <!-- JS del Dashboard -->
-  <script src="{% static 'inventario/js/home.js' %}"></script>
+    <!-- MEJORA: Añadimos un footer para consistencia. -->
+    <footer class="app-footer">
+        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- OPTIMIZACIÓN: Pasamos los datos para el gráfico desde Django a JavaScript de forma segura. -->
+    <script id="dashboard-data" type="application/json">
+        {{ dashboard_data_json|safe }}
+    </script>
+
+    <!-- OPTIMIZACIÓN: Cargamos los scripts con 'defer' para no bloquear el renderizado de la página. -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="{% static 'inventario/js/home.js' %}" defer></script>
 </body>
 </html>

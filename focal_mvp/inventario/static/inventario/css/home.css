@@ -1,251 +1,217 @@
-/* === Variables FOCAL === */
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para el Dashboard (Home)
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
 :root {
   --primary-purple: #4A008B;
   --secondary-purple: #7B1FA2;
-  --light-purple: #F3E8FF;
-  --dark-text: #343A40;
-  --muted-text: #555555;
-  --white: #FFFFFF;
-  --navbar-footer-bg: #2C0140;
+  --light-purple: #f8f0ff;
   --hover-dark-purple: #38006B;
-  --hover-light-purple: #E0B3FF;
+  --hover-light-purple: #d1c4e9;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #dee2e6;
+  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
 }
 
-/* === Tipografías === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 @font-face {
   font-family: 'InterTight';
   src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
   font-weight: 700;
 }
-
 @font-face {
   font-family: 'HankenGrotesk';
   src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
   font-weight: 400;
 }
 
-/* === Generales === */
 body {
-  margin: 0;
-  font-family: 'HankenGrotesk', sans-serif;
+  font-family: var(--font-secondary);
   background-color: var(--light-purple);
   color: var(--dark-text);
+  margin: 0;
+  padding: 0;
   line-height: 1.6;
 }
 
-/* === Navbar === */
-.navbar {
-  background-color: var(--navbar-footer-bg);
+/* 2. Estilos de Layout Común (Header/Footer)
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--primary-purple);
   color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
-
 .navbar-brand {
-  font-family: 'InterTight', sans-serif;
+  font-family: var(--font-primary);
   font-size: 1.8rem;
-  color: var(--white);
+  font-weight: 700;
 }
-
 .navbar-menu {
   list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 1.5rem;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
-
-.navbar-menu li a {
+.navbar-menu a {
   color: var(--white);
   text-decoration: none;
-  font-weight: 400;
-  transition: color 0.3s;
+  font-weight: 600;
+  padding: 0.5rem 0;
+  transition: color 0.2s;
 }
-
-.navbar-menu li a:hover {
+.navbar-menu a:hover {
   color: var(--hover-light-purple);
 }
-
-/* === Contenedor Dashboard === */
-.dashboard-container {
-  padding: 2.5rem 1.5rem;
-  max-width: 1200px;
-  margin: auto;
+.menu-toggle { 
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
 }
 
-/* === Título Principal === */
+/* Estilos para el menú desplegable */
+.dropdown {
+  position: relative;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0; 
+  background-color: var(--white);
+  box-shadow: var(--box-shadow);
+  padding: 0.5rem 0;
+  border-radius: 8px;
+  list-style: none;
+  min-width: 180px;
+  z-index: 1001;
+}
+.dropdown-menu a {
+  color: var(--dark-text);
+  padding: 0.75rem 1.5rem;
+  display: block;
+  white-space: nowrap;
+}
+.dropdown-menu a:hover {
+  background-color: var(--light-purple);
+  color: var(--primary-purple);
+}
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.app-footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: 3rem;
+  font-size: 0.9rem;
+}
+
+/* 3. Estilos Específicos del Dashboard
+   -------------------------------------------------------------------------- */
+main.dashboard-container {
+  padding: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .dashboard-title {
-  font-family: 'InterTight';
-  font-size: 2.4rem;
+  font-family: var(--font-primary);
+  font-size: 2.5rem;
   text-align: center;
   margin-bottom: 3rem;
   color: var(--primary-purple);
 }
 
-/* === Métricas === */
 .dashboard-metrics {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
   margin-bottom: 4rem;
 }
 
 .metric-card {
   background-color: var(--white);
-  border-left: 6px solid var(--primary-purple);
-  border-radius: 10px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  flex: 1 1 30%;
-  min-width: 250px;
+  border-left: 5px solid var(--secondary-purple);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: var(--box-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
 .metric-card h2 {
-  font-size: 1.2rem;
-  color: var(--primary-purple);
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--muted-text);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  font-weight: 600;
 }
-
 .metric-card p {
-  font-size: 2.5rem;
-  font-weight: bold;
+  font-family: var(--font-primary);
+  font-size: 3rem;
+  font-weight: 700;
   margin: 0;
+  color: var(--primary-purple);
 }
 
-/* === Gráficos === */
 .dashboard-graphs {
   background-color: var(--white);
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
 }
-
 .section-title {
-  font-family: 'InterTight';
-  font-size: 1.4rem;
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
   text-align: center;
   color: var(--secondary-purple);
+  margin-top: 0;
   margin-bottom: 2rem;
 }
 
-canvas {
-  max-width: 100%;
-  height: auto;
-}
-
-/* === Estilo para el menú desplegable === */
-.navbar-menu .dropdown {
-  position: relative;
-}
-
-.navbar-menu .dropdown-toggle {
-  cursor: pointer;
-  color: var(--white);
-  text-decoration: none;
-}
-
-.navbar-menu .dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: var(--primary-purple);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  border-radius: 4px;
-}
-
-.navbar-menu .dropdown-menu li {
-  padding: 10px;
-}
-
-.navbar-menu .dropdown-menu li a {
-  color: var(--white);
-  text-decoration: none;
-  display: block;
-}
-
-.navbar-menu .dropdown:hover .dropdown-menu {
-  display: block;
-}
-
-.navbar-menu .dropdown:hover .dropdown-toggle {
-  color: var(--hover-light-purple);
-}
-
-/* === Planes - Mejora en la visualización de las tarjetas === */
-.plan-card {
-  background-color: var(--white);
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1.5rem;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  height: 100%;
-}
-
-.plan-card:hover {
-  transform: translateY(-5px);
-}
-
-.plan-card .plan-title {
-  font-family: 'InterTight', sans-serif;
-  font-size: 1.5rem;
-  color: var(--primary-purple);
-  margin-bottom: 0.5rem;
-}
-
-.plan-card .plan-price {
-  font-size: 2rem;
-  color: var(--secondary-purple);
-  margin-bottom: 1rem;
-}
-
-.plan-card .plan-features {
-  list-style: none;
-  padding-left: 0;
-  margin-bottom: 1.5rem;
-}
-
-.plan-card .plan-features li {
-  font-size: 1rem;
-  color: var(--dark-text);
-}
-
-.plan-card .btn-primary {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  padding: 0.8rem 2rem;
-  border: none;
-  border-radius: 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.plan-card .btn-primary:hover {
-  background-color: var(--hover-dark-purple);
-}
-
-/* === Responsive === */
+/* 4. Responsividad
+   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .dashboard-metrics {
-    flex-direction: column;
-    align-items: center;
+  .navbar-menu {
+    display: none; 
   }
-
-  .metric-card {
-    width: 100%;
-    max-width: 400px;
+  .menu-toggle {
+    display: block; 
   }
-
-  .plan-card {
-    max-width: 100%;
-    margin-bottom: 2rem;
+  .dashboard-title {
+    font-size: 2rem;
+  }
+  main.dashboard-container {
+    padding: 1.5rem;
   }
 }

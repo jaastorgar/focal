@@ -3,9 +3,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    
+    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag.
+         Asegura que la página se adapte correctamente al ancho de la pantalla
+         en cualquier dispositivo, haciendo el formulario fácil de usar. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Editar Producto | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/editar-producto.css' %}">
+    <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
     <header class="navbar">
@@ -37,7 +43,9 @@
                 {% endfor %}
                 <div class="botones">
                     <button type="submit" class="btn-submit">Guardar Cambios</button>
-                    <a href="{% url 'inventario' %}" class="btn-cancelar">Cancelar</a>
+                    
+                    <!-- MEJORA: Añadir role="button" mejora la accesibilidad. -->
+                    <a href="{% url 'inventario' %}" class="btn-cancelar" role="button">Cancelar</a>
                 </div>
             </form>
         </div>
@@ -45,7 +53,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 FOCAL. Todos los derechos reservados.</p>
+            <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
         </div>
     </footer>
 </body>

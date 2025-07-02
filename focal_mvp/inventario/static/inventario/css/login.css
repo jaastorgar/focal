@@ -1,235 +1,208 @@
-/* --- Variables de Colores de la Empresa (Paleta para Login) --- */
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para la Página de Login
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
 :root {
-    /* Morados principales de la marca */
-    --primary-purple: #4A008B;
-    --hover-dark-purple: #38006B;
-    --active-dark-purple: #2b0051;
-
-    /* Colores de texto */
-    --dark-text: #343A40;
-    --muted-text: #555555;
-    --white: #FFFFFF;
-
-    /* Fondo y bordes */
-    --light-background: #f8f9fa; /* Fondo general del body */
-    --card-background: #ffffff; /* Fondo del contenedor del formulario */
-    --border-color: #ced4da; /* Borde general de inputs */
-    --focus-border: #80bdff; /* Borde al enfocar inputs */
-    --focus-shadow: rgba(0, 123, 255, 0.25); /* Sombra al enfocar inputs */
-
-    /* Colores de error */
-    --error-text: #dc3545;
-    --error-bg: #f8d7da;
-    --error-border: #f5c6cb;
-    --error-dark-text: #721c24;
-
-    /* Sombras */
-    --shadow-medium: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --primary-purple: #4A008B;
+  --hover-dark-purple: #38006B;
+  --light-background: #f8f9fa;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #ced4da;
+  --focus-shadow: rgba(74, 0, 139, 0.25);
+  --error-text: #d32f2f;
+  --error-bg: #ffebee;
+  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
 }
 
-/* --- Definiciones de fuentes personalizadas --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
-/* HankenGrotesk Light */
+/* Las declaraciones @font-face se mantienen igual. */
 @font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-    font-weight: 300; /* Peso para Light */
-    font-style: normal;
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
 }
-
-/* HankenGrotesk Regular */
 @font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-    font-weight: 400; /* Peso para Regular */
-    font-style: normal;
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
 }
-
-/* InterTight */
 @font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-    font-weight: 700; /* Peso para Bold */
-    font-style: normal;
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
 }
 
-
-/* --- Estilos generales para el body y centrado --- */
 body {
-    font-family: 'HankenGrotesk', sans-serif;
-    background-color: var(--light-background); /* Usando la variable de fondo claro */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
+  font-family: var(--font-secondary);
+  background-color: var(--light-background);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
 }
 
-/* --- Estilos del contenedor principal del login --- */
-.login-container {
-    max-width: 400px; /* Ancho máximo para el formulario */
-    width: 100%; /* Ocupa el 100% del ancho disponible hasta el max-width */
-    background-color: var(--card-background);
-    padding: 4rem; /* Espaciado interno */
-    border-radius: 0.75rem; /* Bordes más redondeados */
-    box-shadow: var(--shadow-medium); /* Sombra para darle profundidad */
-    text-align: center; /* Centra el título */
+/* 2. Componentes Comunes (Header y Footer)
+   -------------------------------------------------------------------------- */
+.app-header-minimal {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+.app-header-minimal .logo {
+  color: var(--primary-purple);
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  text-decoration: none;
+  font-weight: 700;
 }
 
-/* --- Estilos del título h2 --- */
-.login-container h2 {
-    font-family: 'InterTight', sans-serif; /* Fuente para títulos */
-    color: var(--dark-text); /* Color de texto oscuro */
-    margin-bottom: 2rem;
-    font-size: 2rem;
-    font-weight: 700; /* Bold para InterTight */
+.app-footer {
+  width: 100%;
+  background-color: transparent;
+  color: var(--muted-text);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
 }
 
-/* --- Estilos del formulario de login --- */
+/* 3. Contenedor Principal del Login
+   -------------------------------------------------------------------------- */
+main.login-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--box-shadow);
+  text-align: center;
+}
+
+main.login-container h2 {
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+/* 4. Estilos del Formulario
+   -------------------------------------------------------------------------- */
 .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem; /* Espacio entre los grupos de formulario */
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-/* --- Estilos para cada grupo de formulario (label + input) --- */
 .form-group {
-    margin-bottom: 0; /* Elimina el margen por defecto de Bootstrap si usas form-group */
-    text-align: left; /* Alinea el label y el input a la izquierda */
+  text-align: left;
 }
 
-/* --- Estilos para las etiquetas (labels) --- */
 .form-group label {
-    font-family: 'HankenGrotesk', sans-serif; /* Fuente para labels */
-    color: var(--dark-text); /* Color de texto oscuro */
-    font-weight: 500;
-    margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 4px var(--focus-shadow);
+}
+
+/* 5. Mensajes de Error
+   -------------------------------------------------------------------------- */
+.error-message {
+  color: var(--error-text);
+  font-size: 0.875rem;
+  margin-top: 0.4rem;
+}
+
+.non-field-errors {
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-text);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.non-field-errors span {
     display: block;
-    font-size: 1rem;
 }
 
-/* --- Estilos para los campos de entrada (inputs) --- */
-.login-form input[type="text"],
-.login-form input[type="password"],
-.login-form input[type="email"] { /* Añadir otros tipos de input si es necesario */
-    -webkit-appearance: none; /* Elimina estilos por defecto de navegadores */
-    -moz-appearance: none;
-    appearance: none;
-    width: 90%;
-    padding: 0.85rem 1.25rem;
-    border: 1px solid var(--border-color); /* Borde consistente */
-    border-radius: 0.35rem;
-    font-family: 'HankenGrotesk', sans-serif; /* Fuente para inputs */
-    font-size: 1rem;
-    color: var(--dark-text);
-    background-color: var(--white);
-    box-shadow: none;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.login-form input[type="text"]:focus,
-.login-form input[type="password"]:focus,
-.login-form input[type="email"]:focus {
-    border-color: var(--focus-border);
-    box-shadow: 0 0 0 0.2rem var(--focus-shadow);
-    outline: 0;
-}
-
-/* Estilo para los placeholders */
-.login-form input::placeholder {
-    color: var(--muted-text);
-    opacity: 1; /* Asegura visibilidad en Firefox */
-}
-
-/* --- Estilos del botón de submit --- */
+/* 6. Botón de Envío y Enlaces
+   -------------------------------------------------------------------------- */
 .btn-submit {
-    background-color: var(--primary-purple); /* Color morado principal */
-    color: var(--white); /* Texto blanco */
-    border: 1px solid var(--primary-purple);
-    padding: 0.95rem 2rem;
-    border-radius: 0.35rem;
-    font-family: 'InterTight', sans-serif; /* Fuente para botones */
-    font-weight: 700; /* Bold */
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 1.5rem;
-    width: 100%;
-    display: block; /* Asegura que ocupe todo el ancho si tiene w-100 */
+  background-color: var(--primary-purple);
+  color: var(--white);
+  border: none;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
 }
 
 .btn-submit:hover {
-    background-color: var(--hover-dark-purple); /* Tono más oscuro al pasar el ratón */
-    border-color: var(--hover-dark-purple);
-    transform: translateY(-2px); /* Pequeño efecto de levantamiento */
+  background-color: var(--hover-dark-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.btn-submit:active {
-    background-color: var(--active-dark-purple) !important; /* Tono aún más oscuro al hacer clic */
-    border-color: var(--active-dark-purple) !important;
-    transform: translateY(0); /* Vuelve a su posición original */
-}
-
-/* --- Estilos para mensajes de error de campo individual --- */
-.error-message {
-    font-family: 'HankenGrotesk', sans-serif;
-    font-size: 0.9em;
-    margin-top: 0.5rem;
-    color: var(--error-text);
-    display: block;
-    text-align: left; /* Alinea los errores a la izquierda */
-}
-
-/* --- Estilos para errores no de campo (general del formulario) --- */
-.error-message.non-field-errors {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding: 0.75rem 1.25rem;
-    border-radius: 0.25rem;
-    background-color: var(--error-bg);
-    border: 1px solid var(--error-border);
-    color: var(--error-dark-text);
-    text-align: left;
-}
-
-/* --- Estilos para los nuevos enlaces de "olvidé contraseña" y "regístrate" --- */
 .login-links {
-    display: flex;
-    flex-direction: column;
-    margin-top: 1.5rem; /* Espacio superior para separarlo del botón */
-    font-family: 'HankenGrotesk', sans-serif; /* Aplica la fuente HankenGrotesk */
-    font-size: 0.95rem; /* Un poco más grande que el error, más pequeño que el label */
-    gap: 0.75rem; /* Espacio entre los enlaces */
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .login-links a {
-    color: var(--primary-purple); /* Color morado principal para los enlaces */
-    text-decoration: none; /* Sin subrayado por defecto */
-    transition: color 0.2s ease, text-decoration 0.2s ease;
+  color: var(--primary-purple);
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .login-links a:hover {
-    color: var(--hover-dark-purple); /* Un morado más oscuro al pasar el ratón */
-    text-decoration: underline; /* Subrayado al pasar el ratón */
+  text-decoration: underline;
 }
 
-/* Media Queries para Responsividad (Opcional, pero recomendado) */
-@media (max-width: 576px) { /* Para pantallas más pequeñas */
-    .login-container {
-        padding: 1.5rem;
-        margin: 10px; /* Un poco de margen en dispositivos pequeños */
-    }
-    .login-container h2 {
-        font-size: 1.8rem;
-        margin-bottom: 1.5rem;
-    }
-    .btn-submit {
-        font-size: 1.1rem;
-        padding: 0.8rem 1.5rem;
-    }
-    .login-links {
-        font-size: 0.9rem;
-    }
+/* 7. Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 576px) {
+  body {
+    padding: 1rem;
+  }
+  main.login-container {
+    padding: 2rem;
+  }
 }

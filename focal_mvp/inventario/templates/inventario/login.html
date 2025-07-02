@@ -2,37 +2,59 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iniciar sesión | FOCAL</title>
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'inventario/css/login.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/login.css' %}">
 </head>
 <body>
-  <div class="login-container">
-    <h2>Iniciar sesión</h2>
-    <form method="post" class="login-form">
-      {% csrf_token %}
-      {% for field in form %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <div class="error-message">{{ field.errors }}</div>
-          {% endif %}
-        </div>
-      {% endfor %}
-      {% if form.non_field_errors %}
-        <div class="error-message non-field-errors">{{ form.non_field_errors }}</div>
-      {% endif %}
-      <button type="submit" class="btn-submit">Ingresar</button>
 
-      {# Añadir enlaces para "He olvidado la contraseña" y "Regístrate aquí" #}
-      <div class="login-links">
-        <a href="{% url 'password_reset' %}" class="forgot-password-link">¿Has olvidado la contraseña?</a>
-        <a href="{% url 'registro' %}" class="register-link">Regístrate aquí</a>
-      </div>
-    </form>
-  </div>
+    <!-- MEJORA: Añadimos un header para darle una entrada visual a la página. -->
+    <header class="app-header-minimal">
+        <a href="{% url 'landing_page' %}" class="logo">FOCAL</a>
+    </header>
+
+    <!-- MEJORA: Usamos la etiqueta <main> para el contenido principal. -->
+    <main class="login-container">
+        <h2>Iniciar sesión</h2>
+        
+        <form method="post" class="login-form">
+            {% csrf_token %}
+
+            {# Muestra errores que no son específicos de un campo (ej. "usuario o contraseña incorrectos") #}
+            {% if form.non_field_errors %}
+                <div class="error-message non-field-errors">
+                    {% for error in form.non_field_errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# Itera sobre cada campo del formulario para renderizarlo #}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error-message">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn-submit">Ingresar</button>
+
+            <div class="login-links">
+                <a href="{% url 'password_reset' %}" class="forgot-password-link">¿Has olvidado la contraseña?</a>
+                <span>¿No tienes cuenta? <a href="{% url 'registro' %}" class="register-link">Regístrate aquí</a></span>
+            </div>
+        </form>
+    </main>
+
+    <!-- MEJORA: Un footer consistente, aunque sea simple. -->
+    <footer class="app-footer">
+        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+    </footer>
+
 </body>
 </html>

@@ -1,261 +1,229 @@
-/* --- Variables de Colores (Paleta para Registro) --- */
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para la Página de Registro
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
+   -------------------------------------------------------------------------- */
 :root {
-    /* Morados principales de la marca */
-    --primary-purple: #4A008B;
-    --hover-dark-purple: #38006B;
-    --active-dark-purple: #2b0051;
-
-    /* Colores de texto */
-    --dark-text: #343A40;
-    --muted-text: #555555;
-    --white: #FFFFFF;
-
-    /* Fondo y bordes */
-    --light-background: #f8f9fa; /* Fondo general del body */
-    --card-background: #ffffff; /* Fondo del contenedor del formulario */
-    --border-color: #ced4da; /* Borde general de inputs */
-    --focus-border: #80bdff; /* Borde al enfocar inputs */
-    --focus-shadow: rgba(0, 123, 255, 0.25); /* Sombra al enfocar inputs */
-
-    /* Colores de error */
-    --error-text: #dc3545;
-    --error-bg: #f8d7da;
-    --error-border: #f5c6cb;
-    --error-dark-text: #721c24;
-
-    /* Sombras */
-    --shadow-medium: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-background: #f8f9fa;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #ced4da;
+  --focus-shadow: rgba(74, 0, 139, 0.25);
+  --error-text: #d32f2f;
+  --error-bg: #ffebee;
+  --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
 }
 
-/* --- Definiciones de fuentes personalizadas --- */
-/* HankenGrotesk Light */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Las declaraciones @font-face se mantienen igual. */
 @font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
 }
-
-/* HankenGrotesk Regular */
 @font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
 }
-
-/* InterTight */
 @font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
 }
 
-/* --- Estilos generales para el body y centrado --- */
 body {
-    font-family: 'HankenGrotesk', sans-serif;
-    background-color: var(--light-background);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
+  font-family: var(--font-secondary);
+  background-color: var(--light-background);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
 }
 
-/* --- Contenedor principal del formulario de registro --- */
-.registration-container {
-    max-width: 900px; /* Más ancho para formularios de varias columnas */
-    width: 100%;
-    background-color: var(--card-background);
-    padding: 2.5rem;
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow-medium);
+/* 2. Componentes Comunes (Header y Footer)
+   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
+   -------------------------------------------------------------------------- */
+.app-header-minimal {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+.app-header-minimal .logo {
+  color: var(--primary-purple);
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  text-decoration: none;
+  font-weight: 700;
 }
 
-/* --- Título principal del formulario --- */
+.app-footer {
+  width: 100%;
+  background-color: transparent;
+  color: var(--muted-text);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* 3. Contenedor Principal del Formulario de Registro
+   -------------------------------------------------------------------------- */
+main.registration-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--box-shadow);
+}
+
 .form-title {
-    font-family: 'InterTight', sans-serif;
-    color: var(--dark-text);
-    margin-bottom: 2.5rem;
-    font-size: 2.2rem;
-    font-weight: bold;
+  font-family: var(--font-primary);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
     text-align: center;
-}
-
-/* --- Estilos para el formulario en sí --- */
-.registration-form {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem; /* Espacio entre secciones del formulario */
-}
-
-/* --- Sección del formulario (Almacenero, Empresa) --- */
-.form-section {
-    margin-bottom: 2rem; /* Espacio entre secciones */
-}
-
-.form-section:last-of-type {
-    margin-bottom: 0; /* No hay margen en la última sección */
-}
-
-/* --- Título de cada sección del formulario --- */
-.section-heading {
-    font-family: 'InterTight', sans-serif;
-    color: var(--primary-purple);
-    font-size: 1.6rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid var(--primary-purple);
-    padding-bottom: 0.5rem;
-    display: inline-block; /* Para que el borde inferior se ajuste al texto */
-}
-
-/* --- Grid para los campos del formulario --- */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 2 columnas en pantallas medianas, 1 en pequeñas */
-    gap: 1.5rem; /* Espacio entre campos */
-}
-
-/* --- Grupo de formulario (label + input) --- */
-.form-group {
-    text-align: left;
-}
-
-/* Para elementos que necesitan ocupar todo el ancho en el grid (ej. errores no de campo) */
-.grid-full-width {
-    grid-column: 1 / -1; /* Ocupa todas las columnas del grid */
-}
-
-/* --- Estilos para las etiquetas (labels) --- */
-.form-label {
-    font-family: 'HankenGrotesk', sans-serif;
-    color: var(--dark-text);
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-/* --- Estilos para los campos de entrada (inputs, selects, textareas) --- */
-.form-group input[type="text"],
-.form-group input[type="password"],
-.form-group input[type="email"],
-.form-group input[type="date"],
-.form-group select, /* Este selector ahora incluye las propiedades adicionales */
-.form-group textarea {
-    width: 100%;
-    padding: 0.85rem 1.25rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.35rem;
-    font-family: 'HankenGrotesk', sans-serif;
-    font-size: 1rem;
     color: var(--muted-text);
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    box-sizing: border-box; /* Asegura que el padding no añada ancho extra */
-    
-    /* --- PROPIEDADES ADICIONALES PARA PERSONALIZAR EL SELECT --- */
-    -webkit-appearance: none; /* Elimina el estilo por defecto en Webkit (Chrome, Safari) */
-    -moz-appearance: none;    /* Elimina el estilo por defecto en Firefox */
-    appearance: none;         /* Elimina el estilo por defecto en otros navegadores */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.4c-6.5%200-12.2%203.2-15.6%208.1-3.4%204.9-3.2%2011.6.5%2016.3l122.9%20122.9c4.7%204.7%2011.6%206.5%2018.1%205.4s12.2-3.2%2015.6-8.1l122.9-122.9c3.7-4.7%203.9-11.4.5-16.3z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 8px 10px;
-    padding-right: 2.5rem; /* Ajusta el padding derecho para el icono */
-    /* --- FIN PROPIEDADES ADICIONALES --- */
+    margin-bottom: 3rem;
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="password"]:focus,
-.form-group input[type="email"]:focus,
-.form-group input[type="date"]:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    border-color: var(--focus-border);
-    box-shadow: 0 0 0 0.2rem var(--focus-shadow);
-    outline: 0;
+/* 4. Secciones y Grid del Formulario
+   -------------------------------------------------------------------------- */
+.form-section {
+  margin-bottom: 3rem;
 }
 
-/* --- Contenedor del botón de enviar --- */
-.form-submit-container {
-    text-align: center; /* Centra el botón */
-    margin-top: 2rem; /* Espacio antes del botón */
+.section-heading {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  color: var(--primary-purple);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--primary-purple);
 }
 
-/* --- Estilos para el botón de enviar --- */
-.btn-submit {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    border: none;
-    font-family: 'InterTight', sans-serif;
-    font-weight: bold;
-    padding: 0.95rem 2.5rem; /* Un poco más de padding horizontal */
-    border-radius: 0.35rem;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-block; /* Para aplicar transform y padding correctamente */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem 2rem;
 }
 
-.btn-submit:hover {
-    background-color: var(--hover-dark-purple);
-    transform: translateY(-2px);
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
-.btn-submit:active {
-    background-color: var(--active-dark-purple) !important;
-    transform: translateY(0);
+.form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 }
 
-/* --- Estilos para mensajes de error de campo individual --- */
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 4px var(--focus-shadow);
+}
+
 .error-message {
-    font-family: 'HankenGrotesk', sans-serif;
-    font-size: 0.9em;
-    margin-top: 0.5rem;
-    color: var(--error-text);
-    display: block;
+  color: var(--error-text);
+  font-size: 0.875rem;
+  margin-top: 0.4rem;
 }
 
-/* --- Estilos para errores no de campo (general del formulario) --- */
 .alert-error {
-    font-family: 'HankenGrotesk', sans-serif;
-    font-size: 1em;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding: 0.75rem 1.25rem;
-    border-radius: 0.25rem;
     background-color: var(--error-bg);
-    border: 1px solid var(--error-border);
-    color: var(--error-dark-text);
-    text-align: left;
+    color: var(--error-text);
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.grid-full-width {
+    grid-column: 1 / -1;
 }
 
-/* --- Media Queries para Responsividad --- */
+/* 5. Botón de Envío y Enlaces
+   -------------------------------------------------------------------------- */
+.form-submit-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.btn-submit {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  border: none;
+  padding: 0.9rem 3rem;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.login-link-container {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--muted-text);
+}
+.login-link-container a {
+  color: var(--primary-purple);
+  font-weight: 600;
+  text-decoration: none;
+}
+.login-link-container a:hover {
+  text-decoration: underline;
+}
+
+/* 6. Responsividad
+   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-    .registration-container {
-        padding: 1.5rem;
-        margin: 10px; /* Añade margen en pantallas pequeñas */
-    }
-
-    .form-title {
-        font-size: 1.8rem;
-        margin-bottom: 2rem;
-    }
-
-    .section-heading {
-        font-size: 1.4rem;
-        margin-bottom: 1rem;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr; /* Una sola columna en pantallas muy pequeñas */
-        gap: 1rem;
-    }
-
-    .btn-submit {
-        padding: 0.8rem 2rem;
-        font-size: 1.1rem;
-    }
+  main.registration-container {
+    padding: 2rem;
+    margin: 1rem;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }

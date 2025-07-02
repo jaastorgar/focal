@@ -2,62 +2,73 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Lotes de {{ producto.nombre }} | FOCAL</title>
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'inventario/css/detalle_producto.css' %}">
+    <meta charset="UTF-8">
+    
+    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag.
+         Asegura que la página se adapte correctamente al ancho de la pantalla
+         en cualquier dispositivo, haciendo la tabla y los botones legibles. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Lotes de {{ producto.nombre }} | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/detalle_producto.css' %}">
 </head>
 <body>
 
 <header>
-  <nav class="nav-bar">
-    <a href="{% url 'inventario' %}" class="volver-inventario">← Volver al Inventario</a>
-    <div class="logo">
-      <a href="{% url 'home' %}">FOCAL</a>
-    </div>
-  </nav>
+    <nav class="nav-bar">
+        <a href="{% url 'inventario' %}" class="volver-inventario">← Volver al Inventario</a>
+        <div class="logo">
+            <a href="{% url 'home' %}">FOCAL</a>
+        </div>
+    </nav>
 </header>
 
 <main>
-  <h1>Lotes de {{ producto.nombre }}</h1>
+    <h1>Lotes de: {{ producto.nombre }}</h1>
 
-  {% if lotes %}
-    <table class="tabla-inventario">
-      <thead>
-        <tr>
-          <th>Cantidad</th>
-          <th>Fecha de Vencimiento</th>
-          <th>Registrado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for lote in lotes %}
-          <tr
-            {% if lote.fecha_vencimiento < today %}class="vencido"
-            {% elif lote.fecha_vencimiento|date:"U" <= hoy_mas_15dias %}class="proximo-vencer"
-            {% elif lote.cantidad <= 5 %}class="stock-bajo"
-            {% endif %}
-          >
-            <td>{{ lote.cantidad }}</td>
-            <td>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
-            <td>{{ lote.creado|date:"d-m-Y H:i" }}</td>
-            <td>
-              <a href="{% url 'editar_lote' lote.id %}" class="btn-accion">Editar</a>
-              <a href="{% url 'retirar_lote' lote.id %}" class="btn-accion">Retirar</a>
-              <a href="{% url 'eliminar_lote' lote.id %}" class="btn-accion btn-peligro">Eliminar</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No hay lotes registrados para este producto.</p>
-  {% endif %}
+    {% if lotes %}
+        <div class="table-container">
+            <table class="tabla-inventario">
+                <thead>
+                    <tr>
+                        <th>Cantidad</th>
+                        <th>Fecha de Vencimiento</th>
+                        <th>Registrado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lote in lotes %}
+                      <tr
+                        {% if lote.fecha_vencimiento < today %}class="vencido"
+                        {% elif lote.fecha_vencimiento|date:"U" <= hoy_mas_15dias %}class="proximo-vencer"
+                        {% elif lote.cantidad <= 5 %}class="stock-bajo"
+                        {% endif %}
+                      >
+                        <td>{{ lote.cantidad }}</td>
+                        <td>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
+                        <td>{{ lote.creado|date:"d-m-Y H:i" }}</td>
+                        <td class="acciones">
+                          <a href="{% url 'editar_lote' lote.id %}" class="btn-accion" role="button">Editar</a>
+                          <a href="{% url 'retirar_lote' lote.id %}" class="btn-accion" role="button">Retirar</a>
+                          <a href="{% url 'eliminar_lote' lote.id %}" class="btn-accion btn-peligro" role="button">Eliminar</a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="sin-lotes">No hay lotes registrados para este producto.</p>
+        <div class="acciones-vacias">
+            <a href="{% url 'agregar_lote' %}" class="btn-accion">Agregar un Lote</a>
+        </div>
+    {% endif %}
 </main>
 
 <footer>
-  © 2025 FOCAL. Todos los derechos reservados.
+    <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
 </footer>
 
 </body>

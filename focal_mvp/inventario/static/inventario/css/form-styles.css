@@ -1,0 +1,221 @@
+/* ==========================================================================
+   FOCAL - Hoja de Estilos Maestra para Formularios
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #f8f0ff;
+  --hover-dark-purple: #38006B;
+  --danger: #D32F2F;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #ced4da;
+  --focus-shadow: rgba(74, 0, 139, 0.25);
+  --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.09);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+body {
+  font-family: var(--font-secondary);
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 2. Componentes Comunes (Header y Footer)
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--primary-purple);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.app-header .logo {
+  color: var(--white);
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.app-footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* 3. Contenedor Principal del Formulario
+   -------------------------------------------------------------------------- */
+main.form-container {
+  width: 100%;
+  max-width: 700px;
+  margin: 2.5rem auto;
+  padding: 2.5rem;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--box-shadow);
+}
+
+main.form-container h1 {
+  font-family: var(--font-primary);
+  font-size: 2.2rem;
+  color: var(--primary-purple);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 2.5rem;
+}
+
+/* 4. Estilos de los Campos del Formulario
+   -------------------------------------------------------------------------- */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* Móvil primero: una columna */
+  gap: 1.5rem;
+}
+
+.form-field label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: var(--secondary-purple);
+  box-shadow: 0 0 0 4px var(--focus-shadow);
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* 5. Botones de Acción
+   -------------------------------------------------------------------------- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-submit, .btn-cancelar {
+  padding: 0.8rem 1.8rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+.btn-submit:hover, .btn-cancelar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-submit {
+  background-color: var(--primary-purple);
+  color: var(--white);
+}
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+}
+
+.btn-cancelar {
+  background-color: #f8f9fa;
+  color: var(--muted-text);
+  border-color: #dee2e6;
+}
+.btn-cancelar:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+/* 6. Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  main.form-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  main.form-container h1 {
+    font-size: 1.8rem;
+  }
+  .form-actions {
+    flex-direction: column-reverse; /* Apila botones en móvil */
+  }
+  .btn-submit, .btn-cancelar {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   7. Estilos para Tarjetas de Información (Adicional)
+   ========================================================================== */
+
+.details-card {
+  background-color: var(--light-purple);
+  border-left: 4px solid var(--secondary-purple);
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+  border-radius: 8px;
+}
+
+.details-card p {
+  margin: 0.5rem 0;
+  color: var(--dark-text);
+  font-size: 1rem;
+}
+
+.details-card p strong {
+  color: var(--primary-purple);
+  margin-right: 0.5rem;
+}

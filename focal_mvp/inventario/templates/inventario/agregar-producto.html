@@ -2,36 +2,53 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Agregar Producto | FOCAL</title>
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'inventario/css/agregar-producto.css' %}">
+    <meta charset="UTF-8">
+    
+    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag.
+         Asegura que la página se visualice correctamente en dispositivos móviles. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Agregar Producto | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
 
-  <main class="form-container">
-    <h1>Agregar Nuevo Producto</h1>
+    <!-- MEJORA: Añadir un header mejora la estructura semántica de la página. -->
+    <header class="app-header">
+        <a href="{% url 'home' %}" class="logo">FOCAL</a>
+    </header>
 
-    <form method="post">
-      {% csrf_token %}
-      <div class="form-grid">
-        {% for field in form %}
-          <div class="form-field">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-              <div class="error">{{ field.errors|striptags }}</div>
-            {% endif %}
-          </div>
-        {% endfor %}
-      </div>
+    <main class="form-container">
+        <h1>Agregar Nuevo Producto</h1>
 
-      <div class="form-actions">
-        <button type="submit" class="btn-submit">Guardar Producto</button>
-        <a href="{% url 'inventario' %}" class="btn-cancelar">Cancelar</a>
-      </div>
-    </form>
-  </main>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                {% for field in form %}
+                  <div class="form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="error">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Guardar Producto</button>
+                
+                <!-- MEJORA: Añadir role="button" mejora la accesibilidad. -->
+                <a href="{% url 'inventario' %}" class="btn-cancelar" role="button">Cancelar</a>
+            </div>
+        </form>
+    </main>
+
+    <!-- MEJORA: Un footer le da un cierre profesional a la página. -->
+    <footer class="app-footer">
+        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+    </footer>
 
 </body>
 </html>

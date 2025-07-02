@@ -1,88 +1,116 @@
 {% load static %}
+{% load humanize %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Perfil de Almacenero | FOCAL</title>
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'inventario/css/perfil.css' %}">
+    <meta charset="UTF-8">
+    
+    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag para un diseño responsivo. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Mi Perfil | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/perfil.css' %}">
 </head>
 <body>
 
-  <div class="perfil-container">
-    <h1>Perfil de Almacenero</h1>
+    <!-- MEJORA: Añadimos un header consistente con la navegación principal de la app. -->
+    <header class="app-header">
+        <nav class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <ul class="nav-links">
+                <li><a href="{% url 'inventario' %}">Inventario</a></li>
+                <li><a href="{% url 'historial_movimientos' %}">Historial</a></li>
+                <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <!-- Botones para cada sección -->
-    <div class="perfil-buttons">
-      <button onclick="toggleSection('almacenero')">Datos del Almacenero</button>
-      <button onclick="toggleSection('empresa')">Datos de la Empresa</button>
-      <button onclick="toggleSection('plan')">Plan Activo</button>
-      <button onclick="toggleSection('pago')">Método de Pago</button>
-    </div>
+    <!-- MEJORA: Usamos la etiqueta <main> para el contenido principal. -->
+    <main class="perfil-container">
+        <h1>Mi Perfil</h1>
 
-    <!-- Sección Datos del Almacenero -->
-    <section id="almacenero" class="perfil-datos">
-      <h2>Datos del Almacenero</h2>
-      <ul>
-        <li><strong>Nombre:</strong> {{ almacenero.nombre }} {{ almacenero.snombre }}</li>
-        <li><strong>Apellido:</strong> {{ almacenero.apellido }} {{ almacenero.sapellido }}</li>
-        <li><strong>RUN:</strong> {{ almacenero.run }}</li>
-        <li><strong>Teléfono:</strong> {{ almacenero.telefono }}</li>
-        <li><strong>Dirección:</strong> {{ almacenero.direccion }}</li>
-        <li><strong>Comuna:</strong> {{ almacenero.comuna }}</li>
-        <li><strong>Fecha de Nacimiento:</strong> {{ almacenero.fecha_nacimiento }}</li>
-      </ul>
-    </section>
+        <!-- Los botones para alternar secciones están bien implementados. -->
+        <div class="perfil-buttons">
+            <button onclick="toggleSection('almacenero')">Mis Datos</button>
+            <button onclick="toggleSection('empresa')">Datos de Empresa</button>
+            <button onclick="toggleSection('plan')">Mi Plan</button>
+            <button onclick="toggleSection('pago')">Método de Pago</button>
+        </div>
 
-    <!-- Sección Datos de la Empresa -->
-    <section id="empresa" class="perfil-empresa">
-      <h2>Datos de la Empresa</h2>
-      {% if empresa %}
-        <ul>
-          <li><strong>Nombre del Almacén:</strong> {{ empresa.nombre_almacen }}</li>
-          <li><strong>RUT:</strong> {{ empresa.rut }}</li>
-          <li><strong>Dirección Tributaria:</strong> {{ empresa.direccion_tributaria }}</li>
-          <li><strong>Comuna:</strong> {{ empresa.comuna }}</li>
-          <li><strong>Giro de Negocio:</strong> {{ empresa.giro_negocio }}</li>
-          <li><strong>Tipo de Sociedad:</strong> {{ empresa.tipo_sociedad }}</li>
-        </ul>
-      {% else %}
-        <p>No se ha asociado una empresa a este almacenero.</p>
-      {% endif %}
-    </section>
+        <!-- Sección Datos del Almacenero -->
+        <section id="almacenero" class="perfil-section">
+            <h2>Datos del Almacenero</h2>
+            <ul>
+                <li><strong>Nombre:</strong> {{ almacenero.nombre }} {{ almacenero.snombre }}</li>
+                <li><strong>Apellido:</strong> {{ almacenero.apellido }} {{ almacenero.sapellido }}</li>
+                <li><strong>RUN:</strong> {{ almacenero.run }}</li>
+                <li><strong>Teléfono:</strong> {{ almacenero.telefono|default:"No especificado" }}</li>
+                <li><strong>Dirección:</strong> {{ almacenero.direccion|default:"No especificada" }}</li>
+                <li><strong>Comuna:</strong> {{ almacenero.get_comuna_display }}</li>
+                <li><strong>Fecha de Nacimiento:</strong> {{ almacenero.fecha_nacimiento|date:"d-m-Y"|default:"No especificada" }}</li>
+            </ul>
+        </section>
 
-    <!-- Sección Datos del Plan Activo -->
-    <section id="plan" class="perfil-plan">
-      <h2>Plan Activo</h2>
-      {% if plan %}
-        <ul>
-          <li><strong>Nombre del Plan:</strong> {{ plan.get_nombre_display }}</li>
-          <li><strong>Precio:</strong> ${{ plan.precio }}</li>
-          <li><strong>Productos Permitidos:</strong> {{ plan.max_productos|default:"Ilimitado" }}</li>
-          <li><strong>Almacenes Permitidos:</strong> {{ plan.max_almacenes }}</li>
-          <li><strong>Soporte:</strong> {% if plan.soporte_prioritario %} Prioritario {% else %} Estándar {% endif %}</li>
-        </ul>
-      {% else %}
-        <p>No tienes un plan activo en este momento.</p>
-      {% endif %}
-    </section>
+        <!-- Sección Datos de la Empresa -->
+        <section id="empresa" class="perfil-section" style="display:none;">
+            <h2>Datos de la Empresa</h2>
+            {% if empresa %}
+                <ul>
+                    <li><strong>Nombre del Almacén:</strong> {{ empresa.nombre_almacen }}</li>
+                    <li><strong>RUT:</strong> {{ empresa.rut }}</li>
+                    <li><strong>Dirección Tributaria:</strong> {{ empresa.direccion_tributaria|default:"No especificada" }}</li>
+                    <li><strong>Comuna:</strong> {{ empresa.get_comuna_display }}</li>
+                    <li><strong>Giro de Negocio:</strong> {{ empresa.giro_negocio }}</li>
+                    <li><strong>Tipo de Sociedad:</strong> {{ empresa.tipo_sociedad }}</li>
+                </ul>
+            {% else %}
+                <p>No tienes una empresa asociada a tu cuenta.</p>
+            {% endif %}
+        </section>
 
-    <!-- Sección de Método de Pagos -->
-    <section id="pago" class="perfil-pago">
-      <h2>Método de Pago</h2>
-      {% if empresa and empresa.suscripcion %}
-        <ul>
-          <li><strong>Último Método de Pago:</strong> {{ empresa.suscripcion.plan.nombre }} ({{ empresa.suscripcion.fecha_inicio }} - {{ empresa.suscripcion.fecha_fin }})</li>
-        </ul>
-      {% else %}
-        <p>No se ha asociado un método de pago a esta empresa.</p>
-      {% endif %}
-    </section>
+        <!-- Sección Datos del Plan Activo -->
+        <section id="plan" class="perfil-section" style="display:none;">
+            <h2>Plan Activo</h2>
+            {% if plan %}
+                <ul>
+                    <li><strong>Nombre del Plan:</strong> {{ plan.get_nombre_display }}</li>
+                    <!-- MEJORA: Formato de precio más legible para Chile. -->
+                    <li><strong>Precio:</strong> ${{ plan.precio|floatformat:0|intcomma }}</li>
+                    <li><strong>Productos Permitidos:</strong> {% if plan.max_productos == 0 %}Ilimitados{% else %}{{ plan.max_productos }}{% endif %}</li>
+                    <li><strong>Almacenes Permitidos:</strong> {{ plan.max_almacenes }}</li>
+                    <li><strong>Soporte:</strong> {% if plan.soporte_prioritario %}Prioritario{% else %}Estándar{% endif %}</li>
+                </ul>
+                <a href="{% url 'vista_planes' %}" class="btn-cambiar-plan">Ver otros planes</a>
+            {% else %}
+                <p>No tienes un plan activo en este momento.</p>
+            {% endif %}
+        </section>
 
-  </div>
+        <!-- Sección de Método de Pagos -->
+        <section id="pago" class="perfil-section" style="display:none;">
+            <h2>Método de Pago</h2>
+            {% if empresa.suscripcion %}
+                <ul>
+                    <li><strong>Plan Actual:</strong> {{ empresa.suscripcion.plan.get_nombre_display }}</li>
+                    <li><strong>Inicio de Suscripción:</strong> {{ empresa.suscripcion.fecha_inicio|date:"d-m-Y" }}</li>
+                    <li><strong>Próxima Renovación:</strong> {{ empresa.suscripcion.fecha_fin|date:"d-m-Y"|default:"N/A" }}</li>
+                </ul>
+            {% else %}
+                <p>No hay información de pago disponible.</p>
+            {% endif %}
+        </section>
 
-  <!-- Referencia al archivo JS para la interacción -->
-  <script src="{% static 'inventario/js/perfil.js' %}"></script>
+    </main>
+    
+    <!-- MEJORA: Un footer consistente con el resto de la aplicación. -->
+    <footer class="app-footer">
+        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- OPTIMIZACIÓN: Añadimos 'defer' para que el script no bloquee la carga de la página. -->
+    <script src="{% static 'inventario/js/perfil.js' %}" defer></script>
 
 </body>
 </html>

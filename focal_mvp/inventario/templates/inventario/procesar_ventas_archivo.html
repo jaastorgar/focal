@@ -1,25 +1,62 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Procesar Ventas</title>
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'inventario/css/procesar_ventas_archivo.css' %}">
+    <meta charset="UTF-8">
+    
+    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag para un diseño responsivo. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Procesar Ventas desde Archivo | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/procesar_ventas_archivo.css' %}">
 </head>
 <body>
-  <h2>Descontar Productos desde Archivo</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Procesar</button>
-  </form>
 
-  {% if messages %}
-    <ul>
-      {% for message in messages %}
-        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+    <!-- MEJORA: Añadimos un header para navegación y consistencia. -->
+    <header class="app-header">
+        <nav class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <ul class="nav-links">
+                <li><a href="{% url 'inventario' %}">Volver al Inventario</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- MEJORA: Usamos la etiqueta <main> para el contenido principal. -->
+    <main class="upload-container">
+        <div class="upload-card">
+            <h2>Descontar Stock desde Archivo</h2>
+            <p class="instructions">
+                Sube un archivo Excel (.xlsx) con dos columnas: 'sku' y 'cantidad'. El sistema descontará automáticamente el stock de los productos correspondientes.
+            </p>
+
+            <!-- MEJORA: Mostramos los mensajes de Django de una forma más visible. -->
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="upload-form">
+                {% csrf_token %}
+                
+                <!-- El renderizado con .as_p es funcional, lo mantenemos. -->
+                {{ form.as_p }}
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Procesar Archivo</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- MEJORA: Un footer consistente con el resto de la aplicación. -->
+    <footer class="app-footer">
+        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+    </footer>
+
 </body>
 </html>

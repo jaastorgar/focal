@@ -1,148 +1,225 @@
-/* === Variables FOCAL === */
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para la Página de Perfil
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
 :root {
   --primary-purple: #4A008B;
   --secondary-purple: #7B1FA2;
-  --light-purple: #F3E8FF;
-  --dark-text: #343A40;
-  --muted-text: #555555;
-  --white: #FFFFFF;
-  --navbar-footer-bg: #2C0140;
+  --light-purple: #f8f0ff;
   --hover-dark-purple: #38006B;
-  --hover-light-purple: #E0B3FF;
-  --shadow-light: 0 4px 10px rgba(0,0,0,0.1); /* Sombra para tarjetas */
+  --hover-light-purple: #ede7f6;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #dee2e6;
+  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.09);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
 }
 
-/* === Tipografía === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 @font-face {
   font-family: 'InterTight';
   src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
   font-weight: 700;
 }
-
 @font-face {
   font-family: 'HankenGrotesk';
   src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
   font-weight: 400;
 }
 
-/* === Generales === */
 body {
-  margin: 0;
-  font-family: 'HankenGrotesk', sans-serif;
+  font-family: var(--font-secondary);
   background-color: var(--light-purple);
   color: var(--dark-text);
+  margin: 0;
+  padding: 0;
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-h1 {
-  font-family: 'InterTight', sans-serif;
+/* 2. Componentes Comunes (Header/Footer)
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.app-header nav.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.app-header .logo, .app-header .nav-links a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 700;
+}
+.app-header .logo {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+}
+.app-header .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1.5rem;
+}
+.app-header .nav-links a:hover {
+    color: #d1c4e9;
+}
+
+.app-footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+}
+
+/* 3. Contenedor Principal y Título
+   -------------------------------------------------------------------------- */
+main.perfil-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 2.5rem auto;
+  padding: 2.5rem;
+}
+
+main.perfil-container h1 {
+  font-family: var(--font-primary);
   font-size: 2.5rem;
   color: var(--primary-purple);
   text-align: center;
+  margin-top: 0;
   margin-bottom: 2rem;
 }
 
-/* === Contenedor del Perfil --- */
-.perfil-container {
-  padding: 3rem 2rem;
-  max-width: 1200px;
-  margin: auto;
-  background-color: var(--white);
-  border-radius: 8px;
-  box-shadow: var(--shadow-light);
+/* 4. Navegación por Pestañas (Botones)
+   -------------------------------------------------------------------------- */
+.perfil-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 2.5rem;
 }
 
-/* === Sección de Perfil === */
-section {
+.perfil-buttons button {
+  padding: 0.8rem 1.5rem;
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  color: var(--muted-text);
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.perfil-buttons button:hover {
+  color: var(--primary-purple);
+}
+
+/* Estilo para el botón de la sección activa */
+.perfil-buttons button.active {
+  color: var(--primary-purple);
+  border-bottom-color: var(--primary-purple);
+}
+
+/* 5. Secciones de Contenido
+   -------------------------------------------------------------------------- */
+.perfil-section {
   background-color: var(--white);
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: var(--shadow-light);
-  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
 }
 
-h2 {
+.perfil-section h2 {
+  font-family: var(--font-primary);
   font-size: 1.8rem;
-  color: var(--primary-purple);
-  margin-bottom: 1rem;
-}
-
-/* === Listas de Información --- */
-ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-ul li {
-  font-size: 1.1rem;
-  color: var(--muted-text);
-  margin-bottom: 0.6rem;
-}
-
-strong {
-  font-weight: bold;
   color: var(--dark-text);
-}
-
-/* === Estilo del mensaje de perfil gratuito --- */
-.plan-free-msg {
-  color: var(--secondary-purple);
-  font-style: italic;
-  margin-top: 1rem;
-}
-
-/* === Estilo del Método de Pago --- */
-.perfil-pago ul li {
-  font-size: 1.2rem;
-  color: var(--muted-text);
-}
-
-.perfil-pago p {
-  font-size: 1.1rem;
-  color: var(--muted-text);
-  font-style: italic;
-}
-
-/* === Estilo para los botones y enlaces --- */
-button, .btn-primary {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  border: none;
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover, .btn-primary:hover {
-  background-color: var(--hover-dark-purple);
-}
-
-/* === Estilo para el mensaje de advertencia --- */
-.messages {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  padding: 1rem;
-  border-radius: 5px;
-  font-size: 1rem;
+  margin-top: 0;
   margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.perfil-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.perfil-section ul li {
+  font-size: 1rem;
+  color: var(--muted-text);
+  margin-bottom: 0.8rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #f1f3f5;
+}
+.perfil-section ul li:last-child {
+  border-bottom: none;
 }
 
-/* === Responsive para pantallas pequeñas --- */
-@media (max-width: 768px) {
-  .perfil-container {
-    padding: 2rem 1rem;
-  }
+.perfil-section ul li strong {
+  font-weight: 600;
+  color: var(--dark-text);
+  margin-right: 1rem;
+}
 
-  h1 {
+.btn-cambiar-plan {
+    display: inline-block;
+    margin-top: 1.5rem;
+    background-color: var(--secondary-purple);
+    color: var(--white);
+    padding: 0.7rem 1.5rem;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+.btn-cambiar-plan:hover {
+    background-color: var(--primary-purple);
+}
+
+/* 6. Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  main.perfil-container {
+    padding: 1.5rem;
+    margin: 1.5rem auto;
+  }
+  main.perfil-container h1 {
     font-size: 2rem;
   }
-
-  section {
-    padding: 1.5rem;
+  .perfil-buttons {
+    gap: 0.2rem;
+  }
+  .perfil-buttons button {
+    flex-grow: 1; 
+    padding: 0.7rem 0.5rem;
+    font-size: 0.9rem;
+  }
+  .perfil-section ul li {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

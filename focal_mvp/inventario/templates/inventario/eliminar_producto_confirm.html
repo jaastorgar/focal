@@ -6,23 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirmar Eliminación | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/eliminar_producto.css' %}">
+    <link rel="stylesheet" href="{% static 'inventario/css/confirmation-styles.css' %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <div>
-                <a href="{% url 'home' %}">FOCAL</a>
-            </div>
-            <div>
-                <a href="{% url 'home' %}">Inicio</a>
-                <a href="{% url 'inventario' %}">Inventario</a>
-            </div>
+    <header class="app-header">
+        <!-- MEJORA: Usamos una estructura de navegación más semántica para el menú. -->
+        <nav class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'inventario' %}">Inventario</a></li>
+            </ul>
         </nav>
     </header>
 
-    <main>
+    <main class="confirmation-container">
         <h1>Confirmar Eliminación de Producto</h1>
+        
         {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
@@ -32,23 +32,32 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <p>¿Estás seguro de que quieres eliminar permanentemente el producto:</p>
-        <div class="product-details-card">
+
+        <p>¿Estás seguro de que quieres eliminar permanentemente el siguiente producto?</p>
+        
+        <div class="details-card">
             <p><strong>Nombre:</strong> {{ producto.nombre }}</p>
             <p><strong>SKU:</strong> {{ producto.sku }}</p>
-            <p><strong>Vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y"|default:"N/A" }}</p>
+            <!-- La vista pasa el lote más próximo a vencer, si existe. -->
+            <p><strong>Próximo Vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y"|default:"Sin lotes registrados" }}</p>
         </div>
-        <p class="warning-text">Esta acción no se puede deshacer.</p>
+
+        <!-- MEJORA: Se añade una advertencia más explícita sobre la eliminación de los lotes. -->
+        <p class="warning-text">
+            <strong>¡Atención!</strong> Al eliminar este producto, también se eliminarán permanentemente <strong>todos los lotes asociados</strong> a él. Esta acción no se puede deshacer.
+        </p>
         
         <form method="post" class="delete-form-actions">
             {% csrf_token %}
-            <button type="submit" class="btn-accion btn-peligro">Sí, Eliminar</button>
-            <a href="{% url 'inventario' %}" class="btn-accion btn-secundario">Cancelar</a>
+            <button type="submit" class="btn-accion btn-peligro">Sí, Eliminar Producto</button>
+            
+            <!-- MEJORA: Añadir role="button" mejora la accesibilidad. -->
+            <a href="{% url 'inventario' %}" class="btn-accion btn-secundario" role="button">Cancelar</a>
         </form>
     </main>
 
-    <footer>
-        © 2025 FOCAL. Todos los derechos reservados.
+    <footer class="app-footer">
+        <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>
