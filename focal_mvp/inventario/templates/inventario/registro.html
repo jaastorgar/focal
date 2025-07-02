@@ -6,14 +6,11 @@
     <title>Registro | FOCAL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    
-    <!-- Usamos el CSS optimizado para el registro -->
     <link rel="stylesheet" href="{% static 'inventario/css/registro.css' %}">
 </head>
 <body>
 
     <header class="app-header-minimal">
-        <!-- Enlaza a la página de inicio principal (landing) -->
         <a href="{% url 'landing' %}" class="logo">FOCAL</a>
     </header>
 
@@ -21,7 +18,19 @@
         <h2 class="form-title">Crea tu Cuenta en FOCAL</h2>
         <p class="form-subtitle">Regístrate para empezar a gestionar tu negocio de forma inteligente.</p>
 
-        <form method="post" class="registration-form">
+        {# --- CORRECCIÓN: Contenedor para mostrar mensajes de alerta --- #}
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    {# La clase del div cambiará según el tipo de mensaje (error, success, etc.) #}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" class="registration-form" novalidate>
             {% csrf_token %}
 
             {# Sección del Formulario del Almacenero #}
@@ -32,32 +41,6 @@
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                             {{ field }}
-
-                            {# --- CORRECCIÓN PARA EL JAVASCRIPT --- #}
-                            {# Se añade el bloque de feedback para la contraseña #}
-                            {% if field.name == 'password' %}
-                                <div id="password-feedback" class="password-requirements">
-                                    <p>La contraseña debe contener:</p>
-                                    <ul>
-                                        <li id="req-length">Entre 8 y 12 caracteres</li>
-                                        <li id="req-uppercase">Al menos una mayúscula (A-Z)</li>
-                                        <li id="req-lowercase">Al menos una minúscula (a-z)</li>
-                                        <li id="req-number">Al menos un número (0-9)</li>
-                                        <li id="req-special">Al menos un carácter especial (!@#$...)</li>
-                                    </ul>
-                                </div>
-                            {% endif %}
-
-                            {# Se añade el bloque de feedback para la confirmación de la contraseña #}
-                            {% if field.name == 'confirm_password' %}
-                                <div class="password-requirements">
-                                    <ul>
-                                        <li id="req-match">Las contraseñas deben coincidir</li>
-                                    </ul>
-                                </div>
-                            {% endif %}
-                            {# --- FIN DE LA CORRECCIÓN --- #}
-
                             {% if field.errors %}
                                 <div class="error-message">{{ field.errors|striptags }}</div>
                             {% endif %}
@@ -92,7 +75,6 @@
                 </div>
             </div>
 
-            {# Botón de registro y enlace a login #}
             <div class="form-submit-container">
                 <button type="submit" class="btn-submit">Crear Cuenta</button>
             </div>
@@ -107,7 +89,7 @@
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- El script se carga al final con 'defer' para no bloquear la página. -->
+    <!-- El script de validación de contraseña no necesita cambios -->
     <script src="{% static 'inventario/js/registro.js' %}" defer></script>
 </body>
 </html>

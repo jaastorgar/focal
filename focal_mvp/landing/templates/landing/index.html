@@ -143,15 +143,6 @@
                 
                 <button type="submit" class="btn btn-submit">Enviar Mensaje</button>
             </form>
-
-            <!-- Este bloque mostrará los mensajes de éxito o error que configuramos en la vista -->
-            {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
         </div>
     </section>
 

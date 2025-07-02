@@ -34,4 +34,4 @@ def contacto_submit_view(request):
     
     # Después de procesar el formulario (con éxito o error), siempre redirige
     # de vuelta a la página de inicio.
-    return redirect('landing_page')
+    return redirect('landing')

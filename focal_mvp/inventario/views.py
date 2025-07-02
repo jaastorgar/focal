@@ -23,26 +23,21 @@ def vista_registro(request):
         almacenero_form = AlmaceneroForm(request.POST, prefix='almacenero')
         empresa_form = EmpresaForm(request.POST, prefix='empresa')
 
+        # Comprueba si ambos formularios son válidos
         if almacenero_form.is_valid() and empresa_form.is_valid():
-            # Usamos transaction.atomic para asegurar la integridad de los datos
             try:
                 with transaction.atomic():
-                    # 1. Crear el objeto User
+                    # Lógica para crear el usuario, empresa, etc.
                     user = User.objects.create_user(
                         username=almacenero_form.cleaned_data['username'],
                         password=almacenero_form.cleaned_data['password']
                     )
-
-                    # 2. Guardar la empresa
                     empresa = empresa_form.save()
-
-                    # 3. Guardar el almacenero
                     almacenero = almacenero_form.save(commit=False)
                     almacenero.usuario = user
                     almacenero.empresa = empresa
                     almacenero.save()
 
-                    # 4. Asignar suscripción gratuita
                     plan_gratuito = PlanSuscripcion.objects.get(nombre='FREE')
                     SuscripcionUsuario.objects.create(
                         empresa=empresa,
@@ -50,23 +45,25 @@ def vista_registro(request):
                         activa=True
                     )
                 
-                messages.success(request, 'Registro exitoso. ¡Ahora puedes iniciar sesión!')
-                return redirect('/login/')
+                messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión.')
+                return redirect('login')
             
-            except PlanSuscripcion.DoesNotExist:
-                # Error específico si el plan no existe
-                messages.error(request, "ERROR: El plan 'FREE' no se encontró. Contacte al administrador.")
             except Exception as e:
-                # Captura cualquier otro error durante la transacción
-                messages.error(request, f"Hubo un error en el registro: {e}. Por favor, inténtelo de nuevo.")
+                # Si algo falla durante la creación, muestra un error
+                messages.error(request, f"Hubo un error inesperado durante el registro: {e}")
+        
         else:
-            # Si uno de los formularios no es válido, los errores se mostrarán automáticamente en el template
-            pass
+            # --- CORRECCIÓN CLAVE ---
+            # Si los formularios NO son válidos, envía un mensaje de error general.
+            # Django se encargará de mostrar los errores específicos en cada campo.
+            messages.error(request, 'Por favor, corrige los errores en el formulario para continuar.')
+
     else:
-        # Para solicitudes GET, crea formularios vacíos
+        # Para una solicitud GET, simplemente crea formularios vacíos
         almacenero_form = AlmaceneroForm(prefix='almacenero')
         empresa_form = EmpresaForm(prefix='empresa')
 
+    # Renderiza la plantilla, pasándole los formularios (que pueden contener errores si es POST)
     return render(request, 'inventario/registro.html', {
         'almacenero_form': almacenero_form,
         'empresa_form': empresa_form
