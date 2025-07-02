@@ -1,33 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Buscamos el elemento canvas para el gráfico.
   const canvasElement = document.getElementById('graficoStockPorCategoria');
-  if (!canvasElement) {
-    console.error('Error: No se encontró el elemento canvas para el gráfico.');
-    return;
-  }
-
-  // 2. Buscamos la etiqueta <script> que contiene nuestros datos.
   const dataScriptElement = document.getElementById('dashboard-data');
-  if (!dataScriptElement) {
-    console.error('Error: No se encontró la etiqueta de datos del dashboard.');
+
+  if (!canvasElement || !dataScriptElement) {
     return;
   }
 
   try {
-    // 3. Extraemos y parseamos los datos JSON.
-    // La vista de Django ya ha colocado los datos aquí.
     const dashboardData = JSON.parse(dataScriptElement.textContent);
 
-    // Verificamos que los datos necesarios para el gráfico existan.
-    if (!dashboardData || !dashboardData.labels || !dashboardData.data) {
-        console.warn('Advertencia: Faltan datos para renderizar el gráfico del dashboard.');
+    // --- CORRECCIÓN: Verificamos si hay datos ANTES de intentar dibujar el gráfico ---
+    if (!dashboardData || !dashboardData.labels || dashboardData.labels.length === 0) {
+        // Si no hay datos, podemos ocultar el contenedor del gráfico o mostrar un mensaje.
+        const graphContainer = document.querySelector('.dashboard-graphs');
+        if (graphContainer) {
+            graphContainer.innerHTML = '<p class="no-data-message">No hay datos de stock para mostrar en el gráfico.</p>';
+        }
         return;
     }
 
-    // 4. Creamos el gráfico con los datos obtenidos.
     const ctx = canvasElement.getContext('2d');
     new Chart(ctx, {
-      type: 'bar', 
+      type: 'bar',
       data: {
         labels: dashboardData.labels,
         datasets: [{
@@ -57,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
           y: {
             beginAtZero: true,
             ticks: {
-              // Formatear los ticks para que no tengan decimales si son enteros
               callback: function(value) { if (value % 1 === 0) { return value; } }
             }
           }

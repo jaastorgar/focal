@@ -9,13 +9,14 @@ from django.contrib import messages
 from .decorators import plan_requerido, caracteristica_requerida
 from django.contrib.auth import logout
 from datetime import date, timedelta
-from django.db.models import Q, Min, F, Sum
+from django.db.models import Q, Min, F, Sum, Count
 from openpyxl import Workbook
 from django.http import HttpResponse
 from .utils import obtener_empresa_del_usuario
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
 import time
+import json
 
 def vista_registro(request):
     if request.method == 'POST':
@@ -95,7 +96,48 @@ def vista_login(request):
 
 @login_required
 def home(request):
-    return render(request, 'inventario/home.html')
+    empresa = obtener_empresa_del_usuario(request.user)
+    
+    # --- CORRECCIÓN: Inicializamos el contexto con valores por defecto ---
+    context = {
+        'total_productos': 0,
+        'stock_total': 0,
+        'lotes_activos': 0,
+        'dashboard_data_json': json.dumps({'labels': [], 'data': []})
+    }
+
+    if empresa:
+        productos_empresa = Producto.objects.filter(empresa=empresa)
+        
+        # Si hay productos, calculamos las métricas reales
+        if productos_empresa.exists():
+            metricas = productos_empresa.aggregate(
+                total_stock=Sum('lotes__cantidad'),
+                total_lotes=Count('lotes')
+            )
+            
+            stock_por_producto = (
+                productos_empresa
+                .annotate(stock=Sum('lotes__cantidad'))
+                .filter(stock__gt=0)
+                .values('nombre', 'stock')
+                .order_by('-stock')[:10]
+            )
+            
+            dashboard_data = {
+                'labels': [item['nombre'] for item in stock_por_producto],
+                'data': [item['stock'] for item in stock_por_producto],
+            }
+            
+            # Actualizamos el contexto con los datos reales
+            context.update({
+                'total_productos': productos_empresa.count(),
+                'stock_total': metricas.get('total_stock') or 0,
+                'lotes_activos': metricas.get('total_lotes') or 0,
+                'dashboard_data_json': json.dumps(dashboard_data)
+            })
+
+    return render(request, 'inventario/home.html', context)
 
 @login_required
 def logout_view(request):

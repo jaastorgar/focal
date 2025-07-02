@@ -8,8 +8,6 @@
   --primary-purple: #4A008B;
   --secondary-purple: #7B1FA2;
   --light-purple: #f8f0ff;
-  --hover-dark-purple: #38006B;
-  --hover-light-purple: #ede7f6;
   --white: #FFFFFF;
   --dark-text: #212529;
   --muted-text: #6c757d;
@@ -24,6 +22,7 @@
   box-sizing: border-box;
 }
 
+/* Las declaraciones @font-face se mantienen igual. */
 @font-face {
   font-family: 'InterTight';
   src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
@@ -47,7 +46,7 @@ body {
   min-height: 100vh;
 }
 
-/* 2. Componentes Comunes (Header/Footer)
+/* 2. Componentes Comunes (Header y Footer)
    -------------------------------------------------------------------------- */
 .app-header {
   background-color: var(--primary-purple);
@@ -135,7 +134,6 @@ main.perfil-container h1 {
   color: var(--primary-purple);
 }
 
-/* Estilo para el botón de la sección activa */
 .perfil-buttons button.active {
   color: var(--primary-purple);
   border-bottom-color: var(--primary-purple);
@@ -144,10 +142,20 @@ main.perfil-container h1 {
 /* 5. Secciones de Contenido
    -------------------------------------------------------------------------- */
 .perfil-section {
+  /* CORRECCIÓN CLAVE: Ocultamos las secciones por defecto */
+  display: none;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
   background-color: var(--white);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: var(--box-shadow);
+}
+
+/* La clase '.visible' que añade el JS hará que la sección aparezca */
+.perfil-section.visible {
+  display: block;
+  opacity: 1;
 }
 
 .perfil-section h2 {
@@ -214,7 +222,7 @@ main.perfil-container h1 {
     gap: 0.2rem;
   }
   .perfil-buttons button {
-    flex-grow: 1; 
+    flex-grow: 1;
     padding: 0.7rem 0.5rem;
     font-size: 0.9rem;
   }

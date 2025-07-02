@@ -22,16 +22,6 @@
 
     <main class="confirmation-container">
         <h1>Confirmar Eliminación de Producto</h1>
-        
-        {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
 
         <p>¿Estás seguro de que quieres eliminar permanentemente el siguiente producto?</p>
         

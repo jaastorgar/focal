@@ -3,58 +3,59 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    
-    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag.
-         Asegura que la página se adapte correctamente al ancho de la pantalla
-         en cualquier dispositivo, haciendo el formulario fácil de usar. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Editar Producto | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    
+    <!-- Apuntamos al archivo de estilos maestro para formularios, que vamos a rediseñar. -->
     <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
+    <header class="app-header">
+        <nav class="container">
             <a href="{% url 'home' %}" class="logo">FOCAL</a>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="{% url 'home' %}">Inicio</a></li>
-                    <li><a href="{% url 'inventario' %}">Inventario</a></li>
-                </ul>
-            </nav>
-        </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'inventario' %}">Inventario</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main class="main-content">
-        <div class="container formulario-container">
+    <!-- Envolvemos el contenido en un 'form-wrapper' para centrarlo -->
+    <main class="form-wrapper">
+        <!-- Esta es la tarjeta principal que contendrá el formulario -->
+        <div class="form-card">
             <h1>Editar Producto</h1>
-            <form method="post" class="formulario-producto">
+            
+            <form method="post">
                 {% csrf_token %}
-                {{ form.non_field_errors }}
-                {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <small class="error">{{ field.errors|join:", " }}</small>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                <div class="botones">
-                    <button type="submit" class="btn-submit">Guardar Cambios</button>
-                    
-                    <!-- MEJORA: Añadir role="button" mejora la accesibilidad. -->
-                    <a href="{% url 'inventario' %}" class="btn-cancelar" role="button">Cancelar</a>
+                
+                {% if form.non_field_errors %}
+                    <div class="alert-error">{{ form.non_field_errors|striptags }}</div>
+                {% endif %}
+
+                <div class="form-grid">
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <small class="error-message">{{ field.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'inventario' %}" class="btn btn-cancel" role="button">Cancelar</a>
+                    <button type="submit" class="btn btn-submit">Guardar Cambios</button>
                 </div>
             </form>
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
-        </div>
+    <footer class="app-footer">
+        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>

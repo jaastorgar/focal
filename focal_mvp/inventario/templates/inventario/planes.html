@@ -18,10 +18,9 @@
     <!-- MEJORA: Añadimos un header para navegación y consistencia. -->
     <header class="app-header">
         <nav class="container">
-            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <a href="{% url 'landing' %}" class="logo">FOCAL</a>
             <ul class="nav-links">
-                <li><a href="{% url 'inventario' %}">Inventario</a></li>
-                <li><a href="{% url 'perfil' %}">Mi Perfil</a></li>
+                <li><a href="{% url 'landing' %}">volver al inicio</a></li>
             </ul>
         </nav>
     </header>
@@ -62,7 +61,7 @@
 
             <div class="contact-info">
                 <p>¿Necesitas un plan a medida o tienes más preguntas?</p>
-                <a href="{% url 'landing_page' %}#contact" class="btn-secondary">Contáctanos</a>
+                <a href="{% url 'landing' %}#contact" class="btn-secondary">Contáctanos</a>
             </div>
         </section>
     </main>

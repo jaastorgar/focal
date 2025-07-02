@@ -3,17 +3,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    
-    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag para un diseño responsivo. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Procesar Ventas desde Archivo | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'inventario/css/procesar_ventas_archivo.css' %}">
 </head>
 <body>
 
-    <!-- MEJORA: Añadimos un header para navegación y consistencia. -->
     <header class="app-header">
         <nav class="container">
             <a href="{% url 'home' %}" class="logo">FOCAL</a>
@@ -23,28 +19,34 @@
         </nav>
     </header>
 
-    <!-- MEJORA: Usamos la etiqueta <main> para el contenido principal. -->
     <main class="upload-container">
         <div class="upload-card">
             <h2>Descontar Stock desde Archivo</h2>
             <p class="instructions">
-                Sube un archivo Excel (.xlsx) con dos columnas: 'sku' y 'cantidad'. El sistema descontará automáticamente el stock de los productos correspondientes.
+                Sube un archivo Excel (.xlsx) o CSV con dos columnas: 'sku' y 'cantidad'. El sistema descontará automáticamente el stock de los productos correspondientes.
             </p>
-
-            <!-- MEJORA: Mostramos los mensajes de Django de una forma más visible. -->
-            {% if messages %}
-                <div class="messages-container">
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
 
             <form method="post" enctype="multipart/form-data" class="upload-form">
                 {% csrf_token %}
                 
-                <!-- El renderizado con .as_p es funcional, lo mantenemos. -->
-                {{ form.as_p }}
+                <div class="file-upload-wrapper">
+                    <!-- El input real está oculto, pero Django lo usa para procesar el archivo. -->
+                    {{ form.archivo_ventas }}
+                    
+                    <!-- Este es el "botón" visible que el usuario presionará.
+                         El atributo 'for' es la clave para que funcione. -->
+                    <label for="{{ form.archivo_ventas.id_for_label }}" class="file-upload-label">
+                        <span class="file-upload-icon">📁</span>
+                        <span class="file-upload-text">Seleccionar archivo</span>
+                    </label>
+                    
+                    <!-- Aquí mostraremos el nombre del archivo seleccionado con JS. -->
+                    <span id="file-name-display" class="file-name-display">Ningún archivo seleccionado</span>
+                </div>
+                
+                {% if form.archivo_ventas.errors %}
+                    <div class="error-message">{{ form.archivo_ventas.errors|striptags }}</div>
+                {% endif %}
                 
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">Procesar Archivo</button>
@@ -53,10 +55,12 @@
         </div>
     </main>
 
-    <!-- MEJORA: Un footer consistente con el resto de la aplicación. -->
     <footer class="app-footer">
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
+
+    <!-- Añadimos el script para manejar la interfaz del input de archivo -->
+    <script src="{% static 'inventario/js/procesar_ventas_archivo.js' %}" defer></script>
 
 </body>
 </html>

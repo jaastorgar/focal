@@ -13,7 +13,6 @@
 <body>
 
 <header class="app-header">
-    <!-- MEJORA: Usamos una estructura de navegación más semántica. -->
     <nav class="container">
         <a href="{% url 'home' %}" class="logo">FOCAL</a>
         <ul class="nav-links">
@@ -21,34 +20,25 @@
             <li><a href="{% url 'agregar_lote' %}" class="btn-accion">Registrar Lote</a></li>
             <li><a href="{% url 'descargar_plantilla' %}" class="btn-accion">Descargar Plantilla</a></li>
             <li><a href="{% url 'procesar_ventas_archivo' %}" class="btn-accion">Descontar Productos</a></li>
-            <li><a href="{% url 'home' %}">Volver al Home</a></li>
+            <li><a href="{% url 'home' %}" class="btn-accion">Volver al Home</a></li>
         </ul>
     </nav>
 </header>
 
 <main class="container">
-    <h1>Inventario de productos</h1>
-
-    <div class="search-section">
-        <form method="GET" action="{% url 'inventario' %}" class="search-form"> 
-            <input class="search-input" type="search" placeholder="Buscar por nombre, sku, marca..." aria-label="Search" name="q" value="{{ query|default_if_none:'' }}">
-            <button class="search-button" type="submit">Buscar</button>
-            {% if query %}
-                <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a> 
-            {% endif %}
-        </form>
-    </div>
-
-    {% if messages %}
-        <div id="mensajes">
-            {% for message in messages %}
-                <div class="alert {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
     {% if productos %}
-        <!-- MEJORA: Envolvemos la tabla para hacerla responsiva en móviles. -->
+        <h1>Inventario de productos</h1>
+
+        <div class="search-section">
+            <form method="GET" action="{% url 'inventario' %}" class="search-form"> 
+                <input class="search-input" type="search" placeholder="Buscar por nombre, sku, marca..." aria-label="Search" name="q" value="{{ query|default_if_none:'' }}">
+                <button class="search-button" type="submit">Buscar</button>
+                {% if query %}
+                    <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a> 
+                {% endif %}
+            </form>
+        </div>
+
         <div class="table-container">
             <table class="tabla-inventario">
                 <thead>
@@ -68,12 +58,9 @@
                 <tbody>
                     {% for producto in productos %}
                         <tr
-                            {% if producto.proximo_vencimiento and producto.proximo_vencimiento < today %}
-                                class="vencido"
-                            {% elif producto.proximo_vencimiento and producto.proximo_vencimiento|date:"U" <= hoy_mas_15dias %}
-                                class="proximo-vencer"
-                            {% elif producto.stock_total and producto.stock_total <= 5 %}
-                                class="stock-bajo"
+                            {% if producto.proximo_vencimiento and producto.proximo_vencimiento < today %} class="vencido"
+                            {% elif producto.proximo_vencimiento and producto.proximo_vencimiento|date:"U" <= hoy_mas_15dias %} class="proximo-vencer"
+                            {% elif producto.stock_total and producto.stock_total <= 5 %} class="stock-bajo"
                             {% endif %}
                         >
                             <td>{{ producto.nombre }}</td>
@@ -86,9 +73,9 @@
                             <td>{{ producto.stock_total|default:"0" }}</td>
                             <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
                             <td class="acciones">
-                                <a href="{% url 'editar_producto' producto.id %}" class="btn-accion" role="button">Editar</a>
-                                <a href="{% url 'eliminar_producto' producto.id %}" class="btn-accion btn-peligro" role="button">Eliminar</a>
-                                <a href="{% url 'detalle_producto' producto.id %}" class="btn-accion" role="button">Ver Lotes</a>
+                                <a href="{% url 'editar_producto' producto.id %}" class="btn-accion-tabla" role="button">Editar</a>
+                                <a href="{% url 'eliminar_producto' producto.id %}" class="btn-accion-tabla btn-peligro" role="button">Eliminar</a>
+                                <a href="{% url 'detalle_producto' producto.id %}" class="btn-accion-tabla" role="button">Ver Lotes</a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -96,13 +83,37 @@
             </table>
         </div>
     {% else %}
-        <p class="no-products-message">
-            {% if query %}
-                No se encontraron productos que coincidan con tu búsqueda.
-            {% else %}
-                Aún no has registrado ningún producto. ¡Comienza agregando uno!
-            {% endif %}
-        </p>
+        {# --- NUEVO DISEÑO PARA EL ESTADO VACÍO --- #}
+        <div class="empty-state-wrapper">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h2 class="empty-state-title">
+                    {% if query %}
+                        Sin resultados para "{{ query }}"
+                    {% else %}
+                        Tu inventario está vacío
+                    {% endif %}
+                </h2>
+                <p class="empty-state-message">
+                    {% if query %}
+                        Intenta con otros términos de búsqueda o limpia el filtro para ver todos tus productos.
+                    {% else %}
+                        Añade tu primer producto para empezar a gestionar tu stock.
+                    {% endif %}
+                </p>
+                <div class="empty-state-actions">
+                    <a href="{% url 'agregar_producto' %}" class="btn-accion-principal">
+                        + Agregar Nuevo Producto
+                    </a>
+                </div>
+            </div>
+        </div>
     {% endif %}
 </main>
 
@@ -110,7 +121,6 @@
     <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
 </footer>
 
-<!-- OPTIMIZACIÓN: Añadimos 'defer' para que el script no bloquee la carga de la página. -->
 <script src="{% static 'inventario/js/inventario.js' %}" defer></script>
 
 </body>
