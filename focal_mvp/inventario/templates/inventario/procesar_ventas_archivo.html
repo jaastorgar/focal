@@ -26,21 +26,27 @@
                 Sube un archivo Excel (.xlsx) o CSV con dos columnas: 'sku' y 'cantidad'. El sistema descontará automáticamente el stock de los productos correspondientes.
             </p>
 
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <form method="post" enctype="multipart/form-data" class="upload-form">
                 {% csrf_token %}
                 
                 <div class="file-upload-wrapper">
-                    <!-- El input real está oculto, pero Django lo usa para procesar el archivo. -->
+                    <!-- El input real está oculto, pero es funcional gracias al JS. -->
                     {{ form.archivo_ventas }}
                     
-                    <!-- Este es el "botón" visible que el usuario presionará.
-                         El atributo 'for' es la clave para que funcione. -->
-                    <label for="{{ form.archivo_ventas.id_for_label }}" class="file-upload-label">
-                        <span class="file-upload-icon">📁</span>
-                        <span class="file-upload-text">Seleccionar archivo</span>
-                    </label>
+                    <!-- Este es el "botón" visible. Ya no depende del 'for'. -->
+                    <div class="file-upload-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span class="file-upload-text">Seleccionar archivo...</span>
+                    </div>
                     
-                    <!-- Aquí mostraremos el nombre del archivo seleccionado con JS. -->
                     <span id="file-name-display" class="file-name-display">Ningún archivo seleccionado</span>
                 </div>
                 
@@ -59,7 +65,6 @@
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- Añadimos el script para manejar la interfaz del input de archivo -->
     <script src="{% static 'inventario/js/procesar_ventas_archivo.js' %}" defer></script>
 
 </body>

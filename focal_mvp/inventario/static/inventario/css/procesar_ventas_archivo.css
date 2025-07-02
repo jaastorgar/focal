@@ -1,9 +1,4 @@
-/* ==========================================================================
-   FOCAL - Hoja de Estilos para la Página de Carga de Archivos
-   ========================================================================== */
-
-/* 1. Variables y Configuración Base
-   -------------------------------------------------------------------------- */
+/* 1. Variables, Fuentes y Configuración Base */
 :root {
   --primary-purple: #4A008B;
   --secondary-purple: #7B1FA2;
@@ -18,16 +13,10 @@
   --success-text: #2e7d32;
   --error-bg: #ffebee;
   --error-text: #c62828;
-  
   --font-primary: 'InterTight', sans-serif;
   --font-secondary: 'HankenGrotesk', sans-serif;
 }
-
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-/* --- CORRECCIÓN: Se añaden las declaraciones @font-face --- */
+*, *::before, *::after { box-sizing: border-box; }
 @font-face {
   font-family: 'InterTight';
   src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
@@ -38,8 +27,6 @@
   src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
   font-weight: 400;
 }
-/* --- FIN DE LA CORRECCIÓN --- */
-
 body {
     font-family: var(--font-secondary);
     background-color: var(--light-purple);
@@ -55,7 +42,7 @@ body {
 .app-header .logo { font-family: var(--font-primary); font-size: 1.5rem; }
 .app-header .nav-links { list-style: none; padding: 0; margin: 0; }
 
-/* ... (Estilos del .upload-container y .upload-card) ... */
+/* 2. Contenedor y Tarjeta de Carga */
 main.upload-container {
   flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 2rem;
 }
@@ -65,9 +52,8 @@ main.upload-container {
 .upload-card h2 { font-family: var(--font-primary); font-size: 2rem; color: var(--primary-purple); margin-top: 0; margin-bottom: 1rem; }
 .upload-card .instructions { color: var(--muted-text); font-size: 1rem; margin-bottom: 2rem; line-height: 1.7; }
 
-/* --- ESTILOS CLAVE PARA EL INPUT DE ARCHIVO --- */
+/* 3. Estilos del Formulario de Carga */
 .upload-form { margin-top: 1rem; }
-
 .file-upload-wrapper {
     border: 2px dashed var(--border-color);
     border-radius: 12px;
@@ -80,7 +66,6 @@ main.upload-container {
 }
 .file-upload-wrapper:hover { border-color: var(--secondary-purple); }
 
-/* Ocultamos el input de archivo real */
 .upload-form input[type="file"] {
     width: 0.1px;
     height: 0.1px;
@@ -90,7 +75,6 @@ main.upload-container {
     z-index: -1;
 }
 
-/* Este es nuestro "botón" falso, el label */
 .file-upload-label {
     display: inline-flex;
     align-items: center;
@@ -114,6 +98,7 @@ main.upload-container {
     font-size: 0.9rem;
     color: var(--muted-text);
     font-style: italic;
+    word-break: break-all;
 }
 
 .form-actions { margin-top: 2rem; }
