@@ -48,18 +48,6 @@ class LoteProductoAdmin(admin.ModelAdmin):
     autocomplete_fields = ['producto']
     list_select_related = ('producto',)
 
-@admin.register(MovimientoStock)
-class MovimientoStockAdmin(admin.ModelAdmin):
-    list_display = ('producto', 'lote', 'cantidad_retirada', 'fecha', 'usuario')
-    list_filter = ('fecha',)
-    search_fields = ('producto__nombre', 'usuario__username')
-    autocomplete_fields = ['producto', 'lote', 'usuario']
-    readonly_fields = ('producto', 'lote', 'cantidad_retirada', 'fecha', 'usuario')
-    list_select_related = ('producto', 'lote', 'usuario')
-
-    def has_add_permission(self, request):
-        return False
-
 # Registramos los modelos restantes con su configuración por defecto o una simple.
 admin.site.register(PlanSuscripcion)
 admin.site.register(SuscripcionUsuario)

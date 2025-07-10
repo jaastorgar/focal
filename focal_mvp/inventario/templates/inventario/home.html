@@ -6,25 +6,19 @@
     <title>Dashboard | FOCAL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-
-    <!-- OPTIMIZACIÓN: Pre-conexión al CDN para que el navegador establezca la conexión antes. -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    
     <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
 </head>
 <body>
-    <!-- MEJORA: Envolvemos la navegación en un header para una mejor semántica. -->
     <header class="app-header">
         <nav class="navbar">
             <div class="navbar-brand">FOCAL</div>
             <ul class="navbar-menu">
-                <li><a href="{% url 'inventario' %}" class="btn-accion">Inventario</a></li>
-                <li><a href="#" class="disabled-link" onClick="return false;" title="Disponible próximamente">Reportes</a></li>
+                <li><a href="{% url 'inventario' %}">Inventario</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Mi Cuenta</a>
                     <ul class="dropdown-menu">
                         <li><a href="{% url 'perfil' %}">Perfil</a></li>
-                        <li><a href="{% url 'logout' %}">Cerrar sesión</a></li>
+                        <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
                     </ul>
                 </li>
             </ul>
@@ -32,36 +26,77 @@
     </header>
 
     <main class="dashboard-container">
-        <h1 class="dashboard-title">Resumen General</h1>
+        <!-- Mensaje de Bienvenida -->
+        <section class="welcome-header">
+            <h1>
+                Bienvenido, 
+                <span class="welcome-name">
+                    {% if almacenero %}
+                        {{ almacenero.nombre }}
+                    {% else %}
+                        {{ request.user.username }}
+                    {% endif %}
+                </span>
+            </h1>
+            <p>Aquí tienes un resumen de las alertas importantes de tu inventario.</p>
+        </section>
 
-        <section class="dashboard-metrics">
-            <!-- OPTIMIZACIÓN: Los valores ahora vienen directamente desde la vista de Django. -->
-            <div class="metric-card">
-                <h2>Productos Totales</h2>
-                <p id="total-productos">{{ total_productos|default:"0" }}</p>
+        <!-- Contenedor de Alertas -->
+        <section class="alerts-grid">
+            <!-- Tarjeta de Alertas de Vencimiento -->
+            <div class="alert-card warning">
+                <div class="alert-header">
+                    <div class="alert-icon">⚠️</div>
+                    <h2>Próximos Vencimientos</h2>
+                </div>
+                <div class="alert-content">
+                    {% if alertas_vencimiento %}
+                        <ul class="alert-list">
+                            {% for lote in alertas_vencimiento %}
+                                <li>
+                                    <span class="alert-product">{{ lote.producto.nombre }}</span>
+                                    <span class="alert-details">
+                                        ({{ lote.cantidad }} un.) vence el 
+                                        <span class="alert-date">{{ lote.fecha_vencimiento|date:"d/m/Y" }}</span>
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="no-alerts">¡Todo en orden! No hay lotes próximos a vencer.</p>
+                    {% endif %}
+                </div>
             </div>
-            <div class="metric-card">
-                <h2>Stock Disponible</h2>
-                <p id="stock-total">{{ stock_total|default:"0" }}</p>
-            </div>
-            <div class="metric-card">
-                <h2>Lotes Activos</h2>
-                <p id="lotes-activos">{{ lotes_activos|default:"0" }}</p>
+
+            <!-- Tarjeta de Alertas de Stock Bajo -->
+            <div class="alert-card danger">
+                <div class="alert-header">
+                    <div class="alert-icon">📉</div>
+                    <h2>Stock Bajo</h2>
+                </div>
+                <div class="alert-content">
+                    {% if alertas_stock_bajo %}
+                        <ul class="alert-list">
+                            {% for producto in alertas_stock_bajo %}
+                                <li>
+                                    <span class="alert-product">{{ producto.nombre }}</span>
+                                    <span class="alert-details">
+                                        Quedan 
+                                        <span class="alert-stock">{{ producto.stock_total|default:0 }}</span> unidades.
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="no-alerts">¡Buen trabajo! No hay productos con bajo stock.</p>
+                    {% endif %}
+                </div>
             </div>
         </section>
-        
-    <!-- MEJORA: Añadimos un footer para consistencia. -->
+    </main>
+
     <footer class="app-footer">
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
-
-    <!-- OPTIMIZACIÓN: Pasamos los datos para el gráfico desde Django a JavaScript de forma segura. -->
-    <script id="dashboard-data" type="application/json">
-        {{ dashboard_data_json|safe }}
-    </script>
-
-    <!-- OPTIMIZACIÓN: Cargamos los scripts con 'defer' para no bloquear el renderizado de la página. -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="{% static 'inventario/js/home.js' %}" defer></script>
 </body>
 </html>

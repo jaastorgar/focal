@@ -170,10 +170,6 @@ class EmpresaForm(BootstrapFormMixin, forms.ModelForm):
 
         return rut_limpio
 
-class LoginForm(forms.Form):
-    username = forms.CharField(label="Nombre de usuario", max_length=150, widget=TextInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(label="Contraseña", widget=PasswordInput(attrs={'class': 'form-control'}))
-
 class ProductoForm(BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Producto
@@ -273,4 +269,10 @@ class LoteProductoForm(forms.ModelForm):
             self.fields['producto'].queryset = Producto.objects.filter(empresa=empresa)
         
 class ArchivoVentasForm(forms.Form):
-    archivo = forms.FileField(label="Archivo de ventas (.csv o .xlsx)")
+    """
+    Un formulario simple con un solo campo para subir el archivo de ventas.
+    """
+    archivo_ventas = forms.FileField(
+        label='Archivo de ventas (.csv o .xlsx)',
+        widget=forms.ClearableFileInput(attrs={'accept': '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'})
+    )

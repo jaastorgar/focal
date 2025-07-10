@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
 from django.db import transaction
-from .forms import AlmaceneroForm, LoginForm, EmpresaForm, ProductoForm, LoteProductoForm
+from .forms import ProductoForm, LoteProductoForm, ArchivoVentasForm
 from .models import Almacenero, Empresa, PlanSuscripcion, SuscripcionUsuario, Producto, LoteProducto, MovimientoStock
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -15,125 +13,57 @@ from django.http import HttpResponse
 from .utils import obtener_empresa_del_usuario
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
+from django.db import models
+import pandas as pd
 import time
 import json
 
-def vista_registro(request):
-    if request.method == 'POST':
-        almacenero_form = AlmaceneroForm(request.POST, prefix='almacenero')
-        empresa_form = EmpresaForm(request.POST, prefix='empresa')
-
-        # Comprueba si ambos formularios son válidos
-        if almacenero_form.is_valid() and empresa_form.is_valid():
-            try:
-                with transaction.atomic():
-                    # Lógica para crear el usuario, empresa, etc.
-                    user = User.objects.create_user(
-                        username=almacenero_form.cleaned_data['username'],
-                        password=almacenero_form.cleaned_data['password']
-                    )
-                    empresa = empresa_form.save()
-                    almacenero = almacenero_form.save(commit=False)
-                    almacenero.usuario = user
-                    almacenero.empresa = empresa
-                    almacenero.save()
-
-                    plan_gratuito = PlanSuscripcion.objects.get(nombre='FREE')
-                    SuscripcionUsuario.objects.create(
-                        empresa=empresa,
-                        plan=plan_gratuito,
-                        activa=True
-                    )
-                
-                messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión.')
-                return redirect('login')
-            
-            except Exception as e:
-                # Si algo falla durante la creación, muestra un error
-                messages.error(request, f"Hubo un error inesperado durante el registro: {e}")
-        
-        else:
-            # --- CORRECCIÓN CLAVE ---
-            # Si los formularios NO son válidos, envía un mensaje de error general.
-            # Django se encargará de mostrar los errores específicos en cada campo.
-            messages.error(request, 'Por favor, corrige los errores en el formulario para continuar.')
-
-    else:
-        # Para una solicitud GET, simplemente crea formularios vacíos
-        almacenero_form = AlmaceneroForm(prefix='almacenero')
-        empresa_form = EmpresaForm(prefix='empresa')
-
-    # Renderiza la plantilla, pasándole los formularios (que pueden contener errores si es POST)
-    return render(request, 'inventario/registro.html', {
-        'almacenero_form': almacenero_form,
-        'empresa_form': empresa_form
-    })
-
-def vista_login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            user = authenticate(
-                request,
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'¡Bienvenido de nuevo, {user.username}!')
-                return redirect('/home/')
-            else:
-                messages.error(request, "Usuario o contraseña incorrectos.")
-        else:
-            messages.error(request, "Por favor, complete los campos de inicio de sesión.")
-    else:
-        form = LoginForm()
-
-    return render(request, 'inventario/login.html', {'form': form})
-
 @login_required
 def home(request):
+    """
+    Muestra un dashboard enfocado en alertas de vencimiento y bajo stock.
+    """
+    try:
+        # Obtenemos el objeto Almacenero para el saludo personalizado.
+        almacenero = Almacenero.objects.get(usuario=request.user)
+    except Almacenero.DoesNotExist:
+        almacenero = None
+
     empresa = obtener_empresa_del_usuario(request.user)
     
-    # --- CORRECCIÓN: Inicializamos el contexto con valores por defecto ---
-    context = {
-        'total_productos': 0,
-        'stock_total': 0,
-        'lotes_activos': 0,
-        'dashboard_data_json': json.dumps({'labels': [], 'data': []})
-    }
+    alertas_vencimiento = []
+    alertas_stock_bajo = []
 
     if empresa:
-        productos_empresa = Producto.objects.filter(empresa=empresa)
-        
-        # Si hay productos, calculamos las métricas reales
-        if productos_empresa.exists():
-            metricas = productos_empresa.aggregate(
-                total_stock=Sum('lotes__cantidad'),
-                total_lotes=Count('lotes')
+        # 1. Alerta de Vencimiento: Lotes que vencen en los próximos 30 días.
+        fecha_limite_vencimiento = date.today() + timedelta(days=30)
+        alertas_vencimiento = (
+            LoteProducto.objects
+            .filter(
+                producto__empresa=empresa, 
+                cantidad__gt=0, 
+                fecha_vencimiento__gte=date.today(),
+                fecha_vencimiento__lte=fecha_limite_vencimiento
             )
-            
-            stock_por_producto = (
-                productos_empresa
-                .annotate(stock=Sum('lotes__cantidad'))
-                .filter(stock__gt=0)
-                .values('nombre', 'stock')
-                .order_by('-stock')[:10]
-            )
-            
-            dashboard_data = {
-                'labels': [item['nombre'] for item in stock_por_producto],
-                'data': [item['stock'] for item in stock_por_producto],
-            }
-            
-            # Actualizamos el contexto con los datos reales
-            context.update({
-                'total_productos': productos_empresa.count(),
-                'stock_total': metricas.get('total_stock') or 0,
-                'lotes_activos': metricas.get('total_lotes') or 0,
-                'dashboard_data_json': json.dumps(dashboard_data)
-            })
+            .order_by('fecha_vencimiento')
+            .select_related('producto')[:5] # Mostramos los 5 más urgentes
+        )
 
+        # 2. Alerta de Stock Bajo: Productos con stock total <= 5.
+        alertas_stock_bajo = (
+            Producto.objects
+            .filter(empresa=empresa)
+            .annotate(stock_total=Sum('lotes__cantidad'))
+            .filter(stock_total__lte=5, stock_total__gt=0)
+            .order_by('stock_total')[:5] # Mostramos los 5 con menos stock
+        )
+
+    context = {
+        'almacenero': almacenero,
+        'alertas_vencimiento': alertas_vencimiento,
+        'alertas_stock_bajo': alertas_stock_bajo,
+    }
+    
     return render(request, 'inventario/home.html', context)
 
 @login_required
@@ -450,14 +380,6 @@ def detalle_producto(request, producto_id):
         'lotes': lotes
     })
 
-@cache_page(60 * 60)
-def vista_planes(request):
-    planes = PlanSuscripcion.objects.all().order_by('precio')
-    context = {
-        'planes': planes
-    }
-    return render(request, 'inventario/planes.html', context)
-
 @login_required
 def seleccionar_plan(request, plan_id):
     plan = get_object_or_404(PlanSuscripcion, id=plan_id)
@@ -515,30 +437,6 @@ def vista_soporte_premium(request):
     return render(request, 'inventario/soporte_premium.html')
 
 @login_required
-def historial_movimientos_view(request):
-    # 1. Obtener la empresa del usuario de forma segura.
-    empresa_usuario = obtener_empresa_del_usuario(request.user)
-    
-    if not empresa_usuario:
-        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
-        movimientos = MovimientoStock.objects.none() # Devuelve un QuerySet vacío
-    else:
-        # 2. Filtrar los movimientos por la empresa del usuario.
-        # Esto asegura que un usuario solo vea sus propios datos.
-        movimientos = (
-            MovimientoStock.objects
-            .filter(producto__empresa=empresa_usuario)
-            .select_related('producto', 'lote')
-            .order_by('-fecha')
-        )
-
-    context = {
-        'movimientos': movimientos
-    }
-    
-    return render(request, 'inventario/historial_movimientos.html', context)
-
-@login_required
 def descargar_plantilla_ventas(request):
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
@@ -560,3 +458,83 @@ def descargar_plantilla_ventas(request):
     response['Content-Disposition'] = 'attachment; filename=plantilla_ventas.xlsx'
     wb.save(response)
     return response
+
+@login_required
+@transaction.atomic # Usamos una transacción para asegurar la integridad de los datos
+def procesar_ventas_archivo(request):
+    if request.method == 'POST':
+        form = ArchivoVentasForm(request.POST, request.FILES)
+        if form.is_valid():
+            empresa_usuario = obtener_empresa_del_usuario(request.user)
+            if not empresa_usuario:
+                messages.error(request, "Tu cuenta no está asociada a una empresa.")
+                return redirect('procesar_ventas_archivo')
+
+            archivo = request.FILES['archivo_ventas']
+            try:
+                # Leemos el archivo excel o csv
+                if archivo.name.endswith('.csv'):
+                    df = pd.read_csv(archivo)
+                else:
+                    df = pd.read_excel(archivo)
+            except Exception as e:
+                messages.error(request, f"Error al leer el archivo: {e}")
+                return redirect('procesar_ventas_archivo')
+
+            errores = []
+            sid = transaction.savepoint() # Creamos un punto de guardado
+
+            for index, row in df.iterrows():
+                try:
+                    sku = str(row['sku']).strip()
+                    cantidad_a_retirar = int(row['cantidad'])
+
+                    if cantidad_a_retirar <= 0:
+                        continue
+
+                    # Buscamos el producto que pertenece a la empresa del usuario
+                    producto = Producto.objects.get(sku=sku, empresa=empresa_usuario)
+                    
+                    lotes_disponibles = LoteProducto.objects.filter(
+                        producto=producto, cantidad__gt=0
+                    ).order_by('fecha_vencimiento')
+
+                    cantidad_restante = cantidad_a_retirar
+                    for lote in lotes_disponibles:
+                        if cantidad_restante <= 0:
+                            break
+                        
+                        retiro = min(lote.cantidad, cantidad_restante)
+                        lote.cantidad = models.F('cantidad') - retiro
+                        lote.save()
+
+                        MovimientoStock.objects.create(
+                            lote=lote,
+                            producto=producto,
+                            cantidad_retirada=retiro,
+                            usuario=request.user,
+                            nota=f"Descuento por archivo: {archivo.name}"
+                        )
+                        cantidad_restante -= retiro
+                    
+                    if cantidad_restante > 0:
+                        errores.append(f"Fila {index + 2}: Stock insuficiente para SKU {sku}. Faltaron {cantidad_restante} unidades.")
+
+                except Producto.DoesNotExist:
+                    errores.append(f"Fila {index + 2}: Producto con SKU {sku} no encontrado.")
+                except Exception as e:
+                    errores.append(f"Fila {index + 2}: Error procesando SKU {sku}: {e}")
+
+            if errores:
+                transaction.savepoint_rollback(sid) # Revertimos si hubo errores
+                for error in errores:
+                    messages.error(request, error)
+            else:
+                transaction.savepoint_commit(sid) # Confirmamos si todo salió bien
+                messages.success(request, "Archivo procesado y stock actualizado correctamente.")
+            
+            return redirect('inventario')
+    else:
+        form = ArchivoVentasForm()
+
+    return render(request, 'inventario/procesar_ventas_archivo.html', {'form': form})

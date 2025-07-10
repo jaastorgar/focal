@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos para el Dashboard (Home)
+   FOCAL - Hoja de Estilos para el Dashboard de Alertas
    ========================================================================== */
 
 /* 1. Variables y Configuración Base
@@ -8,14 +8,15 @@
   --primary-purple: #4A008B;
   --secondary-purple: #7B1FA2;
   --light-purple: #f8f0ff;
-  --hover-dark-purple: #38006B;
-  --hover-light-purple: #d1c4e9;
   --white: #FFFFFF;
   --dark-text: #212529;
   --muted-text: #6c757d;
-  --border-color: #dee2e6;
-  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  
+  --border-color: #e0e0e0;
+  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.09);
+  --warning-bg: #fffde7;
+  --warning-border: #ffca28;
+  --danger-bg: #ffebee;
+  --danger-border: #e57373;
   --font-primary: 'InterTight', sans-serif;
   --font-secondary: 'HankenGrotesk', sans-serif;
 }
@@ -24,6 +25,7 @@
   box-sizing: border-box;
 }
 
+/* Las declaraciones @font-face se mantienen igual */
 @font-face {
   font-family: 'InterTight';
   src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
@@ -40,8 +42,9 @@ body {
   background-color: var(--light-purple);
   color: var(--dark-text);
   margin: 0;
-  padding: 0;
-  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* 2. Estilos de Layout Común (Header/Footer)
@@ -51,9 +54,6 @@ body {
   color: var(--white);
   padding: 1rem 2rem;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
 }
 .navbar {
   display: flex;
@@ -83,18 +83,8 @@ body {
   transition: color 0.2s;
 }
 .navbar-menu a:hover {
-  color: var(--hover-light-purple);
+  color: #d1c4e9;
 }
-.menu-toggle { 
-    display: none;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-/* Estilos para el menú desplegable */
 .dropdown {
   position: relative;
 }
@@ -102,7 +92,7 @@ body {
   display: none;
   position: absolute;
   top: 100%;
-  right: 0; 
+  right: 0;
   background-color: var(--white);
   box-shadow: var(--box-shadow);
   padding: 0.5rem 0;
@@ -115,11 +105,9 @@ body {
   color: var(--dark-text);
   padding: 0.75rem 1.5rem;
   display: block;
-  white-space: nowrap;
 }
 .dropdown-menu a:hover {
   background-color: var(--light-purple);
-  color: var(--primary-purple);
 }
 .dropdown:hover .dropdown-menu {
   display: block;
@@ -130,88 +118,116 @@ body {
   color: var(--white);
   text-align: center;
   padding: 1.5rem;
-  margin-top: 3rem;
-  font-size: 0.9rem;
+  margin-top: auto;
 }
 
-/* 3. Estilos Específicos del Dashboard
+/* 3. Estilos del Dashboard de Alertas
    -------------------------------------------------------------------------- */
-main.dashboard-container {
-  padding: 2.5rem;
+.dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 2.5rem;
 }
 
-.dashboard-title {
-  font-family: var(--font-primary);
-  font-size: 2.5rem;
+.welcome-header {
   text-align: center;
   margin-bottom: 3rem;
+}
+.welcome-header h1 {
+  font-family: var(--font-primary);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin: 0;
+}
+.welcome-header .welcome-name {
   color: var(--primary-purple);
 }
-
-.dashboard-metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 4rem;
+.welcome-header p {
+  font-size: 1.2rem;
+  color: var(--muted-text);
+  margin-top: 0.5rem;
 }
 
-.metric-card {
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.alert-card {
   background-color: var(--white);
-  border-left: 5px solid var(--secondary-purple);
-  border-radius: 12px;
-  padding: 1.5rem 2rem;
+  border-radius: 16px;
   box-shadow: var(--box-shadow);
+  border-top: 4px solid;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.metric-card:hover {
+.alert-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.11);
 }
-.metric-card h2 {
-  font-size: 1.1rem;
-  color: var(--muted-text);
-  margin: 0 0 0.5rem 0;
-  text-transform: uppercase;
-  font-weight: 600;
+
+.alert-card.warning { border-color: var(--warning-border); }
+.alert-card.danger { border-color: var(--danger-border); }
+
+.alert-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
-.metric-card p {
+.alert-icon {
+  font-size: 1.8rem;
+}
+.alert-header h2 {
   font-family: var(--font-primary);
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: 1.4rem;
   margin: 0;
-  color: var(--primary-purple);
+  color: var(--dark-text);
 }
 
-.dashboard-graphs {
-  background-color: var(--white);
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: var(--box-shadow);
+.alert-content {
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
 }
-.section-title {
-  font-family: var(--font-primary);
-  font-size: 1.5rem;
+
+.alert-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.alert-list li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 0.95rem;
+}
+.alert-list li:last-child {
+  border-bottom: none;
+}
+.alert-product {
+  font-weight: 600;
+  margin-right: 1rem;
+}
+.alert-details {
+  color: var(--muted-text);
+}
+.alert-date, .alert-stock {
+  font-weight: 700;
+  color: #c62828;
+}
+
+.no-alerts {
+  color: var(--muted-text);
+  font-style: italic;
   text-align: center;
-  color: var(--secondary-purple);
-  margin-top: 0;
-  margin-bottom: 2rem;
+  padding: 2rem 0;
 }
 
-/* 4. Responsividad
-   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .navbar-menu {
-    display: none; 
-  }
-  .menu-toggle {
-    display: block; 
-  }
-  .dashboard-title {
-    font-size: 2rem;
-  }
-  main.dashboard-container {
-    padding: 1.5rem;
-  }
+    .dashboard-container { padding: 1.5rem; }
+    .welcome-header h1 { font-size: 2.2rem; }
+    .alerts-grid { grid-template-columns: 1fr; }
 }
