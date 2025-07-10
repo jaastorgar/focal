@@ -1,0 +1,273 @@
+/* ==========================================================================
+   FOCAL - Hoja de Estilos Maestra para Páginas con Tablas
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #f8f0ff;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #dee2e6;
+  --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ... (tus @font-face no cambian) ... */
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+body {
+  font-family: var(--font-secondary);
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 2. Componentes Comunes (Header y Footer)
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.app-header nav.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.app-header .logo {
+  color: var(--white);
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+.app-header .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+    gap: 0.5rem 1rem;
+}
+.app-header .nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+.app-header .nav-links a:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.app-footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* 3. Contenedor Principal y Título
+   -------------------------------------------------------------------------- */
+main.container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 2.5rem auto;
+  padding: 0 2rem;
+  flex-grow: 1; /* Permite que el main crezca para centrar contenido */
+  display: flex;
+  flex-direction: column;
+}
+
+main.container h1 {
+  font-family: var(--font-primary);
+  font-size: 2.2rem;
+  color: var(--primary-purple);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* 4. Barra de Búsqueda Rediseñada
+   -------------------------------------------------------------------------- */
+.search-section {
+    margin-bottom: 2rem;
+}
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    max-width: 500px;
+}
+.search-input {
+    flex-grow: 1;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 3px rgba(74, 0, 139, 0.2);
+}
+.search-button, .clear-search-button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.search-button {
+    background-color: var(--primary-purple);
+    color: var(--white);
+}
+.search-button:hover {
+    background-color: var(--hover-dark-purple);
+}
+.clear-search-button {
+    background-color: #f8f9fa;
+    color: var(--muted-text);
+    border: 1px solid var(--border-color);
+}
+.clear-search-button:hover {
+    background-color: #e9ecef;
+}
+
+
+/* 5. Estilos de la Tabla Responsiva
+   -------------------------------------------------------------------------- */
+.table-container {
+  width: 100%;
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
+  background-color: var(--white);
+}
+/* ... (el resto de los estilos de la tabla no cambian) ... */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px; 
+}
+table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid var(--border-color);
+}
+table th {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  color: var(--dark-text);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+table td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #f1f3f5;
+  color: var(--muted-text);
+}
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+table tbody tr:hover {
+  background-color: var(--light-purple);
+}
+.acciones { display: flex; gap: 0.5rem; }
+.btn-accion-tabla {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: white;
+    background-color: var(--secondary-purple);
+    transition: opacity 0.2s;
+}
+.btn-accion-tabla:hover { opacity: 0.8; }
+.btn-peligro { background-color: #c62828; }
+
+
+/* 6. Estilos para el Estado Vacío (Rediseñado)
+   -------------------------------------------------------------------------- */
+.empty-state-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.empty-state {
+    max-width: 500px;
+    text-align: center;
+    padding: 2rem;
+}
+.empty-state-icon svg {
+    stroke: var(--primary-purple);
+    opacity: 0.2;
+    margin-bottom: 1.5rem;
+}
+.empty-state-title {
+    font-family: var(--font-primary);
+    font-size: 1.8rem;
+    color: var(--dark-text);
+    margin: 0 0 0.75rem 0;
+}
+.empty-state-message {
+    color: var(--muted-text);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+}
+.btn-accion-principal {
+    display: inline-block;
+    padding: 0.9rem 2rem;
+    background-color: var(--primary-purple);
+    color: var(--white);
+    text-decoration: none;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+.btn-accion-principal:hover {
+    background-color: var(--hover-dark-purple);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(74, 0, 139, 0.2);
+}

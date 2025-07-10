@@ -1,0 +1,215 @@
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para la Página de Login
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
+:root {
+  --primary-purple: #4A008B;
+  --hover-dark-purple: #38006B;
+  --light-background: #f8f9fa;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #ced4da;
+  --focus-shadow: rgba(74, 0, 139, 0.25);
+  --error-text: #d32f2f;
+  --error-bg: #ffebee;
+  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Las declaraciones @font-face se mantienen igual. */
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
+}
+
+body {
+  font-family: var(--font-secondary);
+  background-color: var(--light-background);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+}
+
+/* 2. Componentes Comunes (Header y Footer)
+   -------------------------------------------------------------------------- */
+.app-header-minimal {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+.app-header-minimal .logo {
+  color: var(--primary-purple);
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.app-footer {
+  width: 100%;
+  background-color: transparent;
+  color: var(--muted-text);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* 3. Contenedor Principal del Login
+   -------------------------------------------------------------------------- */
+main.login-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--box-shadow);
+  text-align: center;
+}
+
+main.login-container h2 {
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+/* 4. Estilos del Formulario
+   -------------------------------------------------------------------------- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 4px var(--focus-shadow);
+}
+
+/* 5. Mensajes de Error
+   -------------------------------------------------------------------------- */
+.error-message {
+  color: var(--error-text);
+  font-size: 0.875rem;
+  margin-top: 0.4rem;
+}
+
+.non-field-errors {
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-text);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.non-field-errors span {
+    display: block;
+}
+
+/* 6. Botón de Envío y Enlaces
+   -------------------------------------------------------------------------- */
+.btn-submit {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  border: none;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.login-links {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--muted-text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-links a {
+  color: var(--primary-purple);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+/* 7. Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 576px) {
+  body {
+    padding: 1rem;
+  }
+  main.login-container {
+    padding: 2rem;
+  }
+}
+
+.disabled-link {
+    pointer-events: none;
+    color: gray;
+    text-decoration: none;
+    cursor: not-allowed;
+}

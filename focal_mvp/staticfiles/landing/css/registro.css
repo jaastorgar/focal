@@ -1,0 +1,261 @@
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para la Página de Registro
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
+   -------------------------------------------------------------------------- */
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-background: #f8f9fa;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #ced4da;
+  --focus-shadow: rgba(74, 0, 139, 0.25);
+  --error-text: #d32f2f;
+  --error-bg: #ffebee;
+  --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Las declaraciones @font-face se mantienen igual. */
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
+}
+
+body {
+  font-family: var(--font-secondary);
+  background-color: var(--light-background);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+}
+
+/* 2. Componentes Comunes (Header y Footer)
+   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
+   -------------------------------------------------------------------------- */
+.app-header-minimal {
+  width: 100%;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+.app-header-minimal .logo {
+  color: var(--primary-purple);
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.app-footer {
+  width: 100%;
+  background-color: transparent;
+  color: var(--muted-text);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* 3. Contenedor Principal del Formulario de Registro
+   -------------------------------------------------------------------------- */
+main.registration-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--box-shadow);
+}
+
+.form-title {
+  font-family: var(--font-primary);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+    text-align: center;
+    color: var(--muted-text);
+    margin-bottom: 3rem;
+}
+
+/* 4. Secciones y Grid del Formulario
+   -------------------------------------------------------------------------- */
+.form-section {
+  margin-bottom: 3rem;
+}
+
+.section-heading {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  color: var(--primary-purple);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--primary-purple);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 4px var(--focus-shadow);
+}
+
+.error-message {
+  color: var(--error-text);
+  font-size: 0.875rem;
+  margin-top: 0.4rem;
+}
+
+.alert-error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.grid-full-width {
+    grid-column: 1 / -1;
+}
+
+/* 5. Botón de Envío y Enlaces
+   -------------------------------------------------------------------------- */
+.form-submit-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.btn-submit {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  border: none;
+  padding: 0.9rem 3rem;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.login-link-container {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--muted-text);
+}
+.login-link-container a {
+  color: var(--primary-purple);
+  font-weight: 600;
+  text-decoration: none;
+}
+.login-link-container a:hover {
+  text-decoration: underline;
+}
+
+/* 6. Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  main.registration-container {
+    padding: 2rem;
+    margin: 1rem;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 7. Estilos para Mensajes de Alerta
+   -------------------------------------------------------------------------- */
+   .messages-container {
+    margin-bottom: 2rem;
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}

@@ -1,0 +1,233 @@
+/* ==========================================================================
+   FOCAL - Hoja de Estilos Maestra para Formularios
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple-bg: #f7f5fa;
+  --hover-dark-purple: #38006B;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #e0e0e0;
+  --focus-shadow: rgba(74, 0, 139, 0.25);
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --danger: #d32f2f;
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+body {
+  font-family: var(--font-secondary);
+  background-color: var(--light-purple-bg);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 2. Componentes Comunes (Header y Footer)
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--primary-purple);
+  padding: 1rem 2rem;
+}
+.app-header nav.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.app-header .logo, .app-header .nav-links a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 700;
+}
+.app-header .logo {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+}
+.app-header .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1.5rem;
+}
+.app-header .nav-links a:hover {
+    opacity: 0.8;
+}
+
+.app-footer {
+  background-color: transparent;
+  color: var(--muted-text);
+  text-align: center;
+  padding: 2rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* 3. Contenedor y Tarjeta del Formulario
+   -------------------------------------------------------------------------- */
+.form-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--white);
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: var(--box-shadow);
+}
+
+.form-card h1 {
+  font-family: var(--font-primary);
+  font-size: 2.2rem;
+  color: var(--dark-text);
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 2.5rem;
+}
+
+/* 4. Estilos de los Campos del Formulario (Grid Layout)
+   -------------------------------------------------------------------------- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--muted-text);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: #fdfdff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 4px var(--focus-shadow);
+}
+
+.error-message {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* 5. Botones de Acción
+   -------------------------------------------------------------------------- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f1f1;
+}
+
+.btn {
+  padding: 0.9rem 2rem;
+  border: 1px solid;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-submit {
+  background-color: var(--primary-purple);
+  border-color: var(--primary-purple);
+  color: var(--white);
+}
+.btn-submit:hover {
+  background-color: var(--hover-dark-purple);
+  border-color: var(--hover-dark-purple);
+}
+
+.btn-cancel {
+  background-color: transparent;
+  color: var(--muted-text);
+  border-color: var(--border-color);
+}
+.btn-cancel:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  color: var(--dark-text);
+}
+
+/* 6. Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-card {
+    padding: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  .form-wrapper {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+  .form-card h1 {
+    font-size: 1.8rem;
+  }
+}

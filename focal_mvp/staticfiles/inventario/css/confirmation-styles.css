@@ -1,0 +1,210 @@
+/* ==========================================================================
+   FOCAL - Hoja de Estilos Maestra para Páginas de Confirmación
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
+:root {
+  --primary-purple: #4A008B;
+  --danger: #d32f2f;
+  --danger-dark: #c62828;
+  --danger-light-bg: #ffebee;
+  --light-purple: #f8f0ff;
+  --white: #FFFFFF;
+  --dark-text: #212529;
+  --muted-text: #6c757d;
+  --border-color: #dee2e6;
+  --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.09);
+  
+  --font-primary: 'InterTight', sans-serif;
+  --font-secondary: 'HankenGrotesk', sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+body {
+  font-family: var(--font-secondary);
+  background-color: var(--light-purple);
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 2. Componentes Comunes (Header y Footer)
+   -------------------------------------------------------------------------- */
+.app-header {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.app-header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.app-header .logo {
+  color: var(--white);
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+.app-header .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1.5rem;
+}
+.app-header .nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.app-header .nav-links a:hover {
+    color: #d1c4e9;
+}
+
+.app-footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* 3. Contenedor Principal de Confirmación
+   -------------------------------------------------------------------------- */
+main.confirmation-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--box-shadow);
+  text-align: center;
+}
+
+main.confirmation-container h1 {
+  font-family: var(--font-primary);
+  font-size: 2rem;
+  color: var(--danger);
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+main.confirmation-container p {
+    color: var(--muted-text);
+    margin-bottom: 1.5rem;
+}
+
+/* 4. Tarjeta de Detalles y Texto de Advertencia
+   -------------------------------------------------------------------------- */
+.details-card {
+  background-color: var(--danger-light-bg);
+  border-left: 4px solid var(--danger);
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-radius: 8px;
+  text-align: left;
+}
+.details-card p {
+    margin: 0.5rem 0;
+    color: var(--dark-text);
+}
+.details-card strong {
+    color: var(--danger-dark);
+}
+
+.warning-text {
+  font-weight: 600;
+  color: var(--danger-dark);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* 5. Botones de Acción
+   -------------------------------------------------------------------------- */
+.delete-form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-accion {
+  padding: 0.8rem 2rem;
+  border: 1px solid;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+.btn-accion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-peligro {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: var(--white);
+}
+.btn-peligro:hover {
+  background-color: var(--danger-dark);
+  border-color: var(--danger-dark);
+}
+
+.btn-secundario {
+  background-color: #f8f9fa;
+  color: var(--muted-text);
+  border-color: #dee2e6;
+}
+.btn-secundario:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+/* 6. Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  main.confirmation-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  main.confirmation-container h1 {
+    font-size: 1.8rem;
+  }
+  .delete-form-actions {
+    flex-direction: column-reverse; /* Apila botones en móvil */
+  }
+  .btn-accion {
+    width: 100%;
+  }
+}
