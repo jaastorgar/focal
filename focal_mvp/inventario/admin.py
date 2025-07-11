@@ -33,7 +33,7 @@ class AlmaceneroAdmin(admin.ModelAdmin):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'sku', 'empresa', 'categoria', 'precio_venta')
+    list_display = ('nombre', 'sku', 'empresa', 'categoria', 'dramage', 'precio_venta')
     list_filter = ('categoria', 'empresa')
     search_fields = ('nombre', 'sku', 'marca')
     autocomplete_fields = ['empresa']

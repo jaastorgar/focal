@@ -47,6 +47,7 @@
                         <th>SKU</th>
                         <th>Marca</th>
                         <th>Categoría</th>
+                        <th>Dramage</th>
                         <th>Unidad</th>
                         <th>Precio Compra</th>
                         <th>Precio Venta</th>
@@ -67,6 +68,7 @@
                             <td>{{ producto.sku }}</td>
                             <td>{{ producto.marca|default:"N/A" }}</td>
                             <td>{{ producto.get_categoria_display }}</td>
+                            <td>{{ producto.dramage|default:"0" }}</td>
                             <td>{{ producto.get_unidad_medida_display }}</td>
                             <td>${{ producto.precio_compra|floatformat:0|intcomma }}</td>
                             <td>${{ producto.precio_venta|floatformat:0|intcomma }}</td>

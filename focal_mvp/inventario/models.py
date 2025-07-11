@@ -178,6 +178,7 @@ class Producto(models.Model):
         default='Seleccione la categoría',
         db_index=True 
     )
+    dramage = models.IntegerField(default=0)
     unidad_medida = models.CharField(
         max_length=50,
         choices=UNIDAD_MEDIDA_CHOICES,

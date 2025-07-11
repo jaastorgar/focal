@@ -178,14 +178,15 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm):
             'sku',
             'marca',
             'categoria',
+            'dramage',
             'unidad_medida',
             'precio_compra',
             'precio_venta',
         ]
         widgets = {
             'categoria': forms.Select(attrs={'class': 'form-select'}),
+            'gramage': forms.NumberInput(attrs={'placeholder': 'Cantidad del producto'}),
             'unidad_medida': forms.Select(attrs={'class': 'form-select'}),
-            # Añadimos placeholders para una mejor UX
             'nombre': forms.TextInput(attrs={'placeholder': 'Ej: Leche Entera 1L'}),
             'sku': forms.TextInput(attrs={'placeholder': 'Ej: LECH-ENT-1L-SOP'}),
             'marca': forms.TextInput(attrs={'placeholder': 'Ej: Soprole'}),
@@ -197,6 +198,7 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm):
             'sku': 'SKU (Código Único)',
             'marca': 'Marca',
             'categoria': 'Categoría',
+            'dramage': 'Cantidad de dramage',
             'unidad_medida': 'Unidad de Medida',
             'precio_compra': 'Precio de Compra',
             'precio_venta': 'Precio de Venta',
