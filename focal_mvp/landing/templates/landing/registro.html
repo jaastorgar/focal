@@ -18,14 +18,10 @@
         <h2 class="form-title">Crea tu Cuenta en FOCAL</h2>
         <p class="form-subtitle">Regístrate para empezar a gestionar tu negocio de forma inteligente.</p>
 
-        {# --- CORRECCIÓN: Contenedor para mostrar mensajes de alerta --- #}
         {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
-                    {# La clase del div cambiará según el tipo de mensaje (error, success, etc.) #}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             </div>
         {% endif %}
@@ -33,7 +29,6 @@
         <form method="post" class="registration-form" novalidate>
             {% csrf_token %}
 
-            {# Sección del Formulario del Almacenero #}
             <div class="form-section">
                 <h3 class="section-heading">1. Datos del Administrador</h3>
                 <div class="form-grid">
@@ -41,20 +36,30 @@
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                             {{ field }}
+
+                            {# --- MEJORA: Bloque de feedback para la contraseña --- #}
+                            {% if field.name == 'password' %}
+                                <div id="password-feedback" class="password-requirements">
+                                    <p>La contraseña debe contener:</p>
+                                    <ul>
+                                        <li id="req-length">Entre 8 y 12 caracteres</li>
+                                        <li id="req-uppercase">Al menos una mayúscula (A-Z)</li>
+                                        <li id="req-lowercase">Al menos una minúscula (a-z)</li>
+                                        <li id="req-number">Al menos un número (0-9)</li>
+                                        <li id="req-special">Al menos un carácter especial (!@#$...)</li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            {# --- FIN DE LA MEJORA --- #}
+
                             {% if field.errors %}
                                 <div class="error-message">{{ field.errors|striptags }}</div>
                             {% endif %}
                         </div>
                     {% endfor %}
-                    {% if almacenero_form.non_field_errors %}
-                        <div class="grid-full-width">
-                            <div class="alert-error">{{ almacenero_form.non_field_errors|striptags }}</div>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
 
-            {# Sección del Formulario de la Empresa #}
             <div class="form-section">
                 <h3 class="section-heading">2. Datos de la Empresa</h3>
                 <div class="form-grid">
@@ -67,11 +72,6 @@
                             {% endif %}
                         </div>
                     {% endfor %}
-                    {% if empresa_form.non_field_errors %}
-                        <div class="grid-full-width">
-                            <div class="alert-error">{{ empresa_form.non_field_errors|striptags }}</div>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
 
@@ -89,7 +89,6 @@
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- El script de validación de contraseña no necesita cambios -->
     <script src="{% static 'landing/js/registro.js' %}" defer></script>
 </body>
 </html>

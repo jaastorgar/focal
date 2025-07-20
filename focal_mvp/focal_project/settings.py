@@ -71,7 +71,7 @@ WSGI_APPLICATION = 'focal_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Asegúrate de que esté configurado para MySQL
+        'ENGINE': 'django.db.backends.mysql', 
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),

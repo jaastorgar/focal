@@ -228,34 +228,34 @@ main.registration-container {
   }
 }
 
-/* 7. Estilos para Mensajes de Alerta
-   -------------------------------------------------------------------------- */
-   .messages-container {
-    margin-bottom: 2rem;
-}
+/* 7. --- Estilos para Mensajes de Alerta y Validación de Contraseña --- */
+.messages-container { margin-bottom: 2rem; }
+.alert { padding: 1rem 1.5rem; border-radius: 8px; font-weight: 600; transition: opacity 0.5s ease-out; }
+.alert.fade-out { opacity: 0; }
+.alert-error { background-color: #f8d7da; color: #721c24; }
+.alert-success { background-color: #d4edda; color: #155724; }
 
-.alert {
-    padding: 1rem 1.5rem;
+.password-requirements {
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
     border-radius: 8px;
-    font-weight: 600;
-    border: 1px solid transparent;
-    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0;
+    transition: all 0.3s ease;
 }
-
-.alert-success {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-    color: #155724;
+.password-requirements.visible {
+    opacity: 1;
+    visibility: visible;
+    max-height: 300px; 
 }
-
-.alert-error {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    color: #721c24;
-}
-
-.alert-warning {
-    background-color: #fff3cd;
-    border-color: #ffeeba;
-    color: #856404;
-}
+.password-requirements p { font-weight: 600; margin: 0 0 0.5rem 0; }
+.password-requirements ul { list-style: none; padding: 0; margin: 0; }
+.password-requirements li { color: var(--muted-text); padding-left: 1.5rem; position: relative; transition: color 0.2s; margin-bottom: 0.25rem; }
+.password-requirements li::before { content: '●'; position: absolute; left: 0; color: var(--border-color); transition: color 0.2s; }
+.password-requirements li.invalid { color: var(--error-text); }
+.password-requirements li.invalid::before { content: '✖'; color: var(--error-text); }
+.password-requirements li.valid { color: var(--success-text); text-decoration: line-through; }
+.password-requirements li.valid::before { content: '✔'; color: var(--success-text); }

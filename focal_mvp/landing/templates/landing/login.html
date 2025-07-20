@@ -10,28 +10,34 @@
 </head>
 <body>
 
-    <!-- MEJORA: Añadimos un header para darle una entrada visual a la página. -->
     <header class="app-header-minimal">
         <a href="{% url 'landing' %}" class="logo">FOCAL</a>
     </header>
 
-    <!-- MEJORA: Usamos la etiqueta <main> para el contenido principal. -->
     <main class="login-container">
         <h2>Iniciar sesión</h2>
+
+        {# --- MEJORA: Contenedor para mostrar mensajes de alerta --- #}
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
         
         <form method="post" class="login-form">
             {% csrf_token %}
 
-            {# Muestra errores que no son específicos de un campo (ej. "usuario o contraseña incorrectos") #}
+            {# Muestra errores generales del formulario (ej. "credenciales incorrectas") #}
             {% if form.non_field_errors %}
-                <div class="error-message non-field-errors">
+                <div class="alert alert-error non-field-errors">
                     {% for error in form.non_field_errors %}
                         <span>{{ error }}</span>
                     {% endfor %}
                 </div>
             {% endif %}
 
-            {# Itera sobre cada campo del formulario para renderizarlo #}
             {% for field in form %}
                 <div class="form-group">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -51,10 +57,11 @@
         </form>
     </main>
 
-    <!-- MEJORA: Un footer consistente, aunque sea simple. -->
     <footer class="app-footer">
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 
+    <!-- MEJORA: Enlazamos el nuevo archivo login.js -->
+    <script src="{% static 'landing/js/login.js' %}" defer></script>
 </body>
 </html>

@@ -213,3 +213,40 @@ main.login-container h2 {
     text-decoration: none;
     cursor: not-allowed;
 }
+
+/* 8. Estilos para Mensajes de Alerta
+   -------------------------------------------------------------------------- */
+.messages-container {
+    margin-bottom: 1.5rem;
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    text-align: center;
+    transition: opacity 0.5s ease-out;
+}
+
+.alert.fade-out {
+    opacity: 0;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-error, .non-field-errors {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}

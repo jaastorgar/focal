@@ -1,8 +1,32 @@
+/**
+ * FOCAL - Script para la Página de Registro
+ *
+ * Mejoras:
+ * 1. Mensajes de alerta desaparecen automáticamente después de 5 segundos.
+ * 2. Validación de contraseña en tiempo real.
+ * 3. Requisitos de contraseña se muestran solo al enfocar el campo de contraseña.
+ */
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- MEJORA 1: Mensajes de alerta que desaparecen ---
+    const alertMessages = document.querySelectorAll('.alert');
+    alertMessages.forEach(message => {
+        setTimeout(() => {
+            message.classList.add('fade-out');
+            message.addEventListener('transitionend', () => message.remove(), { once: true });
+        }, 5000); // 5 segundos
+    });
+
+    // --- MEJORAS 2 y 3: Validación de contraseña ---
     const passwordInput = document.getElementById('id_almacenero-password');
     const confirmInput = document.getElementById('id_almacenero-confirm_password');
-    
-    // Un objeto para mantener todos los elementos de feedback de la contraseña
+    const feedbackContainer = document.getElementById('password-feedback');
+
+    // Si los elementos de contraseña no existen, no continuamos.
+    if (!passwordInput || !confirmInput || !feedbackContainer) {
+        return;
+    }
+
     const requirements = {
         length: document.getElementById('req-length'),
         uppercase: document.getElementById('req-uppercase'),
@@ -12,14 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
         match: document.getElementById('req-match')
     };
 
-    // Si los elementos no existen en la página, no hacemos nada.
-    if (!passwordInput || !confirmInput || !requirements.length) {
-        console.warn("No se encontraron los elementos necesarios para la validación de contraseña.");
-        return;
-    }
+    // Muestra el contenedor de requisitos al enfocar el campo de contraseña
+    passwordInput.addEventListener('focus', () => {
+        feedbackContainer.classList.add('visible');
+    });
 
-    // Función para validar un requisito específico y actualizar su clase CSS
+    // Oculta el contenedor de requisitos al salir del campo de contraseña
+    passwordInput.addEventListener('blur', () => {
+        feedbackContainer.classList.remove('visible');
+    });
+
     const validateRequirement = (element, isValid) => {
+        if (!element) return;
         if (isValid) {
             element.classList.add('valid');
             element.classList.remove('invalid');
@@ -29,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Función principal que se ejecuta cada vez que el usuario escribe en el campo de contraseña
     const validatePassword = () => {
         const password = passwordInput.value;
         validateRequirement(requirements.length, password.length >= 8 && password.length <= 12);
@@ -37,12 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
         validateRequirement(requirements.lowercase, /[a-z]/.test(password));
         validateRequirement(requirements.number, /[0-9]/.test(password));
         validateRequirement(requirements.special, /[^A-Za-z0-9]/.test(password));
-        
-        // También validamos la coincidencia cada vez que la contraseña principal cambia
         checkPasswordMatch();
     };
 
-    // Función principal que se ejecuta cada vez que el usuario escribe en el campo de confirmación
     const checkPasswordMatch = () => {
         const password = passwordInput.value;
         const confirmValue = confirmInput.value;
@@ -50,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         validateRequirement(requirements.match, passwordsMatch);
 
-        // Usamos la API de validación del navegador para la confirmación
         if (confirmValue.length > 0 && !passwordsMatch) {
             confirmInput.setCustomValidity("Las contraseñas no coinciden.");
         } else {
@@ -58,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Asignamos los listeners a los eventos 'input'
     passwordInput.addEventListener('input', validatePassword);
     confirmInput.addEventListener('input', checkPasswordMatch);
 });

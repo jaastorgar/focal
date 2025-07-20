@@ -4,45 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retirar Stock del Lote</title>
+    <title>Retirar Stock del Lote | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    
-    <!-- OPTIMIZACIÓN: Apuntamos al archivo de estilos maestro para formularios. -->
     <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
-
     <header class="app-header">
-        <a href="{% url 'home' %}" class="logo">FOCAL</a>
+        <nav class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'inventario' %}">Inventario</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main class="form-container">
-        <h1>Retirar Stock</h1>
+    <!-- Estructura principal para centrar el formulario -->
+    <main class="form-wrapper">
+        <div class="form-card">
+            <h1>Retirar Stock</h1>
+            <div class="details-card">
+                <p><strong>Producto:</strong> {{ lote.producto.nombre }}</p>
+                <p><strong>Cantidad disponible:</strong> {{ lote.cantidad }}</p>
+                <p><strong>Vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y" }}</p>
+            </div>
 
-        <!-- Esta tarjeta ahora tendrá el estilo que añadimos a form-styles.css -->
-        <div class="details-card">
-            <p><strong>Producto:</strong> {{ lote.producto.nombre }}</p>
-            <p><strong>Cantidad disponible en lote:</strong> {{ lote.cantidad }}</p>
-            <p><strong>Fecha de vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y" }}</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="cantidad">Cantidad a retirar:</label>
+                    <input type="number" name="cantidad" id="cantidad" min="1" max="{{ lote.cantidad }}" required autofocus>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'detalle_producto' lote.producto.id %}" class="btn btn-cancel" role="button">Cancelar</a>
+                    <button type="submit" class="btn btn-submit">Confirmar Retiro</button>
+                </div>
+            </form>
         </div>
-
-        <form method="post" class="action-form">
-            {% csrf_token %}
-            <div class="form-field">
-                <label for="cantidad">Cantidad a retirar:</label>
-                <input type="number" name="cantidad" id="cantidad" min="1" max="{{ lote.cantidad }}" required autofocus>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">Confirmar Retiro</button>
-                <a href="{% url 'detalle_producto' lote.producto.id %}" class="btn-cancelar" role="button">Cancelar</a>
-            </div>
-        </form>
     </main>
 
     <footer class="app-footer">
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
-
 </body>
 </html>
