@@ -5,13 +5,9 @@ from django.views.decorators.http import require_POST
 from .forms import ContactoForm, LoginForm
 from django.contrib.auth import login, authenticate
 from inventario.forms import AlmaceneroForm, EmpresaForm
-from django.contrib.auth.models import User
-from django.db import transaction
 from inventario.models import PlanSuscripcion, SuscripcionUsuario
 
-# ==============================================================================
-# VISTAS DE LANDING OPTIMIZADAS
-# ==============================================================================
+
 @cache_page(60 * 15)
 def landing_page_view(request):
     form = ContactoForm()
@@ -29,11 +25,13 @@ def contacto_submit_view(request):
     return redirect('landing')
 
 def vista_registro(request):
+    from django.contrib.auth.models import User
+    from django.db import transaction
+    
     if request.method == 'POST':
         almacenero_form = AlmaceneroForm(request.POST, prefix='almacenero')
         empresa_form = EmpresaForm(request.POST, prefix='empresa')
 
-        # Comprueba si ambos formularios son válidos
         if almacenero_form.is_valid() and empresa_form.is_valid():
             try:
                 with transaction.atomic():
@@ -58,17 +56,14 @@ def vista_registro(request):
                 return redirect('login')
             
             except Exception as e:
-                # Si algo falla durante la creación, muestra un error
                 messages.error(request, f"Hubo un error inesperado durante el registro: {e}")
         else:
             messages.error(request, 'Por favor, corrige los errores en el formulario para continuar.')
 
     else:
-        # Para una solicitud GET, simplemente crea formularios vacíos
         almacenero_form = AlmaceneroForm(prefix='almacenero')
         empresa_form = EmpresaForm(prefix='empresa')
 
-    # Renderiza la plantilla, pasándole los formularios (que pueden contener errores si es POST)
     return render(request, 'landing/registro.html', {
         'almacenero_form': almacenero_form,
         'empresa_form': empresa_form

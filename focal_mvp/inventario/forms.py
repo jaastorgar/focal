@@ -222,7 +222,7 @@ class ProductoForm(BootstrapFormMixin, forms.ModelForm):
     
 class RetirarStockForm(forms.Form): 
     producto = forms.ModelChoiceField(
-        queryset=Producto.objects.all().order_by('nombre'),
+        queryset=Producto.objects.none(), 
         label="Seleccionar Producto",
         empty_label="--- Seleccione un producto ---",
         widget=Select(attrs={'class': 'form-control'})
@@ -234,14 +234,21 @@ class RetirarStockForm(forms.Form):
         widget=NumberInput(attrs={'class': 'form-control'})
     )
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None) 
+        super().__init__(*args, **kwargs)
+        
+        if user and user.is_authenticated and hasattr(user, 'almacenero') and user.almacenero.empresa:
+            self.fields['producto'].queryset = Producto.objects.filter(empresa=user.almacenero.empresa).order_by('nombre')
+        else:
+            pass
+
     def clean(self):
         cleaned_data = super().clean()
         producto = cleaned_data.get('producto')
         cantidad = cleaned_data.get('cantidad')
 
         if producto and cantidad:
-            # Para obtener el stock total de un producto, debes sumar las cantidades de todos sus lotes.
-            # Tu modelo Producto tiene una relación inversa 'lotes' con LoteProducto.
             stock_total_producto = sum(lote.cantidad for lote in producto.lotes.all()) 
             if cantidad > stock_total_producto:
                 self.add_error('cantidad', f'No hay suficiente stock. Solo quedan {stock_total_producto} unidades de {producto.nombre}.')
