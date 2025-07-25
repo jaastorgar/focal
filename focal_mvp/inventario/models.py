@@ -169,8 +169,8 @@ class Almacenero(models.Model):
         return f"{self.nombre} ({self.usuario.username})"
 
 class Producto(models.Model):
+    sku = models.CharField(max_length=50, db_index=True)
     nombre = models.CharField(max_length=100, db_index=True)
-    sku = models.CharField(max_length=50, unique=True, db_index=True)
     marca = models.CharField(max_length=50, blank=True)
     categoria = models.CharField(
         max_length=50,  
@@ -184,22 +184,40 @@ class Producto(models.Model):
         choices=UNIDAD_MEDIDA_CHOICES,
         default='Seleccione la unidad'
     )
-    precio_compra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     creado = models.DateTimeField(auto_now_add=True)
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='productos')
+    empresas = models.ManyToManyField(
+        'Empresa', 
+        through='OfertaProducto',
+        related_name='productos_ofrecidos'
+    )
 
     def __str__(self):
-        return f"{self.nombre} ({self.sku})"
+        return f"{self.sku}"
+
+class OfertaProducto(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    precio_compra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    class Meta:
+        unique_together = ('producto', 'empresa')
+
+    def __str__(self):
+        return f"Oferta de {self.empresa.nombre_almacen} para {self.producto.nombre}"
 
 class LoteProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='lotes')
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='lotes_de_empresa')
     cantidad = models.PositiveIntegerField()
     fecha_vencimiento = models.DateField(db_index=True)
     creado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.cantidad} un. - Vence: {self.fecha_vencimiento}"
+    
+    class Meta:
+        unique_together = ('producto', 'empresa', 'fecha_vencimiento')
 
 class MovimientoStock(models.Model):
     lote = models.ForeignKey('LoteProducto', on_delete=models.CASCADE, related_name='movimientos')

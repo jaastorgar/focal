@@ -231,3 +231,19 @@ body {
     font-size: 1.8rem;
   }
 }
+
+/* 7. Estilos Específicos para Formularios de Producto
+   -------------------------------------------------------------------------- */
+.validation-message {
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+.error {
+    color: #d9534f; /* Rojo */
+}
+.success {
+    color: #5cb85c; /* Verde */
+}
+.input-error {
+    border-color: #d9534f !important;
+}

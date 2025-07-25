@@ -10,7 +10,6 @@
 </head>
 <body>
     <header class="app-header">
-        <!-- MEJORA: Usamos una estructura de navegación más semántica para el menú. -->
         <nav class="container">
             <a href="{% url 'home' %}" class="logo">FOCAL</a>
             <ul class="nav-links">
@@ -21,27 +20,22 @@
     </header>
 
     <main class="confirmation-container">
-        <h1>Confirmar Eliminación de Producto</h1>
+        <h1>Confirmar Eliminación de Producto de tu Inventario</h1>
 
-        <p>¿Estás seguro de que quieres eliminar permanentemente el siguiente producto?</p>
+        <p>¿Estás seguro de que quieres eliminar el siguiente producto de tu inventario?</p>
         
         <div class="details-card">
             <p><strong>Nombre:</strong> {{ producto.nombre }}</p>
             <p><strong>SKU:</strong> {{ producto.sku }}</p>
-            <!-- La vista pasa el lote más próximo a vencer, si existe. -->
-            <p><strong>Próximo Vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y"|default:"Sin lotes registrados" }}</p>
         </div>
 
-        <!-- MEJORA: Se añade una advertencia más explícita sobre la eliminación de los lotes. -->
         <p class="warning-text">
-            <strong>¡Atención!</strong> Al eliminar este producto, también se eliminarán permanentemente <strong>todos los lotes asociados</strong> a él. Esta acción no se puede deshacer.
+            <strong>¡Atención!</strong> Al confirmar, se eliminará tu oferta de precios y todos los lotes asociados a este producto en tu empresa. Si ninguna otra empresa vende este producto, el producto será eliminado permanentemente. <strong>Esta acción no se puede deshacer.</strong>
         </p>
         
         <form method="post" class="delete-form-actions">
             {% csrf_token %}
-            <button type="submit" class="btn-accion btn-peligro">Sí, Eliminar Producto</button>
-            
-            <!-- MEJORA: Añadir role="button" mejora la accesibilidad. -->
+            <button type="submit" class="btn-accion btn-peligro">Sí, Eliminar de Mi Inventario</button>
             <a href="{% url 'inventario' %}" class="btn-accion btn-secundario" role="button">Cancelar</a>
         </form>
     </main>

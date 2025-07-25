@@ -30,11 +30,11 @@
         <h1>Inventario de productos</h1>
 
         <div class="search-section">
-            <form method="GET" action="{% url 'inventario' %}" class="search-form"> 
+            <form method="GET" action="{% url 'inventario' %}" class="search-form">
                 <input class="search-input" type="search" placeholder="Buscar por nombre, sku, marca..." aria-label="Search" name="q" value="{{ query|default_if_none:'' }}">
                 <button class="search-button" type="submit">Buscar</button>
                 {% if query %}
-                    <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a> 
+                    <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a>
                 {% endif %}
             </form>
         </div>
@@ -47,12 +47,12 @@
                         <th>SKU</th>
                         <th>Marca</th>
                         <th>Categoría</th>
-                        <th>Dramage</th>
-                        <th>Unidad</th>
+                        <th>Gramaje</th>
+                        <th>Unidad Medida</th>
                         <th>Precio Compra</th>
                         <th>Precio Venta</th>
-                        <th>Stock Total</th>
                         <th>Próximo Vencimiento</th>
+                        <th>Stock Total</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -68,12 +68,12 @@
                             <td>{{ producto.sku }}</td>
                             <td>{{ producto.marca|default:"N/A" }}</td>
                             <td>{{ producto.get_categoria_display }}</td>
-                            <td>{{ producto.dramage|default:"0" }}</td>
-                            <td>{{ producto.get_unidad_medida_display }}</td>
-                            <td>${{ producto.precio_compra|floatformat:0|intcomma }}</td>
-                            <td>${{ producto.precio_venta|floatformat:0|intcomma }}</td>
-                            <td>{{ producto.stock_total|default:"0" }}</td>
+                            <td>{{ producto.dramage }}</td>
+                            <td>{{ producto.unidad_medida }}</td>
+                            <td>${{ producto.precio_compra_empresa|floatformat:0|intcomma|default:"N/A" }}</td>
+                            <td>${{ producto.precio_venta_empresa|floatformat:0|intcomma|default:"N/A" }}</td>
                             <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
+                            <td>{{ producto.stock_total|default:"0" }}</td>
                             <td class="acciones">
                                 <a href="{% url 'editar_producto' producto.id %}" class="btn-accion-tabla" role="button">Editar</a>
                                 <a href="{% url 'eliminar_producto' producto.id %}" class="btn-accion-tabla btn-peligro" role="button">Eliminar</a>
@@ -85,7 +85,6 @@
             </table>
         </div>
     {% else %}
-        {# --- NUEVO DISEÑO PARA EL ESTADO VACÍO --- #}
         <div class="empty-state-wrapper">
             <div class="empty-state">
                 <div class="empty-state-icon">

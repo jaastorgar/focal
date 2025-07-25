@@ -1,21 +1,38 @@
 from django.contrib import admin
 from .models import (
-    PlanSuscripcion, SuscripcionUsuario, Empresa, Almacenero, 
-    Producto, LoteProducto, MovimientoStock, OrdenVenta, DetalleOrden
+    PlanSuscripcion, 
+    SuscripcionUsuario, 
+    Empresa, 
+    Almacenero, 
+    Producto,
+    OfertaProducto, 
+    LoteProducto, 
+    MovimientoStock, 
+    OrdenVenta, 
+    DetalleOrden
 )
 
 # --- Clases Inline para una mejor visualización ---
+
+class OfertaProductoInline(admin.TabularInline):
+    """Permite ver y agregar las empresas que venden un producto y sus precios."""
+    model = OfertaProducto
+    fields = ('empresa', 'precio_compra', 'precio_venta')
+    autocomplete_fields = ['empresa']
+    extra = 1 
 
 class LoteProductoInline(admin.TabularInline):
     """Permite ver y agregar lotes directamente desde la página de un producto."""
     model = LoteProducto
     readonly_fields = ('creado',)
+    extra = 0
 
 class SuscripcionUsuarioInline(admin.StackedInline):
     """Muestra la suscripción directamente en la página de la empresa."""
     model = SuscripcionUsuario
     extra = 0
     readonly_fields = ('fecha_inicio', 'fecha_fin')
+
 
 # --- Configuraciones del Panel de Administrador ---
 
@@ -33,12 +50,10 @@ class AlmaceneroAdmin(admin.ModelAdmin):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'sku', 'empresa', 'categoria', 'dramage', 'precio_venta')
-    list_filter = ('categoria', 'empresa')
+    list_display = ('nombre', 'sku', 'marca', 'categoria', 'dramage')
+    list_filter = ('categoria',)
     search_fields = ('nombre', 'sku', 'marca')
-    autocomplete_fields = ['empresa']
-    inlines = [LoteProductoInline]
-    list_select_related = ('empresa',)
+    inlines = [OfertaProductoInline, LoteProductoInline]
 
 @admin.register(LoteProducto)
 class LoteProductoAdmin(admin.ModelAdmin):
@@ -48,8 +63,10 @@ class LoteProductoAdmin(admin.ModelAdmin):
     autocomplete_fields = ['producto']
     list_select_related = ('producto',)
 
-# Registramos los modelos restantes con su configuración por defecto o una simple.
+# --- Registros de modelos restantes ---
+
 admin.site.register(PlanSuscripcion)
 admin.site.register(SuscripcionUsuario)
 admin.site.register(OrdenVenta)
 admin.site.register(DetalleOrden)
+admin.site.register(MovimientoStock)
