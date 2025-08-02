@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{% static 'landing/css/registro.css' %}">
 </head>
 <body>
-
     <header class="app-header-minimal">
         <a href="{% url 'landing' %}" class="logo">FOCAL</a>
     </header>
@@ -18,13 +17,9 @@
         <h2 class="form-title">Crea tu Cuenta en FOCAL</h2>
         <p class="form-subtitle">Regístrate para empezar a gestionar tu negocio de forma inteligente.</p>
 
-        {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
 
         <form method="post" class="registration-form" novalidate>
             {% csrf_token %}
@@ -32,25 +27,23 @@
             <div class="form-section">
                 <h3 class="section-heading">1. Datos del Administrador</h3>
                 <div class="form-grid">
-                    {% for field in almacenero_form %}
+                    {% for field in user_form %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                             {{ field }}
 
-                            {# --- MEJORA: Bloque de feedback para la contraseña --- #}
-                            {% if field.name == 'password' %}
+                            {% if field.name == 'password1' %}
                                 <div id="password-feedback" class="password-requirements">
-                                    <p>La contraseña debe contener:</p>
                                     <ul>
                                         <li id="req-length">Entre 8 y 12 caracteres</li>
                                         <li id="req-uppercase">Al menos una mayúscula (A-Z)</li>
                                         <li id="req-lowercase">Al menos una minúscula (a-z)</li>
                                         <li id="req-number">Al menos un número (0-9)</li>
-                                        <li id="req-special">Al menos un carácter especial (!@#$...)</li>
+                                        <li id="req-special">Al menos un carácter especial (_!@#$...)</li>
+                                        <li id="req-match">Las contraseñas deben coincidir</li>
                                     </ul>
                                 </div>
                             {% endif %}
-                            {# --- FIN DE LA MEJORA --- #}
 
                             {% if field.errors %}
                                 <div class="error-message">{{ field.errors|striptags }}</div>
@@ -77,10 +70,6 @@
 
             <div class="form-submit-container">
                 <button type="submit" class="btn-submit">Crear Cuenta</button>
-            </div>
-
-            <div class="login-link-container">
-                <span>¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a>.</span>
             </div>
         </form>
     </main>

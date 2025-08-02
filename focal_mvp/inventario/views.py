@@ -2,58 +2,76 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.db.models import Q, Min, Sum, Subquery, OuterRef
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import date, timedelta
 import time
+
+# Se importan los formularios necesarios
 from .forms import (
     ProductoForm, OfertaProductoFormSet, LoteProductoForm, OfertaProductoForm,
     ArchivoVentasForm
 )
+# Se importan los modelos correctos
 from .models import (
     SuscripcionUsuario, Producto, LoteProducto, OfertaProducto,
-    PlanSuscripcion
+    PlanSuscripcion, Empresa
 )
+# Se importa la función utilitaria
 from .utils import obtener_empresa_del_usuario
+# Se importan los decoradores para vistas de planes
+from .decorators import plan_requerido, caracteristica_requerida
 
-# --- Vistas Principales (Home, Logout, Perfil) ---
+# --- Vistas del Panel Principal ---
 
 @login_required
 def home(request):
+    """
+    Muestra el panel principal con alertas de vencimiento y stock bajo
+    para la empresa del usuario actual.
+    """
     empresa = obtener_empresa_del_usuario(request.user)
     alertas_vencimiento = []
     alertas_stock_bajo = []
 
     if empresa:
         fecha_limite = date.today() + timedelta(days=30)
+        
+        # Filtra alertas de vencimiento a través de la relación correcta: Lote -> Oferta -> Empresa
         alertas_vencimiento = LoteProducto.objects.filter(
-            empresa=empresa, 
+            producto__empresa=empresa,
             cantidad__gt=0, 
             fecha_vencimiento__lte=fecha_limite
-        ).select_related('producto').order_by('fecha_vencimiento')[:5]
+        ).select_related('producto__producto').order_by('fecha_vencimiento')[:5]
 
-        # CORREGIDO: Se crea la subconsulta que realiza la suma
+        # Ajusta la subconsulta para el stock bajo
         lotes_de_la_empresa = LoteProducto.objects.filter(
-            producto=OuterRef('pk'), 
-            empresa=empresa
+            producto__producto=OuterRef('pk'), 
+            producto__empresa=empresa
         )
-        subquery_stock = Subquery(lotes_de_la_empresa.values('producto').annotate(total=Sum('cantidad')).values('total'))
+        subquery_stock = Subquery(
+            lotes_de_la_empresa.values('producto__producto')
+            .annotate(total=Sum('cantidad'))
+            .values('total')
+        )
 
         alertas_stock_bajo = Producto.objects.filter(empresas=empresa).annotate(
-            stock_total=subquery_stock # Se usa la subconsulta corregida
+            stock_total=subquery_stock
         ).filter(stock_total__gt=0, stock_total__lte=5).order_by('stock_total')[:5]
 
     context = {
-        'almacenero': getattr(request.user, 'almacenero', None),
+        'almacenero': request.user,
         'alertas_vencimiento': alertas_vencimiento,
         'alertas_stock_bajo': alertas_stock_bajo,
     }
     return render(request, 'inventario/home.html', context)
 
-# --- Vistas de Inventario (MODIFICADAS) ---
-
 @login_required
 def inventario_view(request):
+    """
+    Muestra la lista de productos del inventario de la empresa actual.
+    """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
@@ -61,18 +79,16 @@ def inventario_view(request):
 
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
     
-    # CORREGIDO: Se crean subconsultas que realizan la agregación
-    lotes_empresa = LoteProducto.objects.filter(producto=OuterRef('pk'), empresa=empresa_usuario)
+    lotes_empresa = LoteProducto.objects.filter(
+        producto__producto=OuterRef('pk'),
+        producto__empresa=empresa_usuario
+    )
     
     subquery_stock = Subquery(
-        lotes_empresa.values('producto')
-        .annotate(total=Sum('cantidad'))
-        .values('total')
+        lotes_empresa.values('producto__producto').annotate(total=Sum('cantidad')).values('total')
     )
     subquery_vencimiento = Subquery(
-        lotes_empresa.values('producto')
-        .annotate(proximo=Min('fecha_vencimiento'))
-        .values('proximo')
+        lotes_empresa.values('producto__producto').annotate(proximo=Min('fecha_vencimiento')).values('proximo')
     )
     
     ofertas_empresa = OfertaProducto.objects.filter(producto=OuterRef('pk'), empresa=empresa_usuario)
@@ -99,31 +115,7 @@ def inventario_view(request):
     }
     return render(request, 'inventario/inventario.html', context)
 
-@login_required
-def detalle_producto(request, producto_id):
-    empresa_usuario = obtener_empresa_del_usuario(request.user)
-    if not empresa_usuario:
-        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
-        return redirect('inventario')
-
-    # Se busca el producto asegurando que la empresa del usuario lo ofrezca
-    producto = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
-    
-    # Se obtiene la oferta específica de esta empresa para mostrar sus precios
-    oferta_empresa = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
-    
-    # ¡CORREGIDO! Ahora filtramos los lotes por la empresa del usuario.
-    lotes = producto.lotes.filter(empresa=empresa_usuario).order_by('fecha_vencimiento')
-
-    context = {
-        'producto': producto,
-        'oferta': oferta_empresa,
-        'lotes': lotes
-    }
-    return render(request, 'inventario/detalle_producto.html', context)
-
-
-# --- Vistas de CRUD de Producto (REFACTORIZADAS) ---
+# --- CRUD de Productos ---
 
 @login_required
 @transaction.atomic
@@ -133,7 +125,6 @@ def agregar_producto(request):
         messages.error(request, "Debes estar asociado a una empresa para agregar productos.")
         return redirect('home')
 
-    # Lógica de plan 
     try:
         plan = SuscripcionUsuario.objects.get(empresa=empresa_usuario, activa=True).plan
         productos_actuales = Producto.objects.filter(empresas=empresa_usuario).count()
@@ -158,15 +149,11 @@ def agregar_producto(request):
                 'unidad_medida': form_prod.cleaned_data['unidad_medida'],
             }
             
-            producto, creado = Producto.objects.update_or_create(
-                sku=sku,
-                defaults=defaults_y_updates
-            )
-            # --- FIN DEL CAMBIO ---
+            producto, creado = Producto.objects.update_or_create(sku=sku, defaults=defaults_y_updates)
 
-            # La lógica para la oferta
             if not creado and OfertaProducto.objects.filter(producto=producto, empresa=empresa_usuario).exists():
                 messages.error(request, f"Este producto (SKU: {sku}) ya existe en tu inventario.")
+                return redirect('agregar_producto')
             else:
                 oferta = formset_oferta.save(commit=False)[0]
                 oferta.producto = producto
@@ -175,37 +162,24 @@ def agregar_producto(request):
                 messages.success(request, f"Producto '{producto.nombre}' agregado/actualizado en tu inventario.")
                 return redirect('inventario')
         else:
-            # Si los formularios no son válidos, renderiza la página con los errores
-            context = {
-                'form': form_prod,
-                'formset': formset_oferta
-            }
+            context = {'form': form_prod, 'formset': formset_oferta}
             return render(request, 'inventario/agregar-producto.html', context)
 
-    # Lógica para la petición GET 
     form_prod = ProductoForm()
     formset_oferta = OfertaProductoFormSet(queryset=OfertaProducto.objects.none())
-    context = {
-        'form': form_prod,
-        'formset': formset_oferta
-    }
+    context = {'form': form_prod, 'formset': formset_oferta}
     return render(request, 'inventario/agregar-producto.html', context)
-
 
 @login_required
 @transaction.atomic
 def editar_producto(request, producto_id):
     empresa_usuario = obtener_empresa_del_usuario(request.user)
-    if not empresa_usuario:
-        return redirect('inventario')
-
-    # Se obtiene el producto y la oferta específica de la empresa
     producto = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
     oferta = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
     
     if request.method == 'POST':
         form_prod = ProductoForm(request.POST, instance=producto)
-        form_oferta = OfertaProductoForm(request.POST, instance=oferta) # Un solo form, no un formset
+        form_oferta = OfertaProductoForm(request.POST, instance=oferta)
 
         if form_prod.is_valid() and form_oferta.is_valid():
             form_prod.save()
@@ -216,194 +190,108 @@ def editar_producto(request, producto_id):
         form_prod = ProductoForm(instance=producto)
         form_oferta = OfertaProductoForm(instance=oferta)
 
-    context = {
-        'form_prod': form_prod,
-        'form_oferta': form_oferta,
-        'producto': producto
-    }
+    context = {'form_prod': form_prod, 'form_oferta': form_oferta, 'producto': producto}
     return render(request, 'inventario/editar-producto.html', context)
-
 
 @login_required
 def eliminar_producto(request, producto_id):
-    """
-    MODIFICADO: Esta vista ahora no elimina el producto global, sino que elimina
-    la OFERTA de la empresa actual. El producto solo se borra si ninguna otra
-    empresa lo está ofreciendo.
-    """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
-    if not empresa_usuario:
-        return redirect('inventario')
-
     producto = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
-    oferta_a_eliminar = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
-
+    
     if request.method == 'POST':
         nombre_producto = producto.nombre
-        # Se elimina la oferta, no el producto directamente
+        oferta_a_eliminar = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
         oferta_a_eliminar.delete()
 
-        # Si el producto ya no tiene ninguna otra oferta, se elimina por completo
         if not producto.ofertaproducto_set.exists():
             producto.delete()
             messages.success(request, f'Producto "{nombre_producto}" y todas sus referencias han sido eliminados.')
         else:
-            messages.success(request, f'Has dejado de ofrecer el producto "{nombre_producto}". Se ha eliminado de tu inventario.')
+            messages.success(request, f'Has dejado de ofrecer el producto "{nombre_producto}".')
         
         return redirect('inventario')
     
     context = {'producto': producto}
     return render(request, 'inventario/eliminar_producto_confirm.html', context)
 
+# --- CRUD de Lotes ---
 
-# --- Vistas de Lotes y Stock (con filtros M2M actualizados) ---
-# ... (Las vistas como agregar_lote, editar_lote, retirar_lote, etc., 
-#      necesitarían actualizar sus filtros de `producto__empresa` a `producto__empresas`.
-#      Aquí un ejemplo clave:)
+@login_required
+def detalle_producto(request, producto_id):
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    producto = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
+    oferta_empresa = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
+    
+    lotes = LoteProducto.objects.filter(producto=oferta_empresa).order_by('fecha_vencimiento')
+
+    context = {'producto': producto, 'oferta': oferta_empresa, 'lotes': lotes}
+    return render(request, 'inventario/detalle_producto.html', context)
 
 @login_required
 def agregar_lote_producto(request):
     empresa_usuario = obtener_empresa_del_usuario(request.user)
-    if not empresa_usuario:
-        return redirect('home')
-
-    if request.method == 'POST':
-        producto_id = request.POST.get('producto_id')
-        if not producto_id:
-            messages.error(request, "Debes seleccionar un producto.")
-            return render(request, 'inventario/agregar_lote.html', {'form': LoteProductoForm()})
-
-        producto_a_asignar = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
-        
-        form = LoteProductoForm(request.POST)
-        if form.is_valid():
-            lote = form.save(commit=False)
-            lote.producto = producto_a_asignar
-            lote.empresa = empresa_usuario
-            lote.save()
-            messages.success(request, f"Lote para '{lote.producto.nombre}' agregado correctamente.")
-            return redirect('inventario')
     
-    return render(request, 'inventario/agregar_lote.html', {'form': LoteProductoForm()})
+    ofertas_de_la_empresa = OfertaProducto.objects.filter(empresa=empresa_usuario).select_related('producto')
+    
+    if request.method == 'POST':
+        form = LoteProductoForm(request.POST)
+        form.fields['producto'].queryset = ofertas_de_la_empresa
 
-# --- Vistas de API (REFACTORIZADAS) ---
-
-@login_required
-def obtener_datos_sku_api(request, sku):
-    empresa_actual = obtener_empresa_del_usuario(request.user)
-
-    if OfertaProducto.objects.filter(producto__sku=sku, empresa=empresa_actual).exists():
-        return JsonResponse({'status': 'duplicado_local', 'mensaje': 'Este producto ya existe en tu inventario.'})
-
-    producto_global = Producto.objects.filter(sku=sku).first()
-    if producto_global:
-        # Devolvemos datos para autocompletar, pero SIN precios
-        data = {
-            'status': 'encontrado_global',
-            'datos': {
-                'nombre': producto_global.nombre,
-                'sku': producto_global.sku,
-                'marca': producto_global.marca,
-                'categoria': producto_global.categoria,
-                'dramage': producto_global.dramage,
-                'unidad_medida': producto_global.unidad_medida,
-            }
-        }
-        return JsonResponse(data)
-
-    # 3. El producto es completamente nuevo
-    return JsonResponse({'status': 'nuevo'})
-
-@login_required
-def logout_view(request):
-    """
-    Cierra la sesión del usuario y lo redirige a la página de inicio.
-    """
-    from django.contrib.auth import logout
-    logout(request)
-    messages.info(request, "Has cerrado sesión correctamente.")
-    return redirect('/')
-
-@login_required
-def perfil(request):
-    """
-    Muestra el perfil del usuario, su empresa y su plan de suscripción activo.
-    """
-    almacenero = getattr(request.user, 'almacenero', None)
-    empresa = obtener_empresa_del_usuario(request.user)
-    suscripcion = None
-    plan = None
-
-    if empresa:
-        try:
-            suscripcion = SuscripcionUsuario.objects.select_related('plan').get(empresa=empresa, activa=True)
-            plan = suscripcion.plan
-        except SuscripcionUsuario.DoesNotExist:
-            messages.warning(request, "No tienes una suscripción activa.")
-
-    context = {
-        'almacenero': almacenero,
-        'empresa': empresa,
-        'suscripcion': suscripcion,
-        'plan': plan,
-    }
-    return render(request, 'inventario/perfil.html', context)
-
-
-# --- Gestión de Lotes (Refactorizado) ---
+        if form.is_valid():
+            lote = form.save()
+            messages.success(request, f"Lote para '{lote.producto.producto.nombre}' agregado.")
+            return redirect('inventario')
+    else:
+        form = LoteProductoForm()
+        form.fields['producto'].queryset = ofertas_de_la_empresa
+    
+    context = {'form': form}
+    return render(request, 'inventario/agregar_lote.html', context)
 
 @login_required
 def editar_lote(request, lote_id):
     empresa_usuario = obtener_empresa_del_usuario(request.user)
-    # MODIFICADO: Se comprueba la pertenencia a través de la relación M2M 'empresas'
-    lote = get_object_or_404(LoteProducto, id=lote_id, producto__empresas=empresa_usuario)
+    lote = get_object_or_404(LoteProducto, id=lote_id, producto__empresa=empresa_usuario)
     
     if request.method == 'POST':
         form = LoteProductoForm(request.POST, instance=lote)
         if form.is_valid():
             form.save()
             messages.success(request, "Lote actualizado correctamente.")
-            return redirect('detalle_producto', producto_id=lote.producto.id)
+            return redirect('detalle_producto', producto_id=lote.producto.producto.id)
     else:
         form = LoteProductoForm(instance=lote)
+        form.fields['producto'].queryset = OfertaProducto.objects.filter(empresa=empresa_usuario)
 
     return render(request, 'inventario/editar_lote.html', {'form': form, 'lote': lote})
-
 
 @login_required
 @transaction.atomic
 def retirar_lote(request, lote_id):
     empresa_usuario = obtener_empresa_del_usuario(request.user)
-    # MODIFICADO: Se comprueba la pertenencia a través de la relación M2M 'empresas'
-    lote = get_object_or_404(LoteProducto, id=lote_id, producto__empresas=empresa_usuario)
+    lote = get_object_or_404(LoteProducto, id=lote_id, producto__empresa=empresa_usuario)
 
     if request.method == 'POST':
         try:
             cantidad_a_retirar = int(request.POST.get('cantidad', 0))
-            if cantidad_a_retirar <= 0:
-                messages.error(request, "La cantidad a retirar debe ser mayor que cero.")
-            elif cantidad_a_retirar > lote.cantidad:
-                messages.error(request, f"No puedes retirar más de {lote.cantidad} unidades.")
-            else:
+            if 0 < cantidad_a_retirar <= lote.cantidad:
                 lote.cantidad -= cantidad_a_retirar
                 lote.save()
-                # Opcional: Registrar el movimiento
-                # MovimientoStock.objects.create(...)
                 messages.success(request, f"Se retiraron {cantidad_a_retirar} unidades del lote.")
+            else:
+                messages.error(request, "La cantidad a retirar es inválida.")
         except (ValueError, TypeError):
             messages.error(request, "La cantidad ingresada no es un número válido.")
         
-        return redirect('detalle_producto', producto_id=lote.producto.id)
+        return redirect('detalle_producto', producto_id=lote.producto.producto.id)
 
     return render(request, 'inventario/retirar_lote.html', {'lote': lote})
-
 
 @login_required
 def eliminar_lote(request, lote_id):
     empresa_usuario = obtener_empresa_del_usuario(request.user)
-    # MODIFICADO: Se comprueba la pertenencia a través de la relación M2M 'empresas'
-    lote = get_object_or_404(LoteProducto, id=lote_id, producto__empresas=empresa_usuario)
-    producto_id = lote.producto.id
+    lote = get_object_or_404(LoteProducto, id=lote_id, producto__empresa=empresa_usuario)
+    producto_id = lote.producto.producto.id
 
     if request.method == 'POST':
         lote.delete()
@@ -412,29 +300,105 @@ def eliminar_lote(request, lote_id):
     
     return render(request, 'inventario/eliminar_lote_confirm.html', {'lote': lote})
 
+# --- Vistas de Utilidades, Perfil y Sesión ---
 
-# --- Gestión de Archivos (Refactorizado) ---
+@login_required
+def perfil(request):
+    from .models import Almacenero
+    """
+    Muestra el perfil del usuario, su empresa y su plan de suscripción activo,
+    optimizando la consulta a la base de datos.
+    """
+    # Usamos select_related para traer la empresa, la suscripción y el plan
+    # en una sola consulta eficiente desde el objeto del usuario.
+    try:
+        almacenero = Almacenero.objects.select_related(
+            'empresa', 
+            'empresa__suscripcion', 
+            'empresa__suscripcion__plan'
+        ).get(id=request.user.id)
+        
+        empresa = almacenero.empresa
+        suscripcion = getattr(empresa, 'suscripcion', None)
+        plan = getattr(suscripcion, 'plan', None)
+        
+    except Almacenero.DoesNotExist:
+        almacenero = request.user
+        empresa = None
+        suscripcion = None
+        plan = None
+
+    context = {
+        'almacenero': almacenero,
+        'empresa': empresa,
+        'suscripcion': suscripcion,
+        'plan': plan
+    }
+    return render(request, 'inventario/perfil.html', context)
+
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.info(request, "Has cerrado sesión correctamente.")
+    return redirect('landing')
+
+# --- Vistas de API ---
+
+@login_required
+def obtener_datos_sku_api(request, sku):
+    empresa_actual = obtener_empresa_del_usuario(request.user)
+    if OfertaProducto.objects.filter(producto__sku=sku, empresa=empresa_actual).exists():
+        return JsonResponse({'status': 'duplicado_local', 'mensaje': 'Este producto ya existe en tu inventario.'})
+
+    producto_global = Producto.objects.filter(sku=sku).first()
+    if producto_global:
+        data = {
+            'status': 'encontrado_global',
+            'datos': {
+                'nombre': producto_global.nombre, 'sku': producto_global.sku,
+                'marca': producto_global.marca, 'categoria': producto_global.categoria,
+                'dramage': producto_global.dramage, 'unidad_medida': producto_global.unidad_medida,
+            }
+        }
+        return JsonResponse(data)
+    return JsonResponse({'status': 'nuevo'})
+
+@login_required
+def buscar_producto_api(request, codigo_barras):
+    empresa = obtener_empresa_del_usuario(request.user)
+    oferta = OfertaProducto.objects.filter(
+        producto__sku=codigo_barras, 
+        empresa=empresa
+    ).select_related('producto').first()
+    
+    if oferta:
+        data = {'encontrado': True, 'oferta_id': oferta.id, 'nombre': oferta.producto.nombre}
+        return JsonResponse(data)
+    else:
+        return JsonResponse({'encontrado': False, 'mensaje': 'Producto no registrado en tu inventario.'}, status=404)
+
+@login_required
+def verificar_producto_api(request, codigo_barras):
+    """
+    Verifica si una oferta para un producto con el SKU dado ya existe para la empresa del usuario.
+    """
+    empresa = obtener_empresa_del_usuario(request.user)
+    existe = OfertaProducto.objects.filter(producto__sku=codigo_barras, empresa=empresa).exists()
+    return JsonResponse({'existe': existe})
+
+
+# --- Vistas de Gestión de Archivos y Planes ---
 
 @login_required
 def descargar_plantilla_ventas(request):
     from openpyxl import Workbook
     from django.http import HttpResponse
 
-    empresa_usuario = obtener_empresa_del_usuario(request.user)
-    if not empresa_usuario:
-        messages.error(request, "No se pudo encontrar tu empresa.")
-        return redirect('home')
-
     wb = Workbook()
     ws = wb.active
     ws.title = "Plantilla Ventas"
     ws.append(['sku', 'cantidad'])
-
-    # MODIFICADO: Se buscan los productos que la empresa ofrece
-    productos = Producto.objects.filter(empresas=empresa_usuario).only('sku')
-    for producto in productos:
-        ws.append([producto.sku, ''])
-
+    
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=plantilla_ventas.xlsx'
     wb.save(response)
@@ -444,121 +408,29 @@ def descargar_plantilla_ventas(request):
 @login_required
 @transaction.atomic
 def procesar_ventas_archivo(request):
-    import pandas as pd
-    
     if request.method != 'POST':
-        return render(request, 'inventario/procesar_ventas_archivo.html', {'form': ArchivoVentasForm()})
-
-    form = ArchivoVentasForm(request.POST, request.FILES)
-    if not form.is_valid():
+        form = ArchivoVentasForm()
         return render(request, 'inventario/procesar_ventas_archivo.html', {'form': form})
-
-    empresa_usuario = obtener_empresa_del_usuario(request.user)
-    archivo = request.FILES['archivo_ventas']
     
-    try:
-        df = pd.read_excel(archivo) if archivo.name.endswith(('.xlsx', '.xls')) else pd.read_csv(archivo)
-    except Exception as e:
-        messages.error(request, f"Error al leer el archivo: {e}")
-        return redirect('procesar_ventas_archivo')
-
-    errores = []
-    # MODIFICACIÓN CLAVE: Procesar todo dentro de una transacción para poder revertir
-    try:
-        with transaction.atomic():
-            for index, row in df.iterrows():
-                try:
-                    sku = str(row['sku']).strip()
-                    cantidad_a_retirar = int(row['cantidad'])
-                    if cantidad_a_retirar <= 0: continue
-
-                    # MODIFICADO: Se busca el producto que ofrezca la empresa actual
-                    producto = Producto.objects.get(sku=sku, empresas=empresa_usuario)
-                    
-                    # El resto de la lógica para descontar de lotes es compleja y puede mantenerse
-                    # similar a tu versión original, asegurando que se haga de forma atómica.
-                    # ... (lógica de retiro de lotes FIFO) ...
-
-                except Producto.DoesNotExist:
-                    errores.append(f"Fila {index + 2}: Producto con SKU {sku} no encontrado en tu inventario.")
-                except (ValueError, TypeError):
-                    errores.append(f"Fila {index + 2}: Cantidad inválida para SKU {sku}.")
-                except Exception as e:
-                    errores.append(f"Fila {index + 2}: Error inesperado con SKU {sku}: {e}")
-            
-            # Si hubo algún error, se lanza una excepción para revertir la transacción completa.
-            if errores:
-                raise Exception("Errores durante el procesamiento.")
-
-    except Exception:
-        for error in errores:
-            messages.error(request, error)
-        messages.warning(request, "No se realizó ninguna actualización en el stock debido a los errores encontrados.")
-    else:
-        messages.success(request, "Archivo procesado y stock actualizado correctamente.")
-    
+    messages.info(request, "Funcionalidad de procesamiento de archivos en desarrollo.")
     return redirect('inventario')
 
 
-# --- Vistas de API (Refactorizadas) ---
-
-@login_required
-def buscar_producto_api(request, codigo_barras):
-    """
-    Busca un producto por SKU que pertenezca a la empresa del usuario.
-    Usado para agregar lotes.
-    """
-    empresa = obtener_empresa_del_usuario(request.user)
-    # MODIFICADO: Filtra por la relación M2M
-    producto = Producto.objects.filter(sku=codigo_barras, empresas=empresa).first()
-    
-    if producto:
-        return JsonResponse({'encontrado': True, 'producto_id': producto.id, 'nombre': producto.nombre})
-    else:
-        return JsonResponse({'encontrado': False, 'mensaje': 'Producto no registrado en tu inventario.'}, status=404)
-
-# --- Vistas Basadas en Planes (Sin cambios, pero necesarias) ---
-
-# Asegúrate de tener los decoradores importados
-from .decorators import plan_requerido, caracteristica_requerida
-
-@login_required
-@plan_requerido('PREMIUM')
-def vista_reportes_avanzados(request):
-    return render(request, 'inventario/reportes_avanzados.html')
-
-
-@login_required
-@caracteristica_requerida('soporte_prioritario')
-def vista_soporte_premium(request):
-    return render(request, 'inventario/soporte_premium.html')
-
-@login_required
-def verificar_producto_api(request, codigo_barras):
-    """
-    Verifica si un producto con el código de barras dado ya existe.
-    """
-    empresa = obtener_empresa_del_usuario(request.user)
-    existe = Producto.objects.filter(sku=codigo_barras, empresa=empresa).exists()
-    
-    return JsonResponse({'existe': existe})
-
 @login_required
 def seleccionar_plan(request, plan_id):
-    """
-    Esta es la vista que faltaba. Por ahora, solo muestra un mensaje
-    y redirige al inicio. Más adelante puedes desarrollar su lógica.
-    """
+    empresa = obtener_empresa_del_usuario(request.user)
+    plan = get_object_or_404(PlanSuscripcion, id=plan_id)
+
+    if not empresa:
+        messages.error(request, "No estás asociado a ninguna empresa para seleccionar un plan.")
+        return redirect('planes') 
+
     try:
-        # Intenta obtener el plan desde la base de datos
-        plan = PlanSuscripcion.objects.get(id=plan_id)
+        with transaction.atomic():
+            SuscripcionUsuario.objects.filter(empresa=empresa, activa=True).update(activa=False)
+            SuscripcionUsuario.objects.create(empresa=empresa, plan=plan, activa=True)
+        messages.success(request, f"Has cambiado exitosamente al plan {plan.nombre}.")
+    except Exception as e:
+        messages.error(request, f"Ocurrió un error al cambiar de plan: {e}")
 
-        # Aquí iría tu lógica para suscribir al usuario al plan
-        messages.success(request, f"Has seleccionado el plan: {plan.nombre}. ¡Funcionalidad en desarrollo!")
-
-        # Redirige al home del inventario
-        return redirect('home') 
-
-    except PlanSuscripcion.DoesNotExist:
-        messages.error(request, "El plan que intentas seleccionar no existe.")
-        return redirect('home') 
+    return redirect('home')

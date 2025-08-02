@@ -3,7 +3,6 @@
    ========================================================================== */
 
 /* 1. Variables y Configuración Base
-   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
    -------------------------------------------------------------------------- */
 :root {
   --primary-purple: #4A008B;
@@ -16,6 +15,7 @@
   --focus-shadow: rgba(74, 0, 139, 0.25);
   --error-text: #d32f2f;
   --error-bg: #ffebee;
+  --success-text: #28a745;
   --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
   
   --font-primary: 'InterTight', sans-serif;
@@ -26,7 +26,6 @@
   box-sizing: border-box;
 }
 
-/* Las declaraciones @font-face se mantienen igual. */
 @font-face {
   font-family: 'InterTight';
   src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
@@ -57,7 +56,6 @@ body {
 }
 
 /* 2. Componentes Comunes (Header y Footer)
-   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
    -------------------------------------------------------------------------- */
 .app-header-minimal {
   width: 100%;
@@ -82,13 +80,13 @@ body {
   font-size: 0.9rem;
 }
 
-/* 3. Contenedor Principal del Formulario de Registro
+/* 3. Contenedor Principal del Formulario
    -------------------------------------------------------------------------- */
 main.registration-container {
   width: 100%;
   max-width: 900px;
   margin: 2rem auto;
-  padding: 3rem;
+  padding: 2rem 3rem;
   background-color: var(--white);
   border-radius: 16px;
   box-shadow: var(--box-shadow);
@@ -122,7 +120,7 @@ main.registration-container {
   color: var(--primary-purple);
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid var(--primary-purple);
+  border-bottom: 2px solid var(--light-purple);
 }
 
 .form-grid {
@@ -165,17 +163,6 @@ main.registration-container {
   margin-top: 0.4rem;
 }
 
-.alert-error {
-    background-color: var(--error-bg);
-    color: var(--error-text);
-    padding: 1rem;
-    border-radius: 8px;
-    font-weight: 600;
-}
-.grid-full-width {
-    grid-column: 1 / -1;
-}
-
 /* 5. Botón de Envío y Enlaces
    -------------------------------------------------------------------------- */
 .form-submit-container {
@@ -216,7 +203,69 @@ main.registration-container {
   text-decoration: underline;
 }
 
-/* 6. Responsividad
+/* 6. Estilos para Mensajes de Alerta y Validación JS
+   -------------------------------------------------------------------------- */
+.messages-container { 
+    margin-bottom: 2rem; 
+}
+.alert { 
+    padding: 1rem 1.5rem; 
+    border-radius: 8px; 
+    font-weight: 600; 
+}
+.alert-error { 
+    background-color: var(--error-bg); 
+    color: var(--error-text); 
+}
+.alert-success { 
+    background-color: #d4edda; 
+    color: #155724; 
+}
+
+.password-requirements {
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: none; /* Oculto por defecto */
+}
+.password-requirements ul { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+}
+.password-requirements li { 
+    color: var(--muted-text); 
+    padding-left: 1.5rem; 
+    position: relative; 
+    transition: color 0.2s; 
+    margin-bottom: 0.25rem; 
+}
+.password-requirements li::before { 
+    content: '●'; 
+    position: absolute; 
+    left: 0; 
+    color: var(--border-color); 
+    transition: color 0.2s; 
+}
+.password-requirements li.invalid { 
+    color: var(--error-text); 
+}
+.password-requirements li.invalid::before { 
+    content: '✖'; 
+    color: var(--error-text); 
+}
+.password-requirements li.valid { 
+    color: var(--success-text); 
+    text-decoration: line-through; 
+}
+.password-requirements li.valid::before { 
+    content: '✔'; 
+    color: var(--success-text); 
+}
+
+/* 7. Responsividad
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
   main.registration-container {
@@ -227,35 +276,3 @@ main.registration-container {
     grid-template-columns: 1fr;
   }
 }
-
-/* 7. --- Estilos para Mensajes de Alerta y Validación de Contraseña --- */
-.messages-container { margin-bottom: 2rem; }
-.alert { padding: 1rem 1.5rem; border-radius: 8px; font-weight: 600; transition: opacity 0.5s ease-out; }
-.alert.fade-out { opacity: 0; }
-.alert-error { background-color: #f8d7da; color: #721c24; }
-.alert-success { background-color: #d4edda; color: #155724; }
-
-.password-requirements {
-    font-size: 0.875rem;
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    opacity: 0;
-    visibility: hidden;
-    max-height: 0;
-    transition: all 0.3s ease;
-}
-.password-requirements.visible {
-    opacity: 1;
-    visibility: visible;
-    max-height: 300px; 
-}
-.password-requirements p { font-weight: 600; margin: 0 0 0.5rem 0; }
-.password-requirements ul { list-style: none; padding: 0; margin: 0; }
-.password-requirements li { color: var(--muted-text); padding-left: 1.5rem; position: relative; transition: color 0.2s; margin-bottom: 0.25rem; }
-.password-requirements li::before { content: '●'; position: absolute; left: 0; color: var(--border-color); transition: color 0.2s; }
-.password-requirements li.invalid { color: var(--error-text); }
-.password-requirements li.invalid::before { content: '✖'; color: var(--error-text); }
-.password-requirements li.valid { color: var(--success-text); text-decoration: line-through; }
-.password-requirements li.valid::before { content: '✔'; color: var(--success-text); }

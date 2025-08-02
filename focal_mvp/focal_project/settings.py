@@ -35,6 +35,13 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
+AUTH_USER_MODEL = 'inventario.Almacenero'
+
+AUTHENTICATION_BACKENDS = [
+    'inventario.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -91,7 +98,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'focal-cache-snowflake', # Puede ser cualquier nombre único
+        'LOCATION': 'focal-cache-snowflake',
     }
 }
 

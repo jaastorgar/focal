@@ -1,9 +1,8 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos para la Página de Planes
+   FOCAL - Hoja de Estilos para la Página de Planes (Actualizada)
    ========================================================================== */
 
 /* 1. Variables y Configuración Base
-   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
    -------------------------------------------------------------------------- */
 :root {
   --primary-purple: #4A008B;
@@ -14,7 +13,7 @@
   --dark-text: #212529;
   --muted-text: #6c757d;
   --border-color: #dee2e6;
-  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.09);
+  --box-shadow: 0 8px 25px rgba(74, 0, 139, 0.09);
   
   --font-primary: 'InterTight', sans-serif;
   --font-secondary: 'HankenGrotesk', sans-serif;
@@ -22,9 +21,10 @@
 
 *, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* Las declaraciones @font-face se mantienen igual. */
 @font-face {
   font-family: 'InterTight';
   src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
@@ -36,94 +36,42 @@
   font-weight: 400;
 }
 
-body {
-  font-family: var(--font-secondary);
+/* 2. Estructura de la Sección de Planes
+   -------------------------------------------------------------------------- */
+.planes-section {
+  padding: 4rem 0;
+  text-align: center;
   background-color: var(--light-purple);
-  color: var(--dark-text);
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
 }
 
-/* 2. Componentes Comunes (Header y Footer)
-   (RECOMENDADO: Mover esta sección a un archivo base-app.css reutilizable)
-   -------------------------------------------------------------------------- */
-.app-header {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.app-header nav.container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-.app-header .logo, .app-header .nav-links a {
-  color: var(--white);
-  text-decoration: none;
-  font-weight: 700;
-}
-.app-header .logo {
-  font-family: var(--font-primary);
-  font-size: 1.5rem;
-}
-.app-header .nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    gap: 1.5rem;
-}
-.app-header .nav-links a:hover {
-    color: #d1c4e9;
-}
-
-.app-footer {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  text-align: center;
-  padding: 1.5rem;
-  margin-top: auto;
-}
-
-/* 3. Contenido Principal y Títulos de la Sección
-   -------------------------------------------------------------------------- */
-main {
-    width: 100%;
-}
-.plans-section {
+.planes-section .container {
   max-width: 1100px;
-  margin: 3rem auto;
-  padding: 0 2rem;
-  text-align: center;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
-.section-title {
+.planes-section h2 {
   font-family: var(--font-primary);
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   color: var(--primary-purple);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
-.section-subtitle {
-  font-size: 1.1rem;
+.planes-section .subtitulo {
+  font-family: var(--font-secondary);
+  font-size: 1.15rem;
   color: var(--muted-text);
   max-width: 600px;
-  margin: 0 auto 3rem auto;
+  margin: 0 auto 3.5rem auto;
 }
 
-/* 4. Cuadrícula y Tarjetas de Planes
+/* 3. Cuadrícula y Tarjetas de Planes
    -------------------------------------------------------------------------- */
-.plans-grid {
+.planes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
+  justify-content: center;
 }
 
 .plan-card {
@@ -134,125 +82,104 @@ main {
   display: flex;
   flex-direction: column;
   text-align: left;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.plan-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.plan-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
+.plan-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 16px 35px rgba(74, 0, 139, 0.15);
 }
-.plan-title {
+
+/* 4. Contenido de las Tarjetas
+   -------------------------------------------------------------------------- */
+.plan-header {
+  padding: 2rem 1.5rem;
+}
+
+.plan-header h3 {
   font-family: var(--font-primary);
-  font-size: 1.5rem;
-  color: var(--primary-purple);
+  font-size: 1.75rem;
+  color: var(--secondary-purple);
   margin: 0;
 }
-.plan-price {
+
+.plan-header .precio {
   font-family: var(--font-primary);
-  font-size: 2.5rem;
+  font-size: 3rem;
   color: var(--dark-text);
   margin: 0.5rem 0 0 0;
+  font-weight: 700;
 }
-.plan-price span {
+
+.plan-header .precio span {
   font-size: 1rem;
   color: var(--muted-text);
   font-family: var(--font-secondary);
+  font-weight: 400;
+  margin-left: 0.25rem;
 }
 
-.plan-features {
+.plan-body {
   padding: 1.5rem;
-  flex-grow: 1; 
+  flex-grow: 1; /* Hace que esta sección ocupe el espacio disponible */
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
-.plan-features p {
-    font-size: 0.9rem;
-    color: var(--muted-text);
-    margin-top: 0;
-    min-height: 50px;
-}
-.plan-features ul {
+
+.plan-body ul {
   list-style: none;
-  padding: 0;
-  margin: 1.5rem 0 0 0;
 }
-.plan-features li {
-  margin-bottom: 0.75rem;
-  padding-left: 1.5rem;
-  position: relative;
+
+.plan-body li {
+  font-family: var(--font-secondary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--dark-text);
 }
-/* Estilo de viñeta personalizada (check mark) */
-.plan-features li::before {
-  content: '✔';
+
+.plan-body li i {
   color: var(--secondary-purple);
-  position: absolute;
-  left: 0;
+  font-size: 1.2rem;
 }
 
 .plan-footer {
   padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-top: 1px solid var(--border-color);
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
+  background-color: #f9fafb;
 }
 
-/* 5. Estilos de Botones
-   -------------------------------------------------------------------------- */
-.btn-primary, .btn-disabled {
+.btn-seleccionar {
+  display: block;
   width: 100%;
-  padding: 0.9rem;
+  padding: 1rem;
+  background-color: var(--primary-purple);
+  color: var(--white);
   border: none;
   border-radius: 8px;
   font-family: var(--font-primary);
   font-size: 1.1rem;
   font-weight: 700;
-  cursor: pointer;
   text-align: center;
-  transition: all 0.2s ease;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
-.btn-primary {
-  background-color: var(--primary-purple);
-  color: var(--white);
-}
-.btn-primary:hover {
+
+.btn-seleccionar:hover {
   background-color: var(--hover-dark-purple);
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-.btn-disabled {
-  background-color: var(--border-color);
-  color: var(--muted-text);
-  cursor: not-allowed;
 }
 
-.contact-info {
-  margin-top: 4rem;
-}
-.contact-info .btn-secondary {
-    background-color: transparent;
-    color: var(--primary-purple);
-    border: 2px solid var(--primary-purple);
-    padding: 0.8rem 2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 700;
-    transition: all 0.2s ease;
-}
-.contact-info .btn-secondary:hover {
-    background-color: var(--primary-purple);
-    color: var(--white);
-}
-
-/* 6. Responsividad
+/* 5. Responsividad
    -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
-    .plans-section {
-        padding: 0 1rem;
-    }
-    .plans-grid {
-        grid-template-columns: 1fr; 
-    }
+  .planes-section h2 {
+    font-size: 2.2rem;
+  }
+
+  .planes-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }

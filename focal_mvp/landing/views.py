@@ -1,20 +1,24 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_POST
-from .forms import ContactoForm, LoginForm
 from django.contrib.auth import login, authenticate
-from inventario.forms import AlmaceneroForm, EmpresaForm
+from django.db import transaction
+from inventario.forms import RegistroAlmaceneroForm, EmailLoginForm, EmpresaForm
 from inventario.models import PlanSuscripcion, SuscripcionUsuario
 
 
 @cache_page(60 * 15)
 def landing_page_view(request):
+    from .forms import ContactoForm
+    
     form = ContactoForm()
     return render(request, 'landing/index.html', {'form': form})
 
 @require_POST
 def contacto_submit_view(request):
+    from .forms import ContactoForm
+    
     form = ContactoForm(request.POST)
     if form.is_valid():
         form.save()  
@@ -25,69 +29,62 @@ def contacto_submit_view(request):
     return redirect('landing')
 
 def vista_registro(request):
-    from django.contrib.auth.models import User
-    from django.db import transaction
-    
-    if request.method == 'POST':
-        almacenero_form = AlmaceneroForm(request.POST, prefix='almacenero')
-        empresa_form = EmpresaForm(request.POST, prefix='empresa')
+    plan_id = request.GET.get('plan')
+    try:
+        plan = get_object_or_404(PlanSuscripcion, id=plan_id)
+    except (ValueError, TypeError):
+        messages.error(request, "El plan seleccionado no es válido.")
+        return redirect('planes')
 
-        if almacenero_form.is_valid() and empresa_form.is_valid():
+    if request.method == 'POST':
+        user_form = RegistroAlmaceneroForm(request.POST)
+        empresa_form = EmpresaForm(request.POST)
+
+        if user_form.is_valid() and empresa_form.is_valid():
             try:
                 with transaction.atomic():
-                    user = User.objects.create_user(
-                        username=almacenero_form.cleaned_data['username'],
-                        password=almacenero_form.cleaned_data['password']
-                    )
+                    user = user_form.save()
                     empresa = empresa_form.save()
-                    almacenero = almacenero_form.save(commit=False)
-                    almacenero.usuario = user
-                    almacenero.empresa = empresa
-                    almacenero.save()
+                    # Se asocia el Almacenero a la Empresa
+                    empresa.almaceneros.add(user)
 
-                    plan_gratuito = PlanSuscripcion.objects.get(nombre='FREE')
                     SuscripcionUsuario.objects.create(
                         empresa=empresa,
-                        plan=plan_gratuito,
+                        plan=plan,
                         activa=True
                     )
                 
-                messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión.')
+                # Se inicia sesión especificando el backend
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                messages.success(request, f"¡Registro exitoso! Inicia Sesión.")
                 return redirect('login')
-            
+
             except Exception as e:
-                messages.error(request, f"Hubo un error inesperado durante el registro: {e}")
-        else:
-            messages.error(request, 'Por favor, corrige los errores en el formulario para continuar.')
-
+                messages.error(request, f"Ocurrió un error inesperado durante el registro: {e}")
     else:
-        almacenero_form = AlmaceneroForm(prefix='almacenero')
-        empresa_form = EmpresaForm(prefix='empresa')
+        user_form = RegistroAlmaceneroForm()
+        empresa_form = EmpresaForm()
 
-    return render(request, 'landing/registro.html', {
-        'almacenero_form': almacenero_form,
-        'empresa_form': empresa_form
-    })
+    context = {
+        'user_form': user_form,
+        'empresa_form': empresa_form,
+        'plan': plan
+    }
+    return render(request, 'landing/registro.html', context)
 
 def vista_login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
     if request.method == 'POST':
-        form = LoginForm(request.POST)
+        form = EmailLoginForm(request, data=request.POST)
         if form.is_valid():
-            user = authenticate(
-                request,
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
+            user = form.get_user()
             if user is not None:
                 login(request, user)
-                messages.success(request, f'¡Bienvenido de nuevo, {user.username}!')
-                return redirect('/home/')
-            else:
-                messages.error(request, "Usuario o contraseña incorrectos.")
-        else:
-            messages.error(request, "Por favor, complete los campos de inicio de sesión.")
+                return redirect(request.GET.get('next', 'home'))
     else:
-        form = LoginForm()
+        form = EmailLoginForm()
 
     return render(request, 'landing/login.html', {'form': form})
 

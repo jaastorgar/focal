@@ -16,7 +16,7 @@
     <nav class="container">
         <a href="{% url 'home' %}" class="logo">FOCAL</a>
         <ul class="nav-links">
-            <li><a href="{% url 'agregar_producto' %}" class="btn-accion">Agregar Producto</a></li>
+            <li><a href="{% url 'agregar-producto' %}" class="btn-accion">Agregar Producto</a></li>
             <li><a href="{% url 'agregar_lote' %}" class="btn-accion">Registrar Lote</a></li>
             <li><a href="{% url 'descargar_plantilla' %}" class="btn-accion">Descargar Plantilla</a></li>
             <li><a href="{% url 'procesar_ventas_archivo' %}" class="btn-accion">Descontar Productos</a></li>
@@ -109,7 +109,7 @@
                     {% endif %}
                 </p>
                 <div class="empty-state-actions">
-                    <a href="{% url 'agregar_producto' %}" class="btn-accion-principal">
+                    <a href="{% url 'agregar-producto' %}" class="btn-accion-principal">
                         + Agregar Nuevo Producto
                     </a>
                 </div>

@@ -66,11 +66,10 @@
             <h2>Plan Activo</h2>
             {% if plan %}
                 <ul>
-                    <li><strong>Nombre del Plan:</strong> {{ plan.get_nombre_display }}</li>
+                    <li><strong>Nombre del Plan:</strong> {{ plan.nombre }}</li>
                     <li><strong>Precio:</strong> ${{ plan.precio|floatformat:0|intcomma }}</li>
                     <li><strong>Productos Permitidos:</strong> {% if plan.max_productos == 0 %}Ilimitados{% else %}{{ plan.max_productos }}{% endif %}</li>
-                    <li><strong>Almacenes Permitidos:</strong> {{ plan.max_almacenes }}</li>
-                    <li><strong>Soporte:</strong> {% if plan.soporte_prioritario %}Prioritario{% else %}Estándar{% endif %}</li>
+                    <li><strong>Lotes Permitidos:</strong> {% if plan.max_lotes == 0 %}Ilimitados{% else %}{{ plan.max_lotes }}{% endif %}</li>
                 </ul>
             {% else %}
                 <p>No tienes un plan activo en este momento.</p>
@@ -79,11 +78,11 @@
 
         <section id="pago" class="perfil-section">
             <h2>Método de Pago</h2>
-            {% if empresa.suscripcion %}
+            {% if suscripcion %}
                 <ul>
-                    <li><strong>Plan Actual:</strong> {{ empresa.suscripcion.plan.get_nombre_display }}</li>
-                    <li><strong>Inicio de Suscripción:</strong> {{ empresa.suscripcion.fecha_inicio|date:"d-m-Y" }}</li>
-                    <li><strong>Próxima Renovación:</strong> {{ empresa.suscripcion.fecha_fin|date:"d-m-Y"|default:"N/A" }}</li>
+                    <li><strong>Plan Actual:</strong> {{ suscripcion.plan.nombre }}</li>
+                    <li><strong>Inicio de Suscripción:</strong> {{ suscripcion.fecha_inicio|date:"d-m-Y" }}</li>
+                    <li><strong>Próxima Renovación:</strong> {{ suscripcion.fecha_fin|date:"d-m-Y"|default:"N/A" }}</li>
                 </ul>
             {% else %}
                 <p>No hay información de pago disponible.</p>

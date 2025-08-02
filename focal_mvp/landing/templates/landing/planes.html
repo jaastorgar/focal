@@ -1,75 +1,58 @@
 {% load static %}
 {% load humanize %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    
-    <!-- OPTIMIZACIÓN CRÍTICA: Viewport Meta Tag para diseño responsivo. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Planes de Suscripción | FOCAL</title>
+{% block extra_head %}
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'landing/css/planes.css' %}">
-</head>
-<body>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
 
-    <!-- MEJORA: Añadimos un header para navegación y consistencia. -->
-    <header class="app-header">
-        <nav class="container">
-            <a href="{% url 'landing' %}" class="logo">FOCAL</a>
-            <ul class="nav-links">
-                <li><a href="{% url 'landing' %}">volver al inicio</a></li>
-            </ul>
-        </nav>
-    </header>
+{% block content %}
+<main>
+    <section class="planes-section">
+        <div class="container">
+            <!-- 2. ESTRUCTURA HTML CON LAS CLASES CORRECTAS -->
+            <h2>Elige el Plan Perfecto para Tu Negocio</h2>
+            <p class="subtitulo">Comienza a optimizar tu inventario hoy mismo con una solución a tu medida.</p>
 
-    <main>
-        <section class="plans-section">
-            <h1 class="section-title">Planes de Suscripción</h1>
-            <p class="section-subtitle">Escoge el plan que mejor se adapte a tu negocio. Mejora tus capacidades con un solo clic.</p>
-
-            <!-- OPTIMIZACIÓN: El contenido ahora se genera dinámicamente desde la base de datos. -->
-            <div class="plans-grid">
+            <div class="planes-grid">
                 {% for plan in planes %}
-                    <div class="plan-card">
-                        <div class="plan-header">
-                            <h2 class="plan-title">{{ plan.get_nombre_display }}</h2>
-                            <p class="plan-price">
-                                ${{ plan.precio|floatformat:0|intcomma }}
-                                <span>/mes</span>
-                            </p>
-                        </div>
-                        <div class="plan-features">
-                            <p>{{ plan.descripcion|default:"Un plan diseñado para tus necesidades." }}</p>
-                            <ul>
-                                <li>
-                                    <strong>{% if plan.max_productos == 0 %}Ilimitados{% else %}{{ plan.max_productos }}{% endif %}</strong> Productos
-                                </li>
-                                <li>
-                                    <strong>{{ plan.max_almacenes }}</strong> {% if plan.max_almacenes == 1 %}Almacén{% else %}Almacenes{% endif %}
-                                </li>
-                                <li>
-                                    Soporte <strong>{% if plan.soporte_prioritario %}Prioritario{% else %}Estándar{% endif %}</strong>
-                                </li>
-                            </ul>
-                        </div>
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <h3>{{ plan.nombre }}</h3>
+                        <p class="precio">${{ plan.precio|floatformat:0|intcomma }}<span>/mes</span></p>
                     </div>
+                    <div class="plan-body">
+                        <ul>
+                            <li>
+                                <i class="fas fa-check-circle"></i> 
+                                {% if plan.max_productos == 0 %}
+                                    Productos Ilimitados
+                                {% else %}
+                                    Hasta {{ plan.max_productos }} productos
+                                {% endif %}
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i> 
+                                {% if plan.max_lotes == 0 %}
+                                    Lotes Ilimitados
+                                {% else %}
+                                    Hasta {{ plan.max_lotes }} lotes
+                                {% endif %}
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i> 
+                                Gestión de hasta {{ plan.max_empresas }} empresa(s)
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="plan-footer">
+                        <a href="{% url 'registro' %}?plan={{ plan.id }}" class="btn-seleccionar">Seleccionar Plan</a>
+                    </div>
+                </div>
                 {% endfor %}
             </div>
-
-            <div class="contact-info">
-                <p>¿Necesitas un plan a medida o tienes más preguntas?</p>
-                <a href="{% url 'landing' %}#contact" class="btn-secondary">Contáctanos</a>
-            </div>
-        </section>
-    </main>
-
-    <!-- MEJORA: Un footer consistente. -->
-    <footer class="app-footer">
-        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
-    </footer>
-
-</body>
-</html>
+        </div>
+    </section>
+</main>
+{% endblock %}
