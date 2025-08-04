@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa, REGIONES_COMUNAS, REGION_CHOICES
+from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa, REGIONES_COMUNAS
 import re
 
 # --- TUS FUNCIONES DE VALIDACIÓN ---
@@ -169,9 +169,24 @@ class ProductoForm(forms.ModelForm):
         exclude = ('empresas',)
 
     def __init__(self, *args, **kwargs):
+        # Permitir pasar la empresa actual para validaciones
+        self.empresa = kwargs.pop('empresa', None)
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+    def clean_sku(self):
+        from django.core.exceptions import ValidationError
+        
+        sku = self.cleaned_data.get('sku')
+        if self.empresa and sku:
+            # Buscar si ya existe una OfertaProducto con este sku para esta empresa
+            if OfertaProducto.objects.filter(
+                producto__sku=sku,
+                empresa=self.empresa
+            ).exists():
+                raise ValidationError("Este SKU ya existe en tu inventario.")
+        return sku
 
 class OfertaProductoForm(forms.ModelForm):
     class Meta:

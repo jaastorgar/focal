@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Seleccionamos los elementos del DOM una sola vez
     const campoCodigoBarras = document.getElementById('id_codigo_barras');
     const campoNombreProducto = document.getElementById('id_nombre_producto');
-    const campoOcultoProductoId = document.getElementById('id_producto_id');
+    const campoOcultoProductoId = document.getElementById('id_producto_id'); // name="producto" en el HTML
     const campoCantidad = document.getElementById('id_cantidad');
     const form = document.getElementById('lote-form');
 
@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // El evento 'change' es ideal para escáneres porque se dispara después de que el valor cambia
     // y el campo pierde el foco (lo que simula la tecla "Enter" del escáner).
     campoCodigoBarras.addEventListener('change', function() {
-        const codigo = this.value;
+        const codigo = this.value.trim(); // Añadido trim para limpiar espacios
 
         if (codigo) {
-            // Construimos la URL de la API de forma dinámica. La ruta debe coincidir con la de urls.py
-            const apiUrl = `/api/buscar-producto/${codigo}/`;
+            // Construimos la URL de la API de forma dinámica
+            const apiUrl = `/api/buscar-producto/${encodeURIComponent(codigo)}/`;
 
             fetch(apiUrl)
                 .then(response => {
@@ -36,9 +36,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     // Si la API nos confirma que encontró el producto
                     if (data.encontrado) {
-                        campoNombreProducto.value = data.nombre;           // Rellenamos el nombre para visualización
-                        campoOcultoProductoId.value = data.producto_id;    // Guardamos el ID en el campo oculto
-                        campoCantidad.focus();                             // Movemos el cursor al siguiente paso: la cantidad
+                        campoNombreProducto.value = data.nombre;
+                        // ✅ CORREGIDO: Usar 'oferta_id' que es lo que devuelve la API
+                        campoOcultoProductoId.value = data.oferta_id;
+                        campoCantidad.focus();
                     }
                 })
                 .catch(error => {
@@ -47,16 +48,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert(error.mensaje || '¡Producto no encontrado! Por favor, regístralo primero.');
 
                     // Limpiamos los campos para permitir un nuevo escaneo
-                    campoCodigoBarras.value = '';
-                    campoNombreProducto.value = '';
-                    campoOcultoProductoId.value = '';
+                    limpiarCampos();
                     campoCodigoBarras.focus(); // Devolvemos el foco al campo de escaneo
                 });
         }
     });
 
+    // Función para limpiar campos
+    function limpiarCampos() {
+        campoCodigoBarras.value = '';
+        campoNombreProducto.value = '';
+        campoOcultoProductoId.value = '';
+    }
+
     // Opcional: Escuchamos el evento de envío del formulario para dar feedback al usuario
-    form.addEventListener('submit', function() {
+    form.addEventListener('submit', function(e) {
+        // Validar que se haya seleccionado un producto
+        if (!campoOcultoProductoId.value || campoOcultoProductoId.value === 'undefined') {
+            e.preventDefault();
+            alert('Por favor, escanea un código de barras válido primero.');
+            campoCodigoBarras.focus();
+            return false;
+        }
+
         // Deshabilitamos el botón de envío para prevenir clics múltiples mientras se procesa
         const submitButton = form.querySelector('button[type="submit"]');
         if (submitButton) {

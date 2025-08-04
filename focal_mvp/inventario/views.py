@@ -136,36 +136,46 @@ def agregar_producto(request):
         return redirect('home')
 
     if request.method == 'POST':
-        form_prod = ProductoForm(request.POST)
+        # Pasamos la empresa al formulario para la validación
+        form_prod = ProductoForm(request.POST, empresa=empresa_usuario)
         formset_oferta = OfertaProductoFormSet(request.POST, queryset=OfertaProducto.objects.none())
 
         if form_prod.is_valid() and formset_oferta.is_valid():
             sku = form_prod.cleaned_data['sku']
-            defaults_y_updates = {
-                'nombre': form_prod.cleaned_data['nombre'],
-                'marca': form_prod.cleaned_data['marca'],
-                'categoria': form_prod.cleaned_data['categoria'],
-                'dramage': form_prod.cleaned_data['dramage'],
-                'unidad_medida': form_prod.cleaned_data['unidad_medida'],
-            }
             
-            producto, creado = Producto.objects.update_or_create(sku=sku, defaults=defaults_y_updates)
+            # 1. Intentar obtener el Producto existente por SKU
+            try:
+                producto = Producto.objects.get(sku=sku)
+                # Si existe, verificar si ya está asociado a esta empresa
+                if OfertaProducto.objects.filter(producto=producto, empresa=empresa_usuario).exists():
+                    messages.error(request, f"Este producto (SKU: {sku}) ya existe en tu inventario.")
+                    # Renderizamos el formulario con errores
+                    context = {'form': form_prod, 'formset': formset_oferta}
+                    return render(request, 'inventario/agregar-producto.html', context)
+                else:
+                    # El producto existe globalmente pero no para esta empresa, lo asociamos
+                    creado_producto = False
+            except Producto.DoesNotExist:
+                # 2. Si no existe globalmente, lo creamos
+                producto = form_prod.save()
+                creado_producto = True
 
-            if not creado and OfertaProducto.objects.filter(producto=producto, empresa=empresa_usuario).exists():
-                messages.error(request, f"Este producto (SKU: {sku}) ya existe en tu inventario.")
-                return redirect('agregar_producto')
-            else:
-                oferta = formset_oferta.save(commit=False)[0]
-                oferta.producto = producto
-                oferta.empresa = empresa_usuario
-                oferta.save()
-                messages.success(request, f"Producto '{producto.nombre}' agregado/actualizado en tu inventario.")
-                return redirect('inventario')
+            # 3. Crear la OfertaProducto para asociar el producto a la empresa
+            oferta = formset_oferta.save(commit=False)[0]
+            oferta.producto = producto
+            oferta.empresa = empresa_usuario
+            oferta.save()
+            
+            accion = "agregado" if creado_producto else "asociado"
+            messages.success(request, f"Producto '{producto.nombre}' {accion} a tu inventario.")
+            return redirect('inventario')
         else:
+            form_prod = ProductoForm(request.POST, empresa=empresa_usuario)
             context = {'form': form_prod, 'formset': formset_oferta}
             return render(request, 'inventario/agregar-producto.html', context)
 
-    form_prod = ProductoForm()
+    # Para GET request
+    form_prod = ProductoForm(empresa=empresa_usuario)
     formset_oferta = OfertaProductoFormSet(queryset=OfertaProducto.objects.none())
     context = {'form': form_prod, 'formset': formset_oferta}
     return render(request, 'inventario/agregar-producto.html', context)
@@ -241,6 +251,10 @@ def agregar_lote_producto(request):
             lote = form.save()
             messages.success(request, f"Lote para '{lote.producto.producto.nombre}' agregado.")
             return redirect('inventario')
+        else:
+            # Para debugging - puedes remover después
+            print("Form errors:", form.errors)
+            print("Form data:", request.POST)
     else:
         form = LoteProductoForm()
         form.fields['producto'].queryset = ofertas_de_la_empresa
@@ -370,12 +384,18 @@ def buscar_producto_api(request, codigo_barras):
         producto__sku=codigo_barras, 
         empresa=empresa
     ).select_related('producto').first()
-    
     if oferta:
-        data = {'encontrado': True, 'oferta_id': oferta.id, 'nombre': oferta.producto.nombre}
+        data = {
+            'encontrado': True, 
+            'producto_id': oferta.id, 
+            'nombre': oferta.producto.nombre
+        }
         return JsonResponse(data)
     else:
-        return JsonResponse({'encontrado': False, 'mensaje': 'Producto no registrado en tu inventario.'}, status=404)
+        return JsonResponse({
+            'encontrado': False, 
+            'mensaje': 'Producto no registrado en tu inventario.'
+        }, status=404)
 
 @login_required
 def verificar_producto_api(request, codigo_barras):

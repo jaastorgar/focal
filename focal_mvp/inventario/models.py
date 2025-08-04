@@ -526,7 +526,7 @@ class Empresa(models.Model):
                 raise ValidationError({'comuna': f'La comuna "{self.comuna}" no pertenece a la región "{self.region}".'})
 
 class Producto(models.Model):
-    sku = models.CharField(max_length=100, unique=True)
+    sku = models.CharField(max_length=100)
     nombre = models.CharField(max_length=200)
     marca = models.CharField(max_length=100, blank=True, null=True)
     categoria = models.CharField(max_length=100, choices=CATEGORIA_CHOICES, blank=True, null=True)
@@ -545,10 +545,19 @@ class OfertaProducto(models.Model):
     precio_venta = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     class Meta:
-        unique_together = ('producto', 'empresa')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['producto', 'empresa'],
+                name='unique_producto_empresa'
+            )
+        ]
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.empresa.nombre_almacen}"
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 class LoteProducto(models.Model):
     producto = models.ForeignKey(OfertaProducto, on_delete=models.CASCADE, related_name='lotes')

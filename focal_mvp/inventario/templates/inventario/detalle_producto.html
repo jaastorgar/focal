@@ -23,18 +23,6 @@
 
 <main>
     <h1>{{ producto.nombre }}</h1>
-    
-    <div class="product-details-card">
-        <h2>Información General</h2>
-        <div class="details-grid">
-            <p><strong>SKU:</strong> {{ producto.sku }}</p>
-            <p><strong>Marca:</strong> {{ producto.marca|default:"N/A" }}</p>
-            <p><strong>Categoría:</strong> {{ producto.get_categoria_display }}</p>
-            <p><strong>Dramaje:</strong> {{ producto.dramage }}</p>
-            <p><strong>Precio Compra:</strong> ${{ oferta.precio_compra|floatformat:0|intcomma }}</p>
-            <p><strong>Precio Venta:</strong> ${{ oferta.precio_venta|floatformat:0|intcomma }}</p>
-        </div>
-    </div>
 
     <h2>Lotes Registrados</h2>
     {% if lotes %}
