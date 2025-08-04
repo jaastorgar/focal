@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_POST
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
+from django.views.decorators.http import require_http_methods
 from django.db import transaction
 from inventario.forms import RegistroAlmaceneroForm, EmailLoginForm, EmpresaForm
 from inventario.models import PlanSuscripcion, SuscripcionUsuario
@@ -95,3 +96,24 @@ def vista_planes(request):
         'planes': planes
     }
     return render(request, 'landing/planes.html', context)
+
+@require_http_methods(["GET"])
+def get_comunas(request):
+    from django.http import JsonResponse
+    from inventario.models import REGIONES_COMUNAS
+    
+    """
+    Vista que recibe una región vía GET y devuelve las comunas correspondientes en formato JSON.
+    Ejemplo: /get-comunas/?region=Valparaíso
+    """
+    region = request.GET.get('region', '').strip()
+
+    if not region:
+        return JsonResponse({'comunas': []}, status=400)
+
+    comunas = REGIONES_COMUNAS.get(region, [])
+
+    if not comunas:
+        return JsonResponse({'comunas': []}, status=404)
+
+    return JsonResponse({'comunas': comunas})

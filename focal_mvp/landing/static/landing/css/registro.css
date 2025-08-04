@@ -228,7 +228,7 @@ main.registration-container {
     padding: 0.75rem 1rem;
     background-color: #f8f9fa;
     border-radius: 8px;
-    display: none; /* Oculto por defecto */
+    display: none; 
 }
 .password-requirements ul { 
     list-style: none; 
@@ -275,4 +275,33 @@ main.registration-container {
   .form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* 8. Estilos para el Feedback de Contraseña
+   -------------------------------------------------------------------------- */
+#password-feedback ul {
+    margin: 5px 0;
+    font-size: 0.85rem;
+}
+
+#password-feedback li {
+    color: #666;
+    list-style: none;
+    margin: 3px 0;
+}
+
+#password-feedback li.valid {
+    color: green;
+}
+
+#password-feedback li.invalid {
+    color: red;
+}
+
+#password-feedback li::before {
+    content: "❌ ";
+}
+
+#password-feedback li.valid::before {
+    content: "✅ ";
 }

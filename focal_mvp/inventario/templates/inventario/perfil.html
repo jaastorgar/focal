@@ -36,8 +36,8 @@
         <section id="almacenero" class="perfil-section">
             <h2>Datos del Almacenero</h2>
             <ul>
-                <li><strong>Nombre:</strong> {{ almacenero.nombre }} {{ almacenero.snombre }}</li>
-                <li><strong>Apellido:</strong> {{ almacenero.apellido }} {{ almacenero.sapellido }}</li>
+                <li><strong>Nombres:</strong> {{ almacenero.nombres }}</li>
+                <li><strong>Apellido:</strong> {{ almacenero.apellidos }}</li>
                 <li><strong>RUN:</strong> {{ almacenero.run }}</li>
                 <li><strong>Teléfono:</strong> {{ almacenero.telefono|default:"No especificado" }}</li>
                 <li><strong>Dirección:</strong> {{ almacenero.direccion|default:"No especificada" }}</li>
@@ -51,6 +51,7 @@
             {% if empresa %}
                 <ul>
                     <li><strong>Nombre del Almacén:</strong> {{ empresa.nombre_almacen }}</li>
+                    <li><strong>Razón Social:</strong> {{ empresa.razon_social }}</li>
                     <li><strong>RUT:</strong> {{ empresa.rut }}</li>
                     <li><strong>Dirección Tributaria:</strong> {{ empresa.direccion_tributaria|default:"No especificada" }}</li>
                     <li><strong>Comuna:</strong> {{ empresa.get_comuna_display }}</li>

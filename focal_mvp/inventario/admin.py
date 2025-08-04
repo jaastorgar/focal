@@ -28,7 +28,7 @@ class SuscripcionUsuarioInline(admin.StackedInline):
     readonly_fields = ('fecha_inicio', 'fecha_fin')
 
 
-# --- Configuraciones del Panel de Administrador (con correcciones) ---
+# --- Configuraciones del Panel de Administrador ---
 
 @admin.register(Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
@@ -36,7 +36,6 @@ class EmpresaAdmin(admin.ModelAdmin):
     search_fields = ('nombre_almacen', 'rut')
     inlines = [SuscripcionUsuarioInline]
 
-# ▼▼▼ CLASE CORREGIDA ▼▼▼
 @admin.register(Almacenero)
 class AlmaceneroAdmin(UserAdmin):
     """
@@ -44,21 +43,21 @@ class AlmaceneroAdmin(UserAdmin):
     Heredamos de UserAdmin para mantener toda la funcionalidad de Django.
     """
     # Usamos los campos correctos del modelo: nombre, apellido, email.
-    list_display = ('email', 'nombre', 'apellido', 'run', 'is_staff')
-    search_fields = ('nombre', 'apellido', 'run', 'email')
+    list_display = ('email', 'nombres', 'apellidos', 'run', 'is_staff')
+    search_fields = ('nombres', 'apellidos', 'run', 'email')
     ordering = ('email',)
     
     # Se ajustan los fieldsets para que el admin muestre los campos personalizados
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Información Personal', {'fields': ('nombre', 'snombre', 'apellido', 'sapellido', 'run', 'telefono', 'direccion', 'comuna', 'fecha_nacimiento', 'empresa')}),
+        ('Información Personal', {'fields': ('nombres', 'apellidos', 'run', 'telefono', 'direccion', 'region', 'comuna', 'fecha_nacimiento', 'empresa')}),
         ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Fechas Importantes', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'nombre', 'apellido', 'run', 'password', 'password2'),
+            'fields': ('email', 'nombres', 'apellidos', 'run', 'password', 'password2'),
         }),
     )
 
@@ -97,3 +96,4 @@ admin.site.register(PlanSuscripcion)
 admin.site.register(MovimientoStock)
 admin.site.register(OrdenVenta)
 admin.site.register(DetalleOrden)
+admin.site.register(SuscripcionUsuario)

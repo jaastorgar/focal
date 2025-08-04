@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa
+from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa, REGIONES_COMUNAS, REGION_CHOICES
 import re
 
 # --- TUS FUNCIONES DE VALIDACIÓN ---
@@ -56,70 +56,74 @@ class RegistroAlmaceneroForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = Almacenero
         fields = (
-            'nombre', 'snombre', 'apellido', 'sapellido', 'run', 
-            'email', 'telefono', 'direccion', 'comuna', 'fecha_nacimiento'
+            'nombres', 'apellidos', 'run','email', 'telefono', 
+            'direccion', 'region', 'comuna', 'fecha_nacimiento'
         )
-        
-        # Widgets para placeholders y estilos
         widgets = {
-            'nombre': forms.TextInput(attrs={'placeholder': 'Ej: Juan'}),
-            'snombre': forms.TextInput(attrs={'placeholder': 'Ej: Pablo (opcional)'}),
-            'apellido': forms.TextInput(attrs={'placeholder': 'Ej: Pérez'}),
-            'sapellido': forms.TextInput(attrs={'placeholder': 'Ej: González (opcional)'}),
+            'nombres': forms.TextInput(attrs={'placeholder': 'Escribe tus nombres'}),
+            'apellidos': forms.TextInput(attrs={'placeholder': 'Escribe tus apellidos'}),
             'run': forms.TextInput(attrs={'placeholder': '12.345.678-9'}),
             'email': forms.EmailInput(attrs={'placeholder': 'ejemplo@correo.com'}),
             'telefono': forms.TextInput(attrs={'placeholder': '+56912345678'}),
             'direccion': forms.TextInput(attrs={'placeholder': 'Calle Falsa 123'}),
+            'region': forms.Select(attrs={'class': 'form-select', 'id': 'id_region'}),
+            'comuna': forms.Select(attrs={'class': 'form-select', 'id': 'id_comuna'}),
             'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].label = 'Primer Nombre'
-        self.fields['apellido'].label = 'Apellido Paterno'
+        
+        # Etiquetas
+        self.fields['nombres'].label = 'Nombres'
+        self.fields['apellidos'].label = 'Apellidos'
         self.fields['password1'].label = 'Contraseña'
         self.fields['password2'].label = 'Confirmar Contraseña'
-        self.fields['password2'].help_text = None 
+        self.fields['password2'].help_text = None
 
-        # Aplicamos clases de CSS a todos los campos
+        # Clases CSS para campos de texto
         for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
-        self.fields['comuna'].widget.attrs['class'] = 'form-select'
+            if field_name not in ['region', 'comuna']:
+                field.widget.attrs['class'] = 'form-control'
 
-    def clean_run(self):
-        run = self.cleaned_data.get('run')
-        return str(run).upper().strip().replace('.', '').replace('-', '')
+        # Opciones de región
+        self.fields['region'].choices = [('', 'Seleccione la región')] + [(r, r) for r in REGIONES_COMUNAS.keys()]
 
-    def clean_password2(self):
-        password = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
+        # Inicialmente, comunas vacías o todas si no hay región
+        if not self.data.get('region'):
+            self.fields['comuna'].choices = [('', 'Primero seleccione una región')]
+        else:
+            region = self.data.get('region')
+            comunas = REGIONES_COMUNAS.get(region, [])
+            self.fields['comuna'].choices = [('', 'Seleccione la comuna')] + list(comunas)
 
-        # Primero, la validación de que las contraseñas coinciden (que hace el UserCreationForm)
-        if password and password2 and password != password2:
-            raise forms.ValidationError("Las contraseñas no coinciden.")
+    def clean(self):
+        cleaned_data = super().clean()
+        region = cleaned_data.get('region')
+        comuna = cleaned_data.get('comuna')
 
-        # Luego, nuestra validación de seguridad sobre la contraseña
-        es_valida, mensaje = validar_password_segura(password)
-        if not es_valida:
-            raise forms.ValidationError(mensaje)
-        
-        return password2
+        if region and comuna:
+            if comuna not in dict(REGIONES_COMUNAS.get(region, [])):
+                raise forms.ValidationError("La comuna seleccionada no pertenece a la región elegida.")
+        elif region and not comuna:
+            raise forms.ValidationError("Debe seleccionar una comuna de la región elegida.")
+        return cleaned_data 
 
 class EmpresaForm(forms.ModelForm):
-    """
-    Formulario para crear una Empresa.
-    """
     class Meta:
         model = Empresa
         fields = [
-            'nombre_almacen', 'rut', 'direccion_tributaria', 'comuna',
+            'nombre_almacen', 'razon_social', 'rut', 'direccion_tributaria', 'region', 'comuna',
             'run_representante', 'inicio_actividades', 'nivel_venta_uf',
             'giro_negocio', 'tipo_sociedad'
         ]
         widgets = {
             'nombre_almacen': forms.TextInput(attrs={'placeholder': 'Nombre del Almacén'}),
+            'razon_social': forms.TextInput(attrs={'placeholder': 'Razón Social'}),
             'rut': forms.TextInput(attrs={'placeholder': '76.123.456-K'}),
             'direccion_tributaria': forms.TextInput(attrs={'placeholder': 'Calle Falsa 123'}),
+            'region': forms.Select(attrs={'class': 'form-select', 'id': 'id_region'}),
+            'comuna': forms.Select(attrs={'class': 'form-select', 'id': 'id_comuna'}),
             'run_representante': forms.TextInput(attrs={'placeholder': '12.345.678-9'}),
             'inicio_actividades': forms.DateInput(attrs={'type': 'date'}),
             'nivel_venta_uf': forms.TextInput(attrs={'placeholder': 'Ej: 0 - 2.400 UF'}),
@@ -129,11 +133,32 @@ class EmpresaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Se aplican las clases de CSS a todos los campos
         for field_name, field in self.fields.items():
-            if not isinstance(field.widget, forms.DateInput):
-                 field.widget.attrs['class'] = 'form-control'
-        self.fields['comuna'].widget.attrs['class'] = 'form-select'
+            if field_name not in ['region', 'comuna']:
+                field.widget.attrs['class'] = 'form-control'
+
+        # Cargar regiones
+        self.fields['region'].choices = [('', 'Seleccione la región')] + [(r, r) for r in REGIONES_COMUNAS.keys()]
+
+        # Cargar comunas según región (para edición)
+        if not self.data.get('region'):
+            self.fields['comuna'].choices = [('', 'Primero seleccione una región')]
+        else:
+            region = self.data.get('region')
+            comunas = REGIONES_COMUNAS.get(region, [])
+            self.fields['comuna'].choices = [('', 'Seleccione la comuna')] + list(comunas)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        region = cleaned_data.get('region')
+        comuna = cleaned_data.get('comuna')
+
+        if region and comuna:
+            if comuna not in dict(REGIONES_COMUNAS.get(region, [])):
+                raise forms.ValidationError("La comuna seleccionada no pertenece a la región elegida.")
+        elif region and not comuna:
+            raise forms.ValidationError("Debe seleccionar una comuna de la región.")
+        return cleaned_data
 
 class ProductoForm(forms.ModelForm):
     """

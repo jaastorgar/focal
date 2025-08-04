@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'landing',
     'inventario',
     'rest_framework',
+    'widget_tweaks',
 ]
 
 AUTH_USER_MODEL = 'inventario.Almacenero'
