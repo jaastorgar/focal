@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Proveedores y Precios - {{ producto.nombre }}</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/gestionar_proveedores_precios.css' %}">
+</head>
+<body>
+    <!-- === Header === -->
+    <header class="app-header">
+        <div class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <nav class="nav-links">
+                <a href="{% url 'home' %}">Inicio</a>
+                <a href="{% url 'inventario' %}">Inventario</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- === Main Content === -->
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">Gestionar Proveedores y Precios</h1>
+            <h2 class="product-subtitle">Producto: {{ producto.nombre }} (SKU: {{ producto.sku }})</h2>
+
+            <!-- === Mensajes de Django === -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                    <button type="button" class="alert-close" aria-label="Cerrar">&times;</button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- === Información Base del Producto === -->
+            <section class="product-info-section">
+                <h3>Información Base del Producto</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Marca:</span>
+                        <span class="info-value">{{ producto.marca|default:"No especificada" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Categoría:</span>
+                        <span class="info-value">{{ producto.get_categoria_display|default:"No especificada" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gramaje:</span>
+                        <span class="info-value">{{ producto.dramage|default:"No especificado" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Unidad de Medida:</span>
+                        <span class="info-value">{{ producto.get_unidad_medida_display|default:"No especificada" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Precio Compra Base:</span>
+                        <span class="info-value">${{ oferta_producto.precio_compra|floatformat:0 }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Precio Venta Base:</span>
+                        <span class="info-value">${{ oferta_producto.precio_venta|floatformat:0 }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- === Lotes y Precios por Proveedor === -->
+            <section class="lots-section">
+                <div class="section-header">
+                    <h3>Lotes y Precios por Proveedor</h3>
+                    <a href="{% url 'agregar_lote_producto' %}" class="btn btn-primary">Agregar Nuevo Lote</a>
+                </div>
+                
+                {% if lotes %}
+                <div class="table-responsive">
+                    <table class="lots-table">
+                        <thead>
+                            <tr>
+                                <th>ID Lote</th>
+                                <th>Fecha Vencimiento</th>
+                                <th>Cantidad</th>
+                                <th>Proveedor</th>
+                                <th>Precio Compra (Lote)</th>
+                                <th>Precio Venta (Lote)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lote in lotes %}
+                            <tr>
+                                <td data-label="ID Lote">{{ lote.id }}</td>
+                                <td data-label="Fecha Vencimiento">{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
+                                <td data-label="Cantidad">{{ lote.cantidad }}</td>
+                                <td data-label="Proveedor">
+                                    {% if lote.proveedor %}
+                                        {{ lote.proveedor.nombre }}
+                                    {% else %}
+                                        <span class="text-muted">No especificado</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Precio Compra">${{ lote.precio_compra|floatformat:0 }}</td>
+                                <td data-label="Precio Venta">${{ lote.precio_venta|floatformat:0 }}</td>
+                                <td data-label="Acciones" class="actions-cell">
+                                    <a href="{% url 'editar_lote' lote.id %}" class="btn btn-outline-primary btn-sm">Editar</a>
+                                    <a href="{% url 'eliminar_lote' lote.id %}" class="btn btn-outline-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="no-lots-message">No hay lotes registrados para este producto.</p>
+                {% endif %}
+            </section>
+
+            <!-- === Enlaces de Navegación Inferiores === -->
+            <div class="navigation-links">
+                <a href="{% url 'inventario' %}" class="btn btn-secondary">Volver al Inventario</a>
+                <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-info">Ver Detalle del Producto</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- === Footer === -->
+    <footer class="app-footer">
+        <div class="container">
+            <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

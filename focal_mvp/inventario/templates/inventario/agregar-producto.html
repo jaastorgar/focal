@@ -7,28 +7,6 @@
     <title>Agregar Producto | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
-    <style>
-        /* Estilos para el nuevo bloque de errores */
-        .error-summary {
-            background-color: #ffebee; /* Rojo claro */
-            border: 1px solid #d32f2f; /* Borde rojo */
-            color: #c62828; /* Texto rojo oscuro */
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-        }
-        .error-summary h3 {
-            margin-top: 0;
-            color: #c62828;
-        }
-        .error-summary ul {
-            padding-left: 20px;
-            margin-bottom: 0;
-        }
-        .error-summary li {
-            margin-bottom: 0.5rem;
-        }
-    </style>
 </head>
 <body>
     <header class="app-header">
@@ -97,24 +75,20 @@
 
                 <hr style="margin: 2rem 0;">
 
-                <h2>Mi Oferta de Precios</h2>
+                <!-- Sección actualizada para reflejar el nuevo modelo OfertaProducto -->
+                <h2>Mi Oferta de Precios (Precio Base de Venta)</h2>
                 {% for oferta_form in formset %}
                     <div style="display:none;">{{ oferta_form.empresa }}</div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="{{ oferta_form.precio_compra.id_for_label }}">{{ oferta_form.precio_compra.label }}</label>
-                            {{ oferta_form.precio_compra }}
-                            {% if oferta_form.precio_compra.errors %}
-                                <small class="error-message">{{ oferta_form.precio_compra.errors|striptags }}</small>
+                            <label for="{{ oferta_form.precio_venta_base.id_for_label }}">{{ oferta_form.precio_venta_base.label }}</label>
+                            {{ oferta_form.precio_venta_base }}
+                            <small class="form-text text-muted">Precio de venta sugerido/referencia para este producto en tu inventario.</small>
+                            {% if oferta_form.precio_venta_base.errors %}
+                                <small class="error-message">{{ oferta_form.precio_venta_base.errors|striptags }}</small>
                             {% endif %}
                         </div>
-                        <div class="form-group">
-                            <label for="{{ oferta_form.precio_venta.id_for_label }}">{{ oferta_form.precio_venta.label }}</label>
-                            {{ oferta_form.precio_venta }}
-                            {% if oferta_form.precio_venta.errors %}
-                                <small class="error-message">{{ oferta_form.precio_venta.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
+                        <!-- El campo precio_compra ya no existe en el modelo OfertaProducto -->
                     </div>
                     {% if oferta_form.non_field_errors %}
                         <div class="alert-error" style="color: var(--danger); text-align: center; margin-top: 1rem;">

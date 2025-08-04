@@ -49,10 +49,9 @@
                         <th>Categoría</th>
                         <th>Gramaje</th>
                         <th>Unidad Medida</th>
-                        <th>Precio Compra</th>
-                        <th>Precio Venta</th>
                         <th>Próximo Vencimiento</th>
                         <th>Stock Total</th>
+                        <th>Cantidad de Lotes</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -63,17 +62,16 @@
                             {% elif producto.proximo_vencimiento and producto.proximo_vencimiento|date:"U" <= hoy_mas_15dias %} class="proximo-vencer"
                             {% elif producto.stock_total and producto.stock_total <= 5 %} class="stock-bajo"
                             {% endif %}
-                        >
+                            >
                             <td>{{ producto.nombre }}</td>
                             <td>{{ producto.sku }}</td>
                             <td>{{ producto.marca|default:"N/A" }}</td>
                             <td>{{ producto.get_categoria_display }}</td>
                             <td>{{ producto.dramage }}</td>
                             <td>{{ producto.unidad_medida }}</td>
-                            <td>${{ producto.precio_compra_empresa|floatformat:0|intcomma|default:"N/A" }}</td>
-                            <td>${{ producto.precio_venta_empresa|floatformat:0|intcomma|default:"N/A" }}</td>
                             <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
                             <td>{{ producto.stock_total|default:"0" }}</td>
+                            <td>{{ producto.cantidad_lotes|default:"0" }}</td>
                             <td class="acciones">
                                 <a href="{% url 'editar_producto' producto.id %}" class="btn-accion-tabla" role="button">Editar</a>
                                 <a href="{% url 'eliminar_producto' producto.id %}" class="btn-accion-tabla btn-peligro" role="button">Eliminar</a>

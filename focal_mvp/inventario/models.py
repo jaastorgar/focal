@@ -1,13 +1,13 @@
+# inventario/models.py
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from .managers import AlmaceneroManager
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
 # ===========================
 # DEFINICIÓN DE REGIONES Y COMUNAS POR REGIÓN
 # ===========================
-
 REGIONES_COMUNAS = {
     'Arica y Parinacota': [
         ('Arica', 'Arica'),
@@ -390,20 +390,20 @@ COMUNA_CHOICES = [('', 'Seleccione la comuna')] + [
 REGION_CHOICES = [('', 'Seleccione la región')] + [(r, r) for r in REGIONES_COMUNAS.keys()]
 
 UNIDAD_MEDIDA_CHOICES = [
-    ('un', 'Unidad'), 
-    ('kg', 'Kilogramo'), 
-    ('g', 'Gramo'), 
-    ('l', 'Litro'), 
+    ('un', 'Unidad'),
+    ('kg', 'Kilogramo'),
+    ('g', 'Gramo'),
+    ('l', 'Litro'),
     ('ml', 'Mililitro'),
-    ('mg', 'Miligramo'), 
+    ('mg', 'Miligramo'),
     ('cm', 'Centímetro'),
 ]
 
 CATEGORIA_CHOICES = [
-    ('abarrotes', 'Abarrotes'), 
-    ('frutas_verduras', 'Frutas y Verduras'), 
-    ('carniceria', 'Carnicería'), 
-    ('panaderia', 'Panadería'), 
+    ('abarrotes', 'Abarrotes'),
+    ('frutas_verduras', 'Frutas y Verduras'),
+    ('carniceria', 'Carnicería'),
+    ('panaderia', 'Panadería'),
     ('lacteos_huevos', 'Lácteos y Huevos'),
     ('bebidas', 'Bebidas'),
     ('snacks', 'Snacks y Dulces'),
@@ -422,7 +422,6 @@ CATEGORIA_CHOICES = [
 # ===========================
 # MANAGER PERSONALIZADO
 # ===========================
-
 class AlmaceneroManager(BaseUserManager):
     def get_by_natural_key(self, email):
         return self.get(email=email)
@@ -454,7 +453,6 @@ class AlmaceneroManager(BaseUserManager):
 # ===========================
 # MODELO ALMACENERO
 # ===========================
-
 class Almacenero(AbstractUser):
     username = None
     email = models.EmailField('correo electrónico', unique=True)
@@ -497,7 +495,6 @@ class Almacenero(AbstractUser):
 # ===========================
 # MODELO EMPRESA
 # ===========================
-
 class Empresa(models.Model):
     nombre_almacen = models.CharField(max_length=100)
     razon_social = models.CharField(max_length=100, blank=True)
@@ -525,8 +522,38 @@ class Empresa(models.Model):
             if self.comuna not in comunas_validas:
                 raise ValidationError({'comuna': f'La comuna "{self.comuna}" no pertenece a la región "{self.region}".'})
 
+# ===========================
+# MODELO PROVEEDOR 
+# ===========================
+class Proveedor(models.Model):
+    """
+    Modelo para representar a un proveedor de productos.
+    """
+    nombre = models.CharField(max_length=150, help_text="Nombre comercial del proveedor")
+    razon_social = models.CharField(max_length=200, blank=True, null=True, help_text="Razón social completa")
+    rut = models.CharField(max_length=12, unique=True, help_text="RUT del proveedor (e.g., 12345678-9)")
+    contacto = models.CharField(max_length=100, blank=True, null=True, help_text="Nombre del contacto principal")
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    comuna = models.CharField(max_length=100, choices=COMUNA_CHOICES, blank=True, null=True)
+    region = models.CharField(max_length=100, choices=REGION_CHOICES, blank=True, null=True)
+    creado = models.DateTimeField(auto_now_add=True)
+    modificado = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Proveedor"
+        verbose_name_plural = "Proveedores"
+        ordering = ['nombre']
+
+    def __str__(self):
+        return f"{self.nombre} ({self.rut})"
+
+# ===========================
+# MODELO PRODUCTO
+# ===========================
 class Producto(models.Model):
-    sku = models.CharField(max_length=100)
+    sku = models.CharField(max_length=100) 
     nombre = models.CharField(max_length=200)
     marca = models.CharField(max_length=100, blank=True, null=True)
     categoria = models.CharField(max_length=100, choices=CATEGORIA_CHOICES, blank=True, null=True)
@@ -534,15 +561,24 @@ class Producto(models.Model):
     unidad_medida = models.CharField(max_length=50, choices=UNIDAD_MEDIDA_CHOICES, blank=True, null=True)
     empresas = models.ManyToManyField(Empresa, through='OfertaProducto', related_name='productos_ofrecidos')
     creado = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         return self.nombre
 
+# ===========================
+# MODELO OFERTA PRODUCTO
+# ===========================
 class OfertaProducto(models.Model):
+    """
+    Relación entre un Producto y una Empresa (inventario).
+    Representa que una empresa ofrece/vende un producto específico.
+    """
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    precio_compra = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    precio_venta_base = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    activo = models.BooleanField(default=True)
 
     class Meta:
         constraints = [
@@ -553,21 +589,78 @@ class OfertaProducto(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.producto.nombre} - {self.empresa.nombre_almacen}"
+        return f"{self.producto.nombre} en {self.empresa.nombre_almacen}"
+
+    @property
+    def ultimo_precio_compra(self):
+        """Obtiene el último precio de compra registrado en lotes"""
+        ultimo_lote = self.lotes.order_by('-fecha_ingreso').first()
+        return ultimo_lote.precio_compra if ultimo_lote else 0.00
+
+    @property
+    def precio_compra_promedio(self):
+        """Calcula el precio de compra promedio ponderado por cantidad"""
+        lotes = self.lotes.filter(cantidad__gt=0)
+        if not lotes.exists():
+            return 0.00
+            
+        total_costo = sum(lote.costo_total for lote in lotes)
+        total_cantidad = sum(lote.cantidad for lote in lotes)
+        
+        return round(total_costo / total_cantidad, 2) if total_cantidad > 0 else 0.00
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 
+# ===========================
+# MODELO LOTE PRODUCTO (Mejorado)
+# ===========================
 class LoteProducto(models.Model):
     producto = models.ForeignKey(OfertaProducto, on_delete=models.CASCADE, related_name='lotes')
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.SET_NULL, null=True, blank=True, related_name='lotes')
     cantidad = models.PositiveIntegerField()
+    precio_compra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fecha_ingreso = models.DateTimeField(auto_now_add=True)
     fecha_vencimiento = models.DateField(null=True, blank=True)
+    numero_factura = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        ordering = ['-fecha_ingreso']
+        verbose_name = "Lote de Producto"
+        verbose_name_plural = "Lotes de Productos"
 
     def __str__(self):
-        return f"Lote de {self.producto.producto.nombre} - Cantidad: {self.cantidad}"
+        return f"Lote de {self.producto.producto.nombre} ({self.cantidad} unidades)"
 
+    @property
+    def costo_total(self):
+        return self.cantidad * self.precio_compra
+
+    @property
+    def ganancia_unitaria(self):
+        return self.precio_venta - self.precio_compra
+
+    @property
+    def ganancia_total(self):
+        return self.cantidad * self.ganancia_unitaria
+
+    def clean(self):
+        if self.precio_compra < 0:
+            raise ValidationError({'precio_compra': 'El precio de compra no puede ser negativo.'})
+        if self.precio_venta < 0:
+            raise ValidationError({'precio_venta': 'El precio de venta no puede ser negativo.'})
+        if self.precio_venta < self.precio_compra:
+            pass 
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+# ===========================
+# MODELOS EXISTENTES 
+# ===========================
 class PlanSuscripcion(models.Model):
     nombre = models.CharField(max_length=100)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
@@ -598,7 +691,7 @@ class MovimientoStock(models.Model):
 
     def __str__(self):
         return f"{self.tipo} de {self.cantidad} para {self.lote.producto.producto.nombre}"
-    
+
 class OrdenVenta(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='ordenes_venta')
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)

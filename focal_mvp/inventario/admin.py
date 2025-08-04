@@ -11,7 +11,8 @@ from .models import (
     LoteProducto, 
     MovimientoStock, 
     OrdenVenta, 
-    DetalleOrden
+    DetalleOrden,
+    Proveedor
 )
 
 # --- Clases Inline (sin cambios) ---
@@ -71,8 +72,10 @@ class ProductoAdmin(admin.ModelAdmin):
 
 @admin.register(OfertaProducto)
 class OfertaProductoAdmin(admin.ModelAdmin):
-    list_display = ('producto', 'empresa', 'precio_venta')
+    list_display = ('producto', 'empresa', 'precio_venta_base', 'activo') 
+    
     search_fields = ('producto__nombre', 'empresa__nombre_almacen')
+    list_filter = ('activo', 'empresa') 
     autocomplete_fields = ['producto', 'empresa']
 
 @admin.register(LoteProducto)
@@ -90,6 +93,11 @@ class LoteProductoAdmin(admin.ModelAdmin):
         return obj.producto.empresa.nombre_almacen
     get_empresa_nombre.short_description = 'Empresa'
 
+@admin.register(Proveedor)
+class ProveedorAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'rut', 'contacto', 'telefono', 'email')
+    search_fields = ('nombre', 'rut', 'contacto')
+    list_filter = ('region',)
 
 # --- Registros de Modelos Adicionales (sin cambios) ---
 admin.site.register(PlanSuscripcion)

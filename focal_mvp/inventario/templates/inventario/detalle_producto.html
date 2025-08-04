@@ -24,6 +24,11 @@
 <main>
     <h1>{{ producto.nombre }}</h1>
 
+    <!-- Botón para gestionar proveedores y precios -->
+    <a href="{% url 'gestionar_proveedores_precios' producto.id %}" class="btn-gestionar">
+        Gestionar Proveedores y Precios
+    </a>
+
     <h2>Lotes Registrados</h2>
     {% if lotes %}
         <div class="table-container">

@@ -1,3 +1,5 @@
+# inventario/forms.py
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa, REGIONES_COMUNAS
@@ -191,8 +193,9 @@ class ProductoForm(forms.ModelForm):
 class OfertaProductoForm(forms.ModelForm):
     class Meta:
         model = OfertaProducto
-        fields = ['precio_compra', 'precio_venta']
+        fields = ['precio_venta_base']
 
+# Actualiza también el formset para usar el formulario corregido
 OfertaProductoFormSet = forms.modelformset_factory(
     OfertaProducto,
     form=OfertaProductoForm,
@@ -209,12 +212,28 @@ class LoteProductoForm(forms.ModelForm):
 
     class Meta:
         model = LoteProducto
-        # Se asegura que el campo 'producto' esté primero
-        fields = ['producto', 'cantidad', 'fecha_vencimiento']
+        exclude = ['precio_compra', 'precio_venta'] 
         widgets = {
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'fecha_vencimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        # Permitir pasar la empresa del usuario para filtrar productos/ofertas
+        self.empresa_usuario = kwargs.pop('empresa_usuario', None)
+        super().__init__(*args, **kwargs)
+        
+        # Si se pasó la empresa, filtrar el queryset de productos/ofertas
+        if self.empresa_usuario:
+            ofertas_qs = OfertaProducto.objects.filter(empresa=self.empresa_usuario).select_related('producto')
+            self.fields['producto'].queryset = ofertas_qs
+        
+        # Asegurarse de que los campos restantes tengan las clases correctas
+        for field_name, field in self.fields.items():
+            # Los Select ya tienen su clase en widgets
+            if not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
+                if 'class' not in field.widget.attrs:
+                    field.widget.attrs['class'] = 'form-control'
 
 class ArchivoVentasForm(forms.Form):
     archivo_ventas = forms.FileField()

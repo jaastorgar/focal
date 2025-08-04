@@ -203,14 +203,33 @@ h1 {
   border-radius: 12px;
   border: 2px dashed var(--border-color);
 }
+
 .acciones-vacias {
   text-align: center;
   margin-top: 1.5rem;
 }
+
 .acciones-vacias .btn-accion {
-    background-color: var(--primary-purple);
-    font-size: 1rem;
+  background-color: var(--primary-purple);
+  font-size: 1rem;
 }
+
 .acciones-vacias .btn-accion:hover {
-    background-color: var(--hover-dark-purple);
+  background-color: var(--hover-dark-purple);
+}
+
+.btn-gestionar {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #7B1FA2; 
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-gestionar:hover {
+  background-color: #4A008B;
 }
