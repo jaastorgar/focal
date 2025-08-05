@@ -1,448 +1,380 @@
-/* --- Variables de Colores de la Empresa --- */
+/* ==========================================================================
+   1. Variables y Configuración Base
+   ========================================================================== */
 :root {
-    --primary-purple: #4A008B; 
-    --secondary-purple: #7B1FA2; 
-    --light-purple: #F3E8FF; 
-    --dark-text: #343A40; 
-    --muted-text: #555555; 
-    --white: #FFFFFF;
-    --header-footer-bg: #2C0140; 
-    --hover-dark-purple: #38006B; 
-    --hover-light-purple: #E0B3FF;
-    --border-color: #dee2e6;
-    --shadow-light: rgba(0, 0, 0, 0.08);
-    --shadow-medium: rgba(0, 0, 0, 0.15);
-    --shadow-dark: rgba(0, 0, 0, 0.3);
-    --danger-color: #dc3545; 
-    --success-color: #28a745; 
-    --info-color: #17a2b8; 
-    --warning-color: #ffc107;
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #F3E8FF;
+  --hover-dark-purple: #38006B;
+  --white: #FFFFFF;
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --border-color: #dee2e6;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* Colores de estado para las filas de la tabla */
+  --danger-bg: #ffebee;   /* Rojo muy claro para 'vencido' */
+  --warning-bg: #fffde7;  /* Amarillo muy claro para 'proximo-vencer' */
+  --info-bg: #e3f2fd;     /* Azul muy claro para 'stock-bajo' */
+
+  /* --- Definiciones de fuentes personalizadas --- */
+  --font-primary: 'InterTight', Arial, sans-serif;
+  --font-secondary: 'HankenGrotesk', Arial, sans-serif;
 }
 
-/* --- Definiciones de fuentes personalizadas --- */
-/* InterTight – títulos y botones */
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-}
-
-/* HankenGrotesk – párrafos y contenido */
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-}
-
-/* --- Estilos Generales del Documento --- */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'HankenGrotesk', Arial, sans-serif;
-    font-weight: 300;
-    color: var(--dark-text);
-    background-color: #f8f9fa; /* Fondo suave */
-    line-height: 1.6;
+  font-family: var(--font-secondary);
+  background-color: #f8f9fa;
+  color: var(--dark-text);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
+/* ==========================================================================
+   2. Estilos de Header y Footer
+   ========================================================================== */
+header {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 0.8rem 2rem;
+  box-shadow: 0 2px 5px var(--shadow-light);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.logo a, .volver-inventario {
+  color: var(--white);
+  text-decoration: none;
+  font-family: var(--font-primary);
+  font-weight: 700;
+}
+.logo a {
+  font-size: 1.8rem;
+}
+.volver-inventario {
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+.volver-inventario:hover {
+  color: var(--hover-light-purple);
 }
 
-/* --- Encabezado --- */
-.app-header {
-    background-color: var(--header-footer-bg);
-    color: var(--white);
-    padding: 1rem 0;
-    box-shadow: 0 2px 5px var(--shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
 }
 
-.app-header .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* ==========================================================================
+   3. Contenido Principal y Título
+   ========================================================================== */
+main {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 2rem auto;
+  width: 100%;
 }
 
-.logo {
-    font-family: 'InterTight', Arial, sans-serif;
-    font-weight: 700;
-    font-size: 1.8rem;
-    color: var(--white);
-    text-decoration: none;
+h1 {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--primary-purple);
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.nav-links a {
-    color: var(--light-purple);
-    text-decoration: none;
-    margin-left: 20px;
-    font-family: 'InterTight', Arial, sans-serif;
-    font-weight: 300;
-    transition: color 0.3s ease;
+h2 {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: var(--secondary-purple);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
 
-.nav-links a:hover {
-    color: var(--hover-light-purple);
+/* === Sección de Búsqueda por SKU === */
+.sku-search-section {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--shadow-light);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-/* --- Contenido Principal --- */
-.main-content {
-    padding: 2rem 0 4rem 0;
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.page-title {
-    font-family: 'InterTight', Arial, sans-serif;
-    font-weight: 700;
-    font-size: 2.2rem;
-    color: var(--primary-purple);
-    margin-bottom: 0.5rem;
-    text-align: center;
+#id_sku_busqueda {
+  width: 300px;
+  padding: 0.8rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: var(--font-secondary);
 }
 
-.product-subtitle {
-    font-family: 'InterTight', Arial, sans-serif;
-    font-weight: 300;
-    font-size: 1.4rem;
-    color: var(--secondary-purple);
-    margin-bottom: 2rem;
-    text-align: center;
+#btn-buscar-sku {
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  transition: all 0.3s ease;
 }
 
-/* --- Mensajes de Django --- */
-.alert {
-    padding: 15px 20px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    position: relative;
+#btn-buscar-sku:hover {
+  background-color: var(--hover-dark-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-medium);
 }
 
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
+.validation-message {
+  min-height: 1.5rem;
+  margin-top: 0.5rem;
 }
 
-.alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
+.validation-message.info { color: #0d6efd; }    /* Azul para info */
+.validation-message.success { color: #198754; } /* Verde para éxito */
+.validation-message.warning { color: #ffc107; }/* Amarillo para advertencia */
+.validation-message.error { color: #dc3545; }  /* Rojo para error */
+
+/* === Sección de Información del Producto === */
+.product-info-section {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--shadow-light);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeaa7;
-}
-
-.alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-}
-
-.alert-close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: inherit;
-    opacity: 0.7;
-}
-
-.alert-close:hover {
-    opacity: 1;
-}
-
-/* --- Secciones --- */
-.product-info-section, .lots-section {
-    background-color: var(--white);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px var(--shadow-light);
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.product-info-section h3, .lots-section h3 {
-    font-family: 'InterTight', Arial, sans-serif;
-    font-weight: 700;
-    color: var(--primary-purple);
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-}
-
-/* --- Información del Producto --- */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+.base-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
 }
 
 .info-item {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .info-label {
-    font-weight: bold;
-    color: var(--muted-text);
-    font-size: 0.9rem;
-    margin-bottom: 0.2rem;
+  font-weight: bold;
+  color: var(--muted-text);
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
 }
 
 .info-value {
-    font-size: 1.1rem;
-    color: var(--dark-text);
+  font-size: 1.1rem;
+  color: var(--dark-text);
 }
 
-/* --- Lotes --- */
+/* === Sección de Lotes y Precios por Proveedor === */
+.lotes-proveedores {
+  margin-top: 2rem;
+}
+
 .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
-/* --- Tabla de Lotes --- */
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+.actions {
+  display: flex;
+  gap: 10px;
 }
 
-.lots-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    font-size: 0.95rem;
-}
-
-.lots-table thead {
-    background-color: var(--light-purple);
-}
-
-.lots-table th {
-    padding: 12px 15px;
-    text-align: left;
-    font-family: 'InterTight', Arial, sans-serif;
-    font-weight: 700;
-    color: var(--primary-purple);
-    border-bottom: 2px solid var(--border-color);
-    white-space: nowrap;
-}
-
-.lots-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: top;
-}
-
-.lots-table tbody tr:hover {
-    background-color: #f1eaff; /* Morado muy claro al pasar el mouse */
-}
-
-.text-muted {
-    color: var(--muted-text);
-    font-style: italic;
-}
-
-/* --- Celdas de Acciones --- */
-.actions-cell {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* --- Botones --- */
-.btn {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 2px 0;
-    font-family: 'InterTight', Arial, sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-align: center;
-    text-decoration: none;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 80px;
-}
-
-/* Botón Primario */
 .btn-primary {
-    background-color: var(--primary-purple);
-    color: var(--white);
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background-color: var(--hover-dark-purple);
-    border-color: var(--hover-dark-purple);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-medium);
+  background-color: var(--hover-dark-purple);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-medium);
 }
 
-/* Botón Secundario */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--box-shadow);
+  background-color: var(--white);
+}
+
+.tabla-inventario {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.tabla-inventario thead {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  font-family: var(--font-primary);
+}
+
+.tabla-inventario th, .tabla-inventario td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.tabla-inventario tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.tabla-inventario tbody tr:hover {
+  background-color: #f1eaff;
+}
+
+.vencido { background-color: var(--danger-bg) !important; }
+.proximo-vencer { background-color: var(--warning-bg) !important; }
+.stock-bajo { background-color: var(--info-bg) !important; }
+
+.sin-lotes {
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--muted-text);
+  padding: 3rem;
+  background-color: var(--white);
+  border-radius: 12px;
+  border: 2px dashed var(--border-color);
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.btn-secondary, .btn-danger {
+  padding: 0.8rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: var(--font-primary);
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
 .btn-secondary {
-    background-color: var(--muted-text);
-    color: var(--white);
+  background-color: var(--muted-text);
+  color: var(--white);
 }
 
 .btn-secondary:hover {
-    background-color: #3d3d3d;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-medium);
+  background-color: #3d3d3d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-medium);
 }
 
-/* Botón de Información */
-.btn-info {
-    background-color: var(--info-color);
-    color: var(--white);
+.btn-danger {
+  background-color: var(--danger-color);
+  color: var(--white);
 }
 
-.btn-info:hover {
-    background-color: #138496;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-medium);
+.btn-danger:hover {
+  background-color: #c62828;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-medium);
 }
 
-/* Botones de Contorno */
-.btn-outline-primary {
-    background-color: transparent;
-    color: var(--primary-purple);
-    border-color: var(--primary-purple);
-}
-
-.btn-outline-primary:hover {
-    background-color: var(--primary-purple);
-    color: var(--white);
-}
-
-.btn-outline-danger {
-    background-color: transparent;
-    color: var(--danger-color);
-    border-color: var(--danger-color);
-}
-
-.btn-outline-danger:hover {
-    background-color: var(--danger-color);
-    color: var(--white);
-}
-
-/* Botón Pequeño */
-.btn-sm {
-    padding: 5px 10px;
-    font-size: 0.8rem;
-    min-width: auto;
-}
-
-/* --- Mensaje de No Hay Lotes --- */
-.no-lots-message {
-    text-align: center;
-    color: var(--muted-text);
-    font-style: italic;
-    padding: 2rem 0;
-    font-size: 1.1rem;
-}
-
-/* --- Enlaces de Navegación Inferiores --- */
-.navigation-links {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-}
-
-/* --- Pie de Página --- */
-.app-footer {
-    background-color: var(--header-footer-bg);
-    color: var(--white);
-    text-align: center;
-    padding: 1.5rem 0;
-    margin-top: auto;
-    font-size: 0.9rem;
-}
-
-/* --- Media Queries para Responsividad --- */
-
-/* Para tablets */
+/* Media Queries para Responsividad */
 @media (max-width: 768px) {
-    .page-title {
+    main {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    h1 {
         font-size: 1.8rem;
     }
 
-    .product-subtitle {
-        font-size: 1.2rem;
+    h2 {
+        font-size: 1.5rem;
     }
 
-    .section-header {
+    .actions {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
     }
 
-    .btn {
+    .btn-primary {
         width: 100%;
-        margin: 5px 0;
+        max-width: 300px;
     }
 
-    .info-grid {
+    .base-info-grid {
         grid-template-columns: 1fr;
     }
 
-    .lots-table th,
-    .lots-table td {
-        padding: 10px 12px;
+    .tabla-inventario th,
+    .tabla-inventario td {
+        padding: 0.75rem 1rem;
         font-size: 0.85rem;
     }
 
     /* Tabla tipo lista para móviles */
-    .lots-table,
-    .lots-table thead,
-    .lots-table tbody,
-    .lots-table th,
-    .lots-table td,
-    .lots-table tr {
+    .tabla-inventario,
+    .tabla-inventario thead,
+    .tabla-inventario tbody,
+    .tabla-inventario th,
+    .tabla-inventario td,
+    .tabla-inventario tr {
         display: block;
     }
 
-    .lots-table thead tr {
+    .tabla-inventario thead tr {
         position: absolute;
         top: -9999px;
         left: -9999px;
     }
 
-    .lots-table tr {
+    .tabla-inventario tr {
         border: 1px solid var(--border-color);
         margin-bottom: 15px;
         border-radius: 8px;
@@ -450,7 +382,7 @@ body {
         box-shadow: 0 2px 5px var(--shadow-light);
     }
 
-    .lots-table td {
+    .tabla-inventario td {
         border: none;
         border-bottom: 1px solid var(--border-color);
         position: relative;
@@ -458,11 +390,11 @@ body {
         text-align: right;
     }
 
-    .lots-table td:last-child {
+    .tabla-inventario td:last-child {
         border-bottom: none;
     }
 
-    .lots-table td::before {
+    .tabla-inventario td::before {
         content: attr(data-label) ": ";
         position: absolute;
         left: 15px;
@@ -471,45 +403,68 @@ body {
         text-align: left;
         font-weight: bold;
         color: var(--muted-text);
+        font-family: var(--font-primary);
     }
 
-    .actions-cell {
-        flex-direction: column;
-        align-items: flex-end;
+    .footer-actions {
+        gap: 10px;
     }
 }
 
-/* Para móviles pequeños */
 @media (max-width: 480px) {
-    .container {
-        width: 95%;
+    header {
+        padding: 0.8rem 1rem;
     }
 
-    .page-title {
+    .nav-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .logo a {
+        font-size: 1.5rem;
+    }
+
+    .volver-inventario {
+        font-size: 0.9rem;
+    }
+
+    main {
+        padding: 0.5rem;
+    }
+
+    h1 {
         font-size: 1.6rem;
     }
 
-    .product-subtitle {
-        font-size: 1.1rem;
+    h2 {
+        font-size: 1.3rem;
     }
 
-    .product-info-section,
-    .lots-section {
+    .product-info-section {
         padding: 1rem;
     }
 
-    .lots-table td {
+    .base-info-grid {
+        gap: 0.75rem;
+    }
+
+    .info-label, .info-value {
+        font-size: 0.95rem;
+    }
+
+    .tabla-inventario td {
         padding: 10px 10px 10px 45%;
         font-size: 0.8rem;
     }
 
-    .lots-table td::before {
+    .tabla-inventario td::before {
         font-size: 0.8rem;
         left: 10px;
         top: 10px;
     }
 
-    .navigation-links {
+    .footer-actions {
         gap: 10px;
     }
 }

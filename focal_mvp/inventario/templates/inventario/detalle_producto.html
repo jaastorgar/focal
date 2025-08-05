@@ -24,50 +24,44 @@
 <main>
     <h1>{{ producto.nombre }}</h1>
 
-    <!-- Botón para gestionar proveedores y precios -->
-    <a href="{% url 'gestionar_proveedores_precios' producto.id %}" class="btn-gestionar">
-        Gestionar Proveedores y Precios
-    </a>
+    <!-- === Nueva Sección: Información Detallada del Producto === -->
+    <section class="product-details-section">
+        <h2>Información del Producto</h2>
+        <div class="details-grid">
+            <div class="detail-item">
+                <span class="detail-label">SKU:</span>
+                <span class="detail-value">{{ producto.sku }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Marca:</span>
+                <span class="detail-value">{{ producto.marca|default:"No especificada" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Categoría:</span>
+                <span class="detail-value">{{ producto.get_categoria_display|default:"No especificada" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Gramaje:</span>
+                <span class="detail-value">{{ producto.dramage|default:"No especificado" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Unidad de Medida:</span>
+                <span class="detail-value">{{ producto.get_unidad_medida_display|default:"No especificada" }}</span>
+            </div>
+            <!-- Puedes añadir más campos aquí si es necesario -->
+        </div>
+    </section>
+    <!-- ============================================================== -->
 
-    <h2>Lotes Registrados</h2>
-    {% if lotes %}
-        <div class="table-container">
-            <table class="tabla-inventario">
-                <thead>
-                    <tr>
-                        <th>Cantidad</th>
-                        <th>Fecha de Vencimiento</th>
-                        <th>Registrado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for lote in lotes %}
-                      <tr
-                        {% if lote.fecha_vencimiento < today %}class="vencido"
-                        {% elif lote.fecha_vencimiento|date:"U" <= hoy_mas_15dias %}class="proximo-vencer"
-                        {% elif lote.cantidad <= 5 %}class="stock-bajo"
-                        {% endif %}
-                      >
-                        <td>{{ lote.cantidad }}</td>
-                        <td>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
-                        <td>{{ lote.creado|date:"d-m-Y H:i" }}</td>
-                        <td class="acciones">
-                          <a href="{% url 'editar_lote' lote.id %}" class="btn-accion" role="button">Editar</a>
-                          <a href="{% url 'retirar_lote' lote.id %}" class="btn-accion" role="button">Retirar</a>
-                          <a href="{% url 'eliminar_lote' lote.id %}" class="btn-accion btn-peligro" role="button">Eliminar</a>
-                        </td>
-                      </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p class="sin-lotes">No hay lotes registrados para este producto.</p>
-        <div class="acciones-vacias">
-            <a href="{% url 'agregar_lote' %}" class="btn-accion">Agregar un Lote</a>
-        </div>
-    {% endif %}
+    <!-- Botón para gestionar proveedores y precios -->
+    <div class="actions-section">
+        <a href="{% url 'gestionar_proveedores_precios' producto.id %}" class="btn-gestionar">
+            Gestionar Proveedores y Lotes
+        </a>
+        <a href="{% url 'editar_producto' producto.id %}" class="btn-editar">
+            Editar Producto
+        </a>
+    </div>
 </main>
 
 <footer>

@@ -13,7 +13,7 @@ import time
 # Se importan los formularios necesarios
 from .forms import (
     ProductoForm, OfertaProductoFormSet, LoteProductoForm, OfertaProductoForm,
-    ArchivoVentasForm
+    ArchivoVentasForm, ProveedorForm
 )
 
 # Se importan los modelos correctos
@@ -374,6 +374,25 @@ def gestionar_proveedores_precios(request, producto_id):
     }
     return render(request, 'inventario/gestionar_proveedores_precios.html', context)
 
+@login_required
+def agregar_proveedor(request):
+    """
+    Vista para agregar un nuevo proveedor.
+    """
+    
+    if request.method == 'POST':
+        form = ProveedorForm(request.POST)
+        if form.is_valid():
+            proveedor = form.save()
+            messages.success(request, f"Proveedor '{proveedor.nombre}' agregado exitosamente.")
+            return redirect('gestionar_proveedores_precios')
+    else:
+        form = ProveedorForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'inventario/agregar_proveedor.html', context)
 
 # --- Vistas de Utilidades, Perfil y Sesión ---
 

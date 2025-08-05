@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa, REGIONES_COMUNAS
+from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa, Proveedor, REGIONES_COMUNAS
 import re
 
 # --- TUS FUNCIONES DE VALIDACIÓN ---
@@ -237,3 +237,28 @@ class LoteProductoForm(forms.ModelForm):
 
 class ArchivoVentasForm(forms.Form):
     archivo_ventas = forms.FileField()
+    
+class ProveedorForm(forms.ModelForm):
+    """
+    Formulario para crear o actualizar un Proveedor.
+    """
+    class Meta:
+        model = Proveedor
+        # Excluye campos que se gestionan automáticamente o que quizás no quieras aquí
+        exclude = ['creado', 'modificado'] 
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del proveedor'}),
+            'razon_social': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Razón social completa'}),
+            'rut': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '12.345.678-9'}),
+            'contacto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del contacto principal'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+56912345678'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contacto@proveedor.cl'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dirección del proveedor'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            # Los widgets ya tienen sus clases, pero por si acaso...
+            if 'class' not in field.widget.attrs and not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
+                 field.widget.attrs['class'] = 'form-control'

@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Proveedor | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}"> 
+    <!-- Asegúrate de que este CSS exista o usa el que corresponda -->
+</head>
+<body>
+    <header class="app-header">
+        <nav class="container">
+            <a href="{% url 'home' %}" class="logo">FOCAL</a>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'inventario' %}">Inventario</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="form-wrapper"> 
+        <!-- Ajusta las clases según tu CSS -->
+        <div class="form-card"> 
+             <!-- Ajusta las clases según tu CSS -->
+            <h1>Agregar Nuevo Proveedor</h1>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors|striptags }}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="form-group"> 
+                         <!-- Ajusta las clases según tu CSS -->
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <small class="error-message">{{ field.errors|striptags }}</small> 
+                             <!-- Ajusta las clases según tu CSS -->
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="form-actions"> 
+                     <!-- Ajusta las clases según tu CSS -->
+                    <a href="{% url 'gestionar_proveedores_precios' %}" class="btn btn-cancel" role="button">Cancelar</a>
+                    <button type="submit" class="btn btn-submit">Guardar Proveedor</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

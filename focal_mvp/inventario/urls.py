@@ -5,7 +5,7 @@ from .views import (
     agregar_lote_producto, detalle_producto, editar_lote, eliminar_lote,
     retirar_lote, descargar_plantilla_ventas, procesar_ventas_archivo,
     buscar_producto_api, verificar_producto_api, obtener_datos_sku_api,
-    gestionar_proveedores_precios
+    gestionar_proveedores_precios, agregar_proveedor
 )
 
 urlpatterns = [
@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/verificar-producto/<str:codigo_barras>/', verificar_producto_api, name='verificar_producto_api'),
     path('api/obtener-datos-sku/<str:sku>/', obtener_datos_sku_api, name='obtener_datos_sku_api'),
     path('inventario/<int:producto_id>/proveedores-precios/', gestionar_proveedores_precios, name='gestionar_proveedores_precios'),
+    path('proveedores/agregar/', agregar_proveedor, name='agregar_proveedor'),
 ]
