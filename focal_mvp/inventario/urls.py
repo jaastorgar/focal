@@ -27,6 +27,6 @@ urlpatterns = [
     path('api/buscar-producto/<str:codigo_barras>/', buscar_producto_api, name='buscar_producto_api'),
     path('api/verificar-producto/<str:codigo_barras>/', verificar_producto_api, name='verificar_producto_api'),
     path('api/obtener-datos-sku/<str:sku>/', obtener_datos_sku_api, name='obtener_datos_sku_api'),
-    path('inventario/<int:producto_id>/proveedores-precios/', gestionar_proveedores_precios, name='gestionar_proveedores_precios'),
+    path('inventario/proveedores-precios/', gestionar_proveedores_precios, name='gestionar_proveedores_precios'),
     path('proveedores/agregar/', agregar_proveedor, name='agregar_proveedor'),
 ]

@@ -1,5 +1,3 @@
-# inventario/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.db.models import Q, Min, Sum, Subquery, OuterRef, Count
@@ -346,31 +344,35 @@ def eliminar_lote(request, lote_id):
 
 
 @login_required
-def gestionar_proveedores_precios(request, producto_id):
+def gestionar_proveedores_precios(request):
+    from django.http import Http404
+    
     """
-    Muestra información detallada de proveedores y precios para un producto específico
-    de la empresa del usuario.
+    Muestra la página para gestionar proveedores y precios.
+    Puede funcionar sin un producto seleccionado inicialmente.
     """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
         return redirect('inventario')
 
-    # Obtenemos el Producto base
-    producto = get_object_or_404(Producto, id=producto_id)
+    # Obtener el SKU de la solicitud GET
+    sku = request.GET.get('sku')
+    producto = None
+    lotes = LoteProducto.objects.none()
 
-    # Verificamos que el producto pertenezca al inventario de la empresa
-    oferta_producto = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
-
-    lotes = LoteProducto.objects.filter(
-        producto=oferta_producto
-    ).select_related('proveedor').order_by('-fecha_vencimiento') 
+    if sku:
+        try:
+            # Buscar el producto por SKU
+            producto = get_object_or_404(Producto, sku=sku, empresas=empresa_usuario)
+            oferta_producto = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
+            lotes = LoteProducto.objects.filter(producto=oferta_producto).order_by('-fecha_vencimiento')
+        except Http404:
+            messages.error(request, "Producto no encontrado o no autorizado.")
 
     context = {
         'producto': producto,
-        'oferta_producto': oferta_producto, 
-        'lotes': lotes, 
-        'empresa_usuario': empresa_usuario,
+        'lotes': lotes,
     }
     return render(request, 'inventario/gestionar_proveedores_precios.html', context)
 

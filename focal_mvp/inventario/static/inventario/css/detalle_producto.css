@@ -357,6 +357,25 @@ h2 {
 .acciones a[href*="eliminar"] { background-color: var(--danger-color); } /* Rojo */
 .acciones a[href*="eliminar"]:hover { background-color: #c62828; }
 
+.btn-eliminar {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background-color: #dc3545; /* Rojo oscuro para eliminar */
+    color: var(--white); /* Texto blanco */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'InterTight', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-eliminar:hover {
+    background-color: #bd2130;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
 
 /* ==========================================================================
    9. Media Queries para Responsividad

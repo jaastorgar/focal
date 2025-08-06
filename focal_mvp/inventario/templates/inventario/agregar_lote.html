@@ -69,6 +69,34 @@
                             {% endif %}
                         </div>
 
+                        <!-- Campo de Proveedor -->
+                        <div class="form-group">
+                            <label for="{{ form.proveedor.id_for_label }}">{{ form.proveedor.label }}</label>
+                            {{ form.proveedor }}
+                            {% if form.proveedor.errors %}
+                                <small class="error-message">{{ form.proveedor.errors|striptags }}</small>
+                            {% endif %}
+
+                        </div>
+
+                        <!-- Campo de Compra -->
+                        <div class="form-group">
+                            <label for="{{ form.precio_compra.id_for_label }}">{{ form.precio_compra.label }}</label>
+                            {{ form.precio_compra }}
+                            {% if form.precio_compra.errors %}
+                                <small class="error-message">{{ form.precio_compra.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Campo de Venta -->
+                        <div class="form-group">
+                            <label for="{{ form.precio_venta.id_for_label }}">{{ form.precio_venta.label }}</label>
+                            {{ form.precio_venta }}
+                            {% if form.precio_venta.errors %}
+                                <small class="error-message">{{ form.precio_venta.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+
                         <!-- Campo de Fecha de Vencimiento (Ocupa las 2 columnas) -->
                         <div class="form-group" style="grid-column: span 2;">
                             <label for="{{ form.fecha_vencimiento.id_for_label }}">{{ form.fecha_vencimiento.label }}</label>

@@ -42,28 +42,26 @@
 
                 <hr>
 
-                <h2>Mi Oferta de Precios</h2>
+                <h2>Mi Oferta de Precios (Precio Base de Venta)</h2>
                 {% if form_oferta.non_field_errors %}
                     <div class="alert-error">{{ form_oferta.non_field_errors|striptags }}</div>
                 {% endif %}
                 <div style="display:none;">{{ form_oferta.empresa }}</div>
+                
+                <!-- Campo nuevo: Precio base de venta -->
                 <div class="form-group">
-                    <label for="{{ form_oferta.precio_compra.id_for_label }}">{{ form_oferta.precio_compra.label }}</label>
-                    {{ form_oferta.precio_compra }}
-                    {% if form_oferta.precio_compra.errors %}
-                        <small class="error-message">{{ form_oferta.precio_compra.errors|striptags }}</small>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form_oferta.precio_venta.id_for_label }}">{{ form_oferta.precio_venta.label }}</label>
-                    {{ form_oferta.precio_venta }}
-                    {% if form_oferta.precio_venta.errors %}
-                        <small class="error-message">{{ form_oferta.precio_venta.errors|striptags }}</small>
+                    <label for="{{ form_oferta.precio_venta_base.id_for_label }}">{{ form_oferta.precio_venta_base.label }}</label>
+                    {{ form_oferta.precio_venta_base }}
+                    <small class="form-text text-muted">
+                        Precio de venta sugerido/referencia para este producto en tu inventario.
+                    </small>
+                    {% if form_oferta.precio_venta_base.errors %}
+                        <small class="error-message">{{ form_oferta.precio_venta_base.errors|striptags }}</small>
                     {% endif %}
                 </div>
 
                 <div class="form-actions">
-                    <a href="{% url 'inventario' %}" class="btn btn-cancel" role="button">Cancelar</a>
+                    <a href="{% url 'gestionar_proveedores_precios' %}" class="btn btn-cancel" role="button">Cancelar</a>
                     <button type="submit" class="btn btn-submit">Guardar Cambios</button>
                 </div>
             </form>
