@@ -1,5 +1,3 @@
-# inventario/models.py
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
@@ -566,7 +564,7 @@ class Producto(models.Model):
         return self.nombre
 
 # ===========================
-# MODELO OFERTA PRODUCTO
+# MODELO OFERTA PRODUCTO (ACTUALIZADO)
 # ===========================
 class OfertaProducto(models.Model):
     """
@@ -575,7 +573,6 @@ class OfertaProducto(models.Model):
     """
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    precio_venta_base = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     activo = models.BooleanField(default=True)
@@ -591,6 +588,7 @@ class OfertaProducto(models.Model):
     def __str__(self):
         return f"{self.producto.nombre} en {self.empresa.nombre_almacen}"
 
+    # === Propiedades dinámicas para precios ===
     @property
     def ultimo_precio_compra(self):
         """Obtiene el último precio de compra registrado en lotes"""
@@ -609,12 +607,29 @@ class OfertaProducto(models.Model):
         
         return round(total_costo / total_cantidad, 2) if total_cantidad > 0 else 0.00
 
+    @property
+    def ultimo_precio_venta(self):
+        """Obtiene el último precio de venta registrado en lotes"""
+        ultimo_lote = self.lotes.order_by('-fecha_ingreso').first()
+        return ultimo_lote.precio_venta if ultimo_lote else 0.00
+
+    @property
+    def precio_venta_promedio(self):
+        """Calcula el precio de venta promedio ponderado por cantidad"""
+        lotes = self.lotes.filter(cantidad__gt=0)
+        if not lotes.exists():
+            return 0.00
+
+        total_venta = sum(lote.precio_venta * lote.cantidad for lote in lotes)
+        total_cantidad = sum(lote.cantidad for lote in lotes)
+        return round(total_venta / total_cantidad, 2) if total_cantidad > 0 else 0.00
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 
 # ===========================
-# MODELO LOTE PRODUCTO (Mejorado)
+# MODELO LOTE PRODUCTO 
 # ===========================
 class LoteProducto(models.Model):
     producto = models.ForeignKey(OfertaProducto, on_delete=models.CASCADE, related_name='lotes')
@@ -652,7 +667,7 @@ class LoteProducto(models.Model):
         if self.precio_venta < 0:
             raise ValidationError({'precio_venta': 'El precio de venta no puede ser negativo.'})
         if self.precio_venta < self.precio_compra:
-            pass 
+            raise ValidationError({'precio_venta': 'El precio de venta no puede ser menor al precio de compra.'})
 
     def save(self, *args, **kwargs):
         self.full_clean()

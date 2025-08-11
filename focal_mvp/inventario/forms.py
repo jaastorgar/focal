@@ -1,14 +1,20 @@
-# inventario/forms.py
-
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from .models import Producto, LoteProducto, OfertaProducto, Almacenero, Empresa, Proveedor, REGIONES_COMUNAS
+from .models import (
+    Producto,
+    LoteProducto,
+    OfertaProducto,
+    Almacenero,
+    Empresa,
+    Proveedor,
+    REGIONES_COMUNAS,
+)
 import re
 
 # --- TUS FUNCIONES DE VALIDACIÓN ---
 def validar_run_rut(run_rut):
     run_rut = str(run_rut).upper().strip()
-    run_rut = re.sub(r'[\.-]', '', run_rut)
+    run_rut = re.sub(r'[.-]', '', run_rut)
     if not run_rut or len(run_rut) < 2:
         return False
     cuerpo = run_rut[:-1]
@@ -30,21 +36,6 @@ def validar_run_rut(run_rut):
     else:
         dv_esperado = str(dv_calculado)
     return dv_esperado == dv
-
-def validar_password_segura(password):
-    if not (8 <= len(password) <= 12):
-        return False, "La contraseña debe tener entre 8 y 12 caracteres."
-    if not re.search(r"[A-Z]", password):
-        return False, "La contraseña debe contener al menos una mayúscula."
-    if not re.search(r"[a-z]", password):
-        return False, "La contraseña debe contener al menos una minúscula."
-    if not re.search(r"[0-9]", password):
-        return False, "La contraseña debe contener al menos un número."
-    if not re.search(r"[_\W]", password):
-        return False, "La contraseña debe contener al menos un carácter especial."
-    return True, ""
-
-# --- FORMULARIOS ACTUALIZADOS ---
 
 class EmailLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
@@ -163,102 +154,144 @@ class EmpresaForm(forms.ModelForm):
         return cleaned_data
 
 class ProductoForm(forms.ModelForm):
-    """
-    Formulario para crear o actualizar los datos de un Producto.
-    """
     class Meta:
         model = Producto
         exclude = ('empresas',)
 
-    def __init__(self, *args, **kwargs):
-        # Permitir pasar la empresa actual para validaciones
-        self.empresa = kwargs.pop('empresa', None)
+    def __init__(self, empresa=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
+        self.empresa = empresa
 
     def clean_sku(self):
-        from django.core.exceptions import ValidationError
-        
         sku = self.cleaned_data.get('sku')
-        if self.empresa and sku:
-            # Buscar si ya existe una OfertaProducto con este sku para esta empresa
-            if OfertaProducto.objects.filter(
-                producto__sku=sku,
-                empresa=self.empresa
-            ).exists():
-                raise ValidationError("Este SKU ya existe en tu inventario.")
+        if sku:
+            if OfertaProducto.objects.filter(producto__sku=sku, empresa=self.empresa).exists():
+                raise forms.ValidationError("Este SKU ya existe en tu inventario.")
         return sku
 
 class OfertaProductoForm(forms.ModelForm):
     class Meta:
         model = OfertaProducto
-        fields = ['precio_venta_base']
+        exclude = ('empresa',)
 
-# Actualiza también el formset para usar el formulario corregido
-OfertaProductoFormSet = forms.modelformset_factory(
-    OfertaProducto,
-    form=OfertaProductoForm,
-    extra=1,
-    can_delete=False
-)
+    def __init__(self, empresa=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.empresa = empresa
+
+    def clean(self):
+        cleaned_data = super().clean()
+        producto = cleaned_data.get('producto')
+        if producto:
+            if OfertaProducto.objects.filter(producto=producto, empresa=self.empresa).exists():
+                raise forms.ValidationError("Ya existe una oferta para este producto en tu inventario.")
+        return cleaned_data
 
 class LoteProductoForm(forms.ModelForm):
-    producto = forms.ModelChoiceField(
-        queryset=OfertaProducto.objects.none(), 
-        label="Producto",
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
-
     class Meta:
         model = LoteProducto
-        exclude = ['precio_compra', 'precio_venta'] 
+        fields = ['producto', 'cantidad', 'precio_compra', 'precio_venta', 'fecha_vencimiento']
         widgets = {
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'fecha_vencimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'precio_compra': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'precio_venta': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': '0.00'
+            }),
+            'fecha_vencimiento': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
-        # Permitir pasar la empresa del usuario para filtrar productos/ofertas
         self.empresa_usuario = kwargs.pop('empresa_usuario', None)
+        # =======================================
+        
         super().__init__(*args, **kwargs)
-        
-        # Si se pasó la empresa, filtrar el queryset de productos/ofertas
-        if self.empresa_usuario:
-            ofertas_qs = OfertaProducto.objects.filter(empresa=self.empresa_usuario).select_related('producto')
-            self.fields['producto'].queryset = ofertas_qs
-        
-        # Asegurarse de que los campos restantes tengan las clases correctas
+
+        # Aplicar clases CSS a todos los campos si no están definidas en widgets
         for field_name, field in self.fields.items():
-            # Los Select ya tienen su clase en widgets
             if not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
                 if 'class' not in field.widget.attrs:
                     field.widget.attrs['class'] = 'form-control'
 
-class ArchivoVentasForm(forms.Form):
-    archivo_ventas = forms.FileField()
-    
+        # === FILTRAR LOS PRODUCTOS DISPONIBLES PARA LA EMPRESA ===
+        if self.empresa_usuario:
+            self.fields['producto'].queryset = OfertaProducto.objects.filter(
+                empresa=self.empresa_usuario
+            ).select_related('producto')
+        else:
+            # Si no hay empresa, mostrar un queryset vacío
+            self.fields['producto'].queryset = OfertaProducto.objects.none()
+        # =======================================================
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cantidad = cleaned_data.get('cantidad')
+        precio_compra = cleaned_data.get('precio_compra')
+        precio_venta = cleaned_data.get('precio_venta')
+
+        if cantidad is None or cantidad <= 0:
+            raise forms.ValidationError("La cantidad debe ser mayor que cero.")
+
+        if precio_compra is None or precio_compra < 0:
+            raise forms.ValidationError("El precio de compra no puede ser negativo.")
+
+        if precio_venta is None or precio_venta < 0:
+            raise forms.ValidationError("El precio de venta no puede ser negativo.")
+
+        return cleaned_data
+
 class ProveedorForm(forms.ModelForm):
-    """
-    Formulario para crear o actualizar un Proveedor.
-    """
     class Meta:
         model = Proveedor
-        # Excluye campos que se gestionan automáticamente o que quizás no quieras aquí
-        exclude = ['creado', 'modificado'] 
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del proveedor'}),
-            'razon_social': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Razón social completa'}),
-            'rut': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '12.345.678-9'}),
-            'contacto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del contacto principal'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+56912345678'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contacto@proveedor.cl'}),
-            'direccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dirección del proveedor'}),
-        }
+        exclude = ('lotes',)
+
+    widgets = {
+        'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+        'razon_social': forms.TextInput(attrs={'class': 'form-control'}),
+        'rut': forms.TextInput(attrs={'class': 'form-control'}),
+        'contacto': forms.TextInput(attrs={'class': 'form-control'}),
+        'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+        'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+        'region': forms.Select(attrs={'class': 'form-select'}),
+        'comuna': forms.Select(attrs={'class': 'form-select'}),
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            # Los widgets ya tienen sus clases, pero por si acaso...
-            if 'class' not in field.widget.attrs and not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
-                 field.widget.attrs['class'] = 'form-control'
+            if field_name not in ['region', 'comuna']:
+                field.widget.attrs['class'] = 'form-control'
+
+        # Cargar regiones
+        self.fields['region'].choices = [('', 'Seleccione la región')] + [(r, r) for r in REGIONES_COMUNAS.keys()]
+
+        # Cargar comunas según región (para edición)
+        if not self.data.get('region'):
+            self.fields['comuna'].choices = [('', 'Primero seleccione una región')]
+        else:
+            region = self.data.get('region')
+            comunas = REGIONES_COMUNAS.get(region, [])
+            self.fields['comuna'].choices = [('', 'Seleccione la comuna')] + list(comunas)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        region = cleaned_data.get('region')
+        comuna = cleaned_data.get('comuna')
+
+        if region and comuna:
+            if comuna not in dict(REGIONES_COMUNAS.get(region, [])):
+                raise forms.ValidationError("La comuna seleccionada no pertenece a la región elegida.")
+        elif region and not comuna:
+            raise forms.ValidationError("Debe seleccionar una comuna de la región.")
+        return cleaned_data
+
+class ArchivoVentasForm(forms.Form):
+    archivo = forms.FileField()

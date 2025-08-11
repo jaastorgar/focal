@@ -72,7 +72,7 @@ class ProductoAdmin(admin.ModelAdmin):
 
 @admin.register(OfertaProducto)
 class OfertaProductoAdmin(admin.ModelAdmin):
-    list_display = ('producto', 'empresa', 'precio_venta_base', 'activo') 
+    list_display = ('producto', 'empresa', 'activo') 
     
     search_fields = ('producto__nombre', 'empresa__nombre_almacen')
     list_filter = ('activo', 'empresa') 

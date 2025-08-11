@@ -49,8 +49,7 @@
                         <th>Unidad Medida</th>
                         <th>Próximo Vencimiento</th>
                         <th>Stock Total</th>
-                        <th>Cantidad de Lotes</th>
-                        <th>Acciones</th>
+                        <th>Cantidad Lotes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,9 +69,6 @@
                             <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
                             <td>{{ producto.stock_total|default:"0" }}</td>
                             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
-                            <td class="acciones">
-                                <a href="{% url 'eliminar_producto' producto.id %}" class="btn-accion-tabla btn-peligro" role="button">Eliminar</a>
-                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -1,28 +1,21 @@
-// registro.js
 document.addEventListener('DOMContentLoaded', () => {
-    // === FUNCIÓN DE VALIDACIÓN DE RUN/RUT ===
     function validarRunRut(runRut) {
-        // Limpiar el input: mayúsculas, sin puntos, sin guiones
         let valor = runRut.replace(/\./g, '').replace(/-/g, '').toUpperCase().trim();
 
-        // Verificar formato mínimo (al menos 2 caracteres: número y dígito verificador)
         if (valor.length < 2) return false;
 
-        // Separar el cuerpo del dígito verificador
         const cuerpo = valor.slice(0, -1);
         const dv = valor.slice(-1);
 
-        // Verificar que el cuerpo sea numérico
         if (!/^\d+$/.test(cuerpo)) return false;
 
-        // Calcular dígito verificador esperado
         let suma = 0;
         let multiplo = 2;
 
-        // Recorrer el cuerpo de derecha a izquierda
         for (let i = cuerpo.length - 1; i >= 0; i--) {
             suma += parseInt(cuerpo.charAt(i)) * multiplo;
             multiplo++;
+
             if (multiplo === 8) multiplo = 2;
         }
 
@@ -33,13 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (dvCalculado === 10) dvCalculado = 'K';
         else dvCalculado = dvCalculado.toString();
 
-        // Comparar con el dígito ingresado
         return dv === dvCalculado;
     }
 
-    // === 1. VALIDACIÓN DE CONTRASEÑA (usando data attributes) ===
-    const passwordInput = document.querySelector('[id$="password1"]'); // Busca cualquier ID que termine en 'password1'
-    const confirmInput = document.querySelector('[id$="password2"]');  // Busca cualquier ID que termine en 'password2'
+    const passwordInput = document.querySelector('[id$="password1"]'); 
+    const confirmInput = document.querySelector('[id$="password2"]');  
     const feedbackContainer = document.getElementById('password-feedback');
 
     if (passwordInput && confirmInput && feedbackContainer) {
@@ -86,12 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordInput.addEventListener('input', validatePassword);
         confirmInput.addEventListener('input', checkPasswordMatch);
     } else {
-        // Opcional: mensaje de depuración si no se encuentran los campos
-        // console.log("Campos de contraseña no encontrados, se omite la validación.");
     }
 
-    // === 2. VALIDACIÓN DE RUN/RUT ===
-    // Validar RUN del administrador
     const runInput = document.querySelector('input[name$="run"]');
     if (runInput) {
         const runFeedback = document.createElement('div');
@@ -120,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         runInput.addEventListener('blur', validarRun);
     }
 
-    // Validar RUT de la empresa
     const rutInput = document.querySelector('input[name$="rut"]');
     if (rutInput) {
         const rutFeedback = document.createElement('div');
@@ -149,12 +135,9 @@ document.addEventListener('DOMContentLoaded', () => {
         rutInput.addEventListener('blur', validarRut);
     }
 
-    // === 3. CARGA DINÁMICA DE COMUNAS POR REGIÓN (usando data attributes) ===
-    // Busca todos los selects de región que tengan el atributo data-region-target
     document.querySelectorAll('select[data-region-target]').forEach(regionSelect => {
-        const formPrefix = regionSelect.dataset.regionTarget; // Obtiene 'almacenero' o 'empresa'
+        const formPrefix = regionSelect.dataset.regionTarget;
 
-        // Encuentra el select de comuna correspondiente usando el mismo data attribute
         const comunaSelect = document.querySelector(`select[data-comuna-target="${formPrefix}"]`);
 
         if (!comunaSelect) {
@@ -162,11 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Función para cargar comunas
         const cargarComunas = () => {
             const region = regionSelect.value;
 
-            // Limpiar comunas
             comunaSelect.innerHTML = '<option value="">Cargando...</option>';
 
             if (!region) {
@@ -200,12 +181,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         };
 
-        // Asignar evento change
         regionSelect.addEventListener('change', cargarComunas);
 
-        // Cargar comunas si ya hay una región seleccionada (edición)
         if (regionSelect.value) {
             cargarComunas();
         }
     });
+
+    const alertas = document.querySelectorAll('.alert');
+
+    if (alertas.length > 0) {
+        alertas.forEach(alerta => {
+            if (alerta.classList.contains('alert-success') || 
+                alerta.classList.contains('alert-info') || 
+                alerta.classList.contains('alert-warning')) {
+                
+                setTimeout(() => {
+                    alerta.style.transition = 'opacity 0.5s ease-out';
+                    alerta.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        alerta.style.display = 'none';
+                    }, 500);
+                }, 5000); 
+            }
+        });
+    }
 });

@@ -76,10 +76,9 @@
                             {% if form.proveedor.errors %}
                                 <small class="error-message">{{ form.proveedor.errors|striptags }}</small>
                             {% endif %}
-
                         </div>
 
-                        <!-- Campo de Compra -->
+                        <!-- Campo de Precio de Compra -->
                         <div class="form-group">
                             <label for="{{ form.precio_compra.id_for_label }}">{{ form.precio_compra.label }}</label>
                             {{ form.precio_compra }}
@@ -88,7 +87,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Campo de Venta -->
+                        <!-- Campo de Precio de Venta -->
                         <div class="form-group">
                             <label for="{{ form.precio_venta.id_for_label }}">{{ form.precio_venta.label }}</label>
                             {{ form.precio_venta }}
@@ -105,11 +104,29 @@
                                 <small class="error-message">{{ form.fecha_vencimiento.errors|striptags }}</small>
                             {% endif %}
                         </div>
+                        
+                        <!-- Campo de Número de Factura (Ocupa las 2 columnas) -->
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="{{ form.numero_factura.id_for_label }}">{{ form.numero_factura.label }}</label>
+                            {{ form.numero_factura }}
+                            {% if form.numero_factura.errors %}
+                                <small class="error-message">{{ form.numero_factura.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Campo de Lote del Proveedor (Ocupa las 2 columnas) -->
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="{{ form.lote_proveedor.id_for_label }}">{{ form.lote_proveedor.label }}</label>
+                            {{ form.lote_proveedor }}
+                            {% if form.lote_proveedor.errors %}
+                                <small class="error-message">{{ form.lote_proveedor.errors|striptags }}</small>
+                            {% endif %}
+                        </div>
                     </div>
                 </fieldset>
 
                 <div class="form-actions">
-                    <a href="{% url 'inventario' %}" class="btn btn-cancel" role="button">Cancelar</a>
+                    <a href="{% url 'gestionar_proveedores_precios' %}" class="btn btn-cancel" role="button">Cancelar</a>
                     <button type="submit" class="btn btn-submit">Guardar Lote</button>
                 </div>
             </form>
