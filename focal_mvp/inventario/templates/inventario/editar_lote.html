@@ -49,7 +49,7 @@
 
                 <hr>
 
-                <!-- Sección 2: Detalles del Lote -->
+                <!-- Sección 2: Detalles del Lote (Campos Editables) -->
                 <fieldset>
                     <legend><strong>2. Detalles del Lote</strong></legend>
                     
@@ -99,21 +99,11 @@
                             {% endif %}
                         </div>
                         
-                        <!-- Campo de Número de Factura (Ocupa las 2 columnas) -->
                         <div class="form-group" style="grid-column: span 2;">
                             <label for="{{ form.numero_factura.id_for_label }}">{{ form.numero_factura.label }}</label>
                             {{ form.numero_factura }}
                             {% if form.numero_factura.errors %}
                                 <small class="error-message">{{ form.numero_factura.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Campo de Lote del Proveedor (Ocupa las 2 columnas) -->
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label for="{{ form.lote_proveedor.id_for_label }}">{{ form.lote_proveedor.label }}</label>
-                            {{ form.lote_proveedor }}
-                            {% if form.lote_proveedor.errors %}
-                                <small class="error-message">{{ form.lote_proveedor.errors|striptags }}</small>
                             {% endif %}
                         </div>
                     </div>
@@ -131,7 +121,5 @@
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- Si tienes un JS específico para editar lote, descomenta la siguiente línea -->
-    <!-- <script src="{% static 'inventario/js/editar_lote.js' %}"></script> -->
 </body>
 </html>

@@ -1,5 +1,3 @@
-# inventario/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.db.models import Q, Min, Sum, Subquery, OuterRef, Count
@@ -280,21 +278,30 @@ def agregar_lote_producto(request):
 def editar_lote(request, lote_id):
     """
     Vista para editar un lote de producto existente.
+    La OfertaProducto (producto) asociada NO se puede cambiar aquí.
     """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
-    lote = get_object_or_404(LoteProducto, id=lote_id, producto__empresa=empresa_usuario)
-    
+    lote = get_object_or_404(
+        LoteProducto.objects.select_related('producto__producto', 'proveedor'), 
+        id=lote_id, 
+        producto__empresa=empresa_usuario
+    )
+
     if request.method == 'POST':
-        form = LoteProductoForm(request.POST, instance=lote, empresa_usuario=empresa_usuario)
+        form = LoteProductoForm(request.POST, instance=lote)
         if form.is_valid():
-            form.save()
+            lote_actualizado = form.save()
             messages.success(request, "Lote actualizado correctamente.")
-            return redirect('detalle_producto', producto_id=lote.producto.producto.id)
+            return redirect('detalle_producto', producto_id=lote_actualizado.producto.producto.id)
+        else:
+            print("Form errors (editar_lote):", form.errors)
+            print("Form non-field errors:", form.non_field_errors())
+            print("Form data:", request.POST)
+            messages.error(request, "Por favor, corrige los errores en el formulario.")
     else:
-        form = LoteProductoForm(instance=lote, empresa_usuario=empresa_usuario)
+        form = LoteProductoForm(instance=lote)
         
     return render(request, 'inventario/editar_lote.html', {'form': form, 'lote': lote})
-
 
 @login_required
 @transaction.atomic
@@ -317,7 +324,6 @@ def retirar_lote(request, lote_id):
         return redirect('detalle_producto', producto_id=lote.producto.producto.id)
 
     return render(request, 'inventario/retirar_lote.html', {'lote': lote})
-
 
 @login_required
 def eliminar_lote(request, lote_id):

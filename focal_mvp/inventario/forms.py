@@ -189,7 +189,7 @@ class OfertaProductoForm(forms.ModelForm):
 class LoteProductoForm(forms.ModelForm):
     class Meta:
         model = LoteProducto
-        fields = ['producto', 'cantidad', 'precio_compra', 'precio_venta', 'fecha_vencimiento']
+        exclude = ['producto', 'fecha_ingreso']
         widgets = {
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'precio_compra': forms.NumberInput(attrs={
@@ -206,29 +206,20 @@ class LoteProductoForm(forms.ModelForm):
                 'class': 'form-control',
                 'type': 'date'
             }),
+            'numero_factura': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Número de factura (opcional)'
+            }),
+            'proveedor': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, **kwargs):
-        self.empresa_usuario = kwargs.pop('empresa_usuario', None)
-        # =======================================
-        
         super().__init__(*args, **kwargs)
-
-        # Aplicar clases CSS a todos los campos si no están definidas en widgets
+        
         for field_name, field in self.fields.items():
             if not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
                 if 'class' not in field.widget.attrs:
                     field.widget.attrs['class'] = 'form-control'
-
-        # === FILTRAR LOS PRODUCTOS DISPONIBLES PARA LA EMPRESA ===
-        if self.empresa_usuario:
-            self.fields['producto'].queryset = OfertaProducto.objects.filter(
-                empresa=self.empresa_usuario
-            ).select_related('producto')
-        else:
-            # Si no hay empresa, mostrar un queryset vacío
-            self.fields['producto'].queryset = OfertaProducto.objects.none()
-        # =======================================================
 
     def clean(self):
         cleaned_data = super().clean()
