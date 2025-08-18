@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Recordatorios | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/lista_recordatorios.css' %}">
+</head>
+<body>
+
+<header class="app-header">
+    <nav class="container">
+        <a href="{% url 'home' %}" class="logo">FOCAL</a>
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="container">
+    <h1 class="page-title">Mis Recordatorios</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="filtros-recordatorios">
+        <a href="{% url 'lista_recordatorios' %}" class="filtro-btn {% if not estado_filtro %}activo{% endif %}">Todos</a>
+        <a href="{% url 'lista_recordatorios' %}?estado=vencido" class="filtro-btn {% if estado_filtro == 'vencido' %}activo{% endif %}">Vencidos</a>
+        <a href="{% url 'lista_recordatorios' %}?estado=proxima" class="filtro-btn {% if estado_filtro == 'proxima' %}activo{% endif %}">Próximos a Vencer</a>
+        <a href="{% url 'lista_recordatorios' %}?estado=normal" class="filtro-btn {% if estado_filtro == 'normal' %}activo{% endif %}">Normales</a>
+        <a href="{% url 'agregar_recordatorio' %}" class="btn btn-primary" style="margin-left: auto;">+ Agregar Recordatorio</a>
+    </div>
+
+    {% if recordatorios %}
+        <div class="table-container">
+            <table class="tabla-inventario">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Tipo</th>
+                        <th>Periodicidad</th>
+                        <th>Próxima Fecha</th>
+                        <th>Días Restantes</th>
+                        <th>Estado</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recordatorio in recordatorios %}
+                        <tr>
+                            <td>{{ recordatorio.nombre }}</td>
+                            <td>{{ recordatorio.descripcion|truncatewords:10|default:"N/A" }}</td>
+                            <td>{{ recordatorio.get_tipo_obligacion_display }}</td>
+                            <td>{{ recordatorio.get_periodicidad_display|default:"N/A" }}</td>
+                            <td>{{ recordatorio.proxima_fecha_ejecucion|date:"d-m-Y"|default:"N/A" }}</td>
+                            <td>
+                                {% if recordatorio.dias_para_vencer is not None %}
+                                    {{ recordatorio.dias_para_vencer }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if recordatorio.estado_alerta == 'vencido' %}
+                                    <span class="estado-indicador estado-vencido">Vencido</span>
+                                {% elif recordatorio.estado_alerta == 'proxima' %}
+                                    <span class="estado-indicador estado-proximo">Próximo</span>
+                                {% else %}
+                                    <span class="estado-indicador estado-normal">Normal</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ recordatorio.activo|yesno:"Sí,No" }}</td>
+                            <td class="acciones">
+                                <a href="{% url 'editar_recordatorio' recordatorio.id %}" class="btn btn-secondary btn-sm">Editar</a>
+                                {% if recordatorio.estado_alerta != 'vencido' %}
+                                    <a href="{% url 'completar_recordatorio' recordatorio.id %}" class="btn btn-success btn-sm">Completar</a>
+                                {% endif %}
+                                <a href="{% url 'eliminar_recordatorio' recordatorio.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="sin-recordatorios">
+            {% if estado_filtro %}
+                No hay recordatorios con el estado "{{ estado_filtro }}".
+            {% else %}
+                No tienes recordatorios registrados.
+            {% endif %}
+            <br><br>
+            <a href="{% url 'agregar_recordatorio' %}" class="btn btn-primary">+ Agregar tu Primer Recordatorio</a>
+        </div>
+    {% endif %}
+</main>
+
+<footer class="app-footer">
+    <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+</footer>
+
+</body>
+</html>

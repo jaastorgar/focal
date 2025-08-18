@@ -1,0 +1,74 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Recordatorio | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/agregar_recordatorio.css' %}">
+</head>
+<body>
+
+<header class="app-header">
+    <nav class="container">
+        <a href="{% url 'home' %}" class="logo">FOCAL</a>
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+            <li><a href="{% url 'lista_recordatorios' %}">Recordatorios</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="form-wrapper">
+    <div class="form-card">
+        <h1>Agregar Nuevo Recordatorio</h1>
+        
+        <form method="post" id="recordatorio-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert-error">{{ form.non_field_errors|striptags }}</div>
+            {% endif %}
+
+            <div class="form-grid-2cols">
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% if field.name == 'tipo_obligacion' %}
+                            {{ field|add_class:"form-select" }}
+                        {% elif field.name == 'activo' %}
+                            {{ field }}
+                        {% else %}
+                            {{ field|add_class:"form-control" }}
+                        {% endif %}
+                        
+                        {% if field.errors %}
+                            <small class="error-message">{{ field.errors|striptags }}</small>
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'lista_recordatorios' %}" class="btn btn-cancel" role="button">Cancelar</a>
+                <button type="submit" class="btn btn-submit">Guardar Recordatorio</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer class="app-footer">
+    <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+</footer>
+
+<script src="{% static 'inventario/js/agregar_recordatorio.js' %}" defer></script>
+
+</body>
+</html>

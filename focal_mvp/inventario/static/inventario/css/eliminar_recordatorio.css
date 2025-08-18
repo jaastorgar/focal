@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos para el Dashboard Principal (home)
+   FOCAL - Hoja de Estilos para Eliminar Recordatorio
    ========================================================================== */
 
 /* 1. Variables y Configuración Base
@@ -25,6 +25,11 @@
   --info-color: #17a2b8; /* Azul para mensajes de información */
   --warning-color: #ffc107; /* Amarillo para mensajes de advertencia */
 
+  /* --- Colores de estado para las alertas --- */
+  --danger-bg: #ffebee;   /* Rojo muy claro para 'vencido' */
+  --warning-bg: #fffde7;  /* Amarillo muy claro para 'proximo-vencer' */
+  --info-bg: #e3f2fd;     /* Azul muy claro para 'stock-bajo' */
+  
   /* --- Definiciones de fuentes personalizadas --- */
   --font-primary: 'InterTight', Arial, sans-serif; /* Para títulos y botones */
   --font-secondary: 'HankenGrotesk', Arial, sans-serif; /* Para párrafos y contenido */
@@ -70,8 +75,9 @@
 
 body {
     font-family: var(--font-secondary);
-    background-color: #f8f9fa; /* Fondo suave */
+    font-weight: 300;
     color: var(--dark-text);
+    background-color: #f8f9fa; /* Fondo suave */
     line-height: 1.6;
     display: flex;
     flex-direction: column;
@@ -96,7 +102,7 @@ body {
     z-index: 1000;
 }
 
-.navbar {
+.nav-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -105,7 +111,7 @@ body {
     padding: 0 15px;
 }
 
-.navbar-brand {
+.logo {
     font-family: var(--font-primary);
     font-weight: 700;
     font-size: 1.8rem;
@@ -113,16 +119,16 @@ body {
     text-decoration: none;
 }
 
-.navbar-menu {
+.nav-links {
     display: flex;
     list-style: none;
 }
 
-.navbar-menu li {
+.nav-links li {
     margin-left: 20px;
 }
 
-.navbar-menu a {
+.nav-links a {
     color: var(--light-purple);
     text-decoration: none;
     font-family: var(--font-primary);
@@ -130,51 +136,133 @@ body {
     transition: color 0.3s ease;
 }
 
-.navbar-menu a:hover {
+.nav-links a:hover {
     color: var(--hover-light-purple);
 }
 
-.dropdown {
-    position: relative;
+/* --- Contenido Principal --- */
+main {
+    flex: 1; /* Ocupa el espacio disponible entre header y footer */
+    padding: 2rem 0 4rem 0; /* Espacio arriba y abajo */
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 90%;
 }
 
-.dropdown-toggle::after {
-    content: " ▼";
-    font-size: 0.7rem;
-    margin-left: 5px;
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: var(--white);
-    box-shadow: 0 4px 8px var(--shadow-medium);
-    padding: 0.5rem 0;
-    border-radius: 4px;
-    list-style: none;
-    min-width: 150px;
-    z-index: 1001;
-}
-
-.dropdown:hover .dropdown-menu {
-    display: block;
-}
-
-.dropdown-menu a {
-    color: var(--dark-text);
-    padding: 10px 15px;
-    display: block;
-    font-family: var(--font-secondary);
-    font-weight: 300;
-}
-
-.dropdown-menu a:hover {
-    background-color: var(--light-purple);
+h1 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 2.2rem;
     color: var(--primary-purple);
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
+h2 {
+    font-family: var(--font-primary);
+    font-weight: 300;
+    font-size: 1.5rem;
+    color: var(--secondary-purple);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* --- Tarjeta del Formulario --- */
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-card {
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-light);
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* --- Alertas de Bootstrap (simplificadas) --- */
+.alert {
+    position: relative;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.alert-heading {
+    color: inherit;
+    margin-top: 0;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.alert p {
+    margin: 0.5rem 0;
+}
+
+.alert strong {
+    font-weight: 700;
+}
+
+/* --- Formulario y Acciones --- */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+/* Botón Cancelar */
+.btn-cancel {
+    background-color: var(--muted-text);
+    color: var(--white);
+}
+
+.btn-cancel:hover {
+    background-color: #3d3d3d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* Botón Peligro (Eliminar) */
+.btn-danger {
+    background-color: var(--danger-color);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #bd2130;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* --- Pie de Página --- */
 .app-footer {
     background-color: var(--header-footer-bg);
     color: var(--white);
@@ -184,145 +272,62 @@ body {
     font-size: 0.9rem;
 }
 
-/* --- Contenido Principal --- */
-.dashboard-container {
-    flex: 1;
-    padding: 2.5rem 0 4rem 0;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 90%;
-}
-
-.welcome-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.welcome-header h1 {
-    font-family: var(--font-primary);
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: var(--dark-text);
-    margin: 0;
-}
-
-.welcome-name {
-    color: var(--primary-purple);
-}
-
-.welcome-header p {
-    font-size: 1.2rem;
-    color: var(--muted-text);
-    margin-top: 0.5rem;
-}
-
-/* === Estilos de las Tarjetas (Cards) === */
-.main-navigation {
-    margin-bottom: 3rem;
-}
-
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.card {
-    background-color: var(--white);
-    border-radius: 16px;
-    box-shadow: 0 8px 25px var(--shadow-light);
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: var(--dark-text);
-    padding: 1.5rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    cursor: pointer;
-    text-decoration: none;
-    position: relative;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px var(--shadow-medium);
-    border-color: var(--primary-purple);
-    background-color: var(--light-purple);
-}
-
-.card-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--primary-purple);
-}
-
-.card-title {
-    font-family: var(--font-primary);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-purple);
-    margin-bottom: 0.5rem;
-}
-
-.card-description {
-    color: var(--muted-text);
-    font-size: 1rem;
-    margin: 0;
-}
-
-/* === Media Queries para Responsividad === */
+/* --- Media Queries para Responsividad --- */
 
 /* Para tablets */
 @media (max-width: 768px) {
-    .container, .dashboard-container {
+    .container, main {
         width: 95%;
     }
 
-    .navbar {
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    .form-card {
+        padding: 1.5rem;
+        max-width: 500px;
+    }
+
+    .alert-heading {
+        font-size: 1.1rem;
+    }
+
+    .alert p {
+        font-size: 0.95rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .nav-bar {
         flex-direction: column;
         gap: 1rem;
         padding: 1rem 0;
     }
 
-    .navbar-brand {
+    .logo {
         font-size: 1.6rem;
     }
 
-    .navbar-menu {
+    .nav-links {
         margin-top: 0.5rem;
     }
 
-    .navbar-menu li {
+    .nav-links li {
         margin: 0 10px;
-    }
-
-    .welcome-header h1 {
-        font-size: 2.2rem;
-    }
-
-    .welcome-header p {
-        font-size: 1.1rem;
-    }
-
-    .card-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .card {
-        padding: 1.2rem;
-    }
-
-    .card-title {
-        font-size: 1.3rem;
-    }
-
-    .card-description {
-        font-size: 0.95rem;
     }
 
     .app-footer {
@@ -333,41 +338,44 @@ body {
 
 /* Para móviles medianos */
 @media (max-width: 576px) {
-    .dashboard-container {
-        padding: 1.5rem 0 2rem 0;
+    main {
+        padding: 1.5rem 0 3rem 0;
+        margin: 1.5rem auto;
     }
 
-    .welcome-header h1 {
-        font-size: 1.8rem;
+    h1 {
+        font-size: 1.6rem;
     }
 
-    .welcome-header p {
+    h2 {
+        font-size: 1.1rem;
+    }
+
+    .form-card {
+        padding: 1.2rem;
+        max-width: 400px;
+    }
+
+    .alert {
+        padding: 0.8rem;
+    }
+
+    .alert-heading {
         font-size: 1rem;
     }
 
-    .card-grid {
-        gap: 1.2rem;
-    }
-
-    .card {
-        padding: 1rem;
-    }
-
-    .card-title {
-        font-size: 1.2rem;
-    }
-
-    .card-description {
+    .alert p {
         font-size: 0.9rem;
     }
 
-    .navbar-menu {
-        flex-wrap: wrap;
-        justify-content: center;
+    .form-actions {
+        gap: 8px;
     }
 
-    .navbar-menu li {
-        margin: 5px;
+    .btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+        min-width: 120px;
     }
 
     .app-footer {
@@ -377,51 +385,61 @@ body {
 }
 
 /* Para móviles pequeños */
-@media (max-width: 400px) {
-    .container, .dashboard-container {
+@media (max-width: 480px) {
+    .container, main, .form-card {
         width: 98%;
         padding: 0 10px;
     }
 
-    .navbar {
+    .nav-bar {
         padding: 0.8rem 0;
     }
 
-    .navbar-brand {
+    .logo {
         font-size: 1.4rem;
     }
 
-    .navbar-menu li {
+    .nav-links li {
         margin: 3px;
     }
 
-    .navbar-menu a {
+    .nav-links a {
         font-size: 0.9rem;
         padding: 0.4rem 0.6rem;
     }
 
-    .welcome-header h1 {
-        font-size: 1.6rem;
+    h1 {
+        font-size: 1.4rem;
     }
 
-    .welcome-header p {
-        font-size: 0.9rem;
+    h2 {
+        font-size: 1rem;
     }
 
-    .card-grid {
-        gap: 1rem;
+    .form-card {
+        padding: 1rem;
     }
 
-    .card {
-        padding: 0.8rem;
+    .alert {
+        padding: 0.7rem;
     }
 
-    .card-title {
-        font-size: 1.1rem;
+    .alert-heading {
+        font-size: 0.95rem;
     }
 
-    .card-description {
+    .alert p {
         font-size: 0.85rem;
+    }
+
+    .form-actions {
+        gap: 6px;
+    }
+
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        min-width: 100px;
     }
 
     .app-footer {

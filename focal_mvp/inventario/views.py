@@ -11,14 +11,14 @@ from .forms import (
     ProductoForm, 
     LoteProductoForm, 
     OfertaProductoForm,
-    ArchivoVentasForm,
-    ProveedorForm
+    ProveedorForm,
+    RecordatorioForm
 )
 
 # Se importan los modelos correctos
 from .models import (
     SuscripcionUsuario, Producto, LoteProducto, OfertaProducto,
-    PlanSuscripcion
+    PlanSuscripcion, Recordatorio
 )
 from .utils import obtener_empresa_del_usuario
 
@@ -506,18 +506,6 @@ def descargar_plantilla_ventas(request):
     wb.save(response)
     return response
 
-
-@login_required
-@transaction.atomic
-def procesar_ventas_archivo(request):
-    if request.method != 'POST':
-        form = ArchivoVentasForm()
-        return render(request, 'inventario/procesar_ventas_archivo.html', {'form': form})
-
-    messages.info(request, "Funcionalidad de procesamiento de archivos en desarrollo.")
-    return redirect('inventario')
-
-
 @login_required
 def seleccionar_plan(request, plan_id):
     empresa = obtener_empresa_del_usuario(request.user)
@@ -536,3 +524,107 @@ def seleccionar_plan(request, plan_id):
         messages.error(request, f"Ocurrió un error al cambiar de plan: {e}")
 
     return redirect('home')
+
+@login_required
+def lista_recordatorios(request):
+    """Muestra la lista de recordatorios de la empresa"""
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    if not empresa_usuario:
+        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
+        return redirect('home')
+    
+    recordatorios = Recordatorio.objects.filter(empresa=empresa_usuario).order_by('proxima_fecha_ejecucion')
+    
+    # Filtrar por estado
+    estado = request.GET.get('estado')
+    if estado == 'vencido':
+        recordatorios = recordatorios.filter(proxima_fecha_ejecucion__lt=date.today())
+    elif estado == 'proxima':
+        hoy = date.today()
+        limite = hoy + timedelta(days=5)  # 5 días de anticipación por defecto
+        recordatorios = recordatorios.filter(
+            proxima_fecha_ejecucion__gte=hoy,
+            proxima_fecha_ejecucion__lte=limite
+        )
+    elif estado == 'normal':
+        hoy = date.today()
+        limite = hoy + timedelta(days=5)
+        recordatorios = recordatorios.filter(proxima_fecha_ejecucion__gt=limite)
+    
+    context = {
+        'recordatorios': recordatorios,
+        'estado_filtro': estado,
+        'today': date.today(),
+    }
+    return render(request, 'inventario/lista_recordatorios.html', context)
+
+@login_required
+def agregar_recordatorio(request):
+    """Agrega un nuevo recordatorio"""
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    if not empresa_usuario:
+        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = RecordatorioForm(request.POST)
+        if form.is_valid():
+            recordatorio = form.save(commit=False)
+            recordatorio.empresa = empresa_usuario
+            recordatorio.save()
+            messages.success(request, f"Recordatorio '{recordatorio.nombre}' agregado correctamente.")
+            return redirect('lista_recordatorios')
+    else:
+        form = RecordatorioForm()
+    
+    context = {'form': form}
+    return render(request, 'inventario/agregar_recordatorio.html', context)
+
+@login_required
+def editar_recordatorio(request, recordatorio_id):
+    """Edita un recordatorio existente"""
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    recordatorio = get_object_or_404(Recordatorio, id=recordatorio_id, empresa=empresa_usuario)
+    
+    if request.method == 'POST':
+        form = RecordatorioForm(request.POST, instance=recordatorio)
+        if form.is_valid():
+            recordatorio = form.save()
+            messages.success(request, f"Recordatorio '{recordatorio.nombre}' actualizado correctamente.")
+            return redirect('lista_recordatorios')
+    else:
+        form = RecordatorioForm(instance=recordatorio)
+    
+    context = {'form': form, 'recordatorio': recordatorio}
+    return render(request, 'inventario/editar_recordatorio.html', context)
+
+@login_required
+def eliminar_recordatorio(request, recordatorio_id):
+    """Elimina un recordatorio"""
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    recordatorio = get_object_or_404(Recordatorio, id=recordatorio_id, empresa=empresa_usuario)
+    
+    if request.method == 'POST':
+        nombre_recordatorio = recordatorio.nombre
+        recordatorio.delete()
+        messages.success(request, f"Recordatorio '{nombre_recordatorio}' eliminado correctamente.")
+        return redirect('lista_recordatorios')
+    
+    context = {'recordatorio': recordatorio}
+    return render(request, 'inventario/eliminar_recordatorio_confirm.html', context)
+
+@login_required
+def completar_recordatorio(request, recordatorio_id):
+    """Marca un recordatorio como completado y calcula la próxima fecha"""
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    recordatorio = get_object_or_404(Recordatorio, id=recordatorio_id, empresa=empresa_usuario)
+    
+    if request.method == 'POST':
+        recordatorio.fecha_ultima_ejecucion = date.today()
+        recordatorio.proxima_fecha_ejecucion = recordatorio.calcular_proxima_fecha()
+        recordatorio.save()
+        messages.success(request, f"Recordatorio '{recordatorio.nombre}' marcado como completado.")
+        return redirect('lista_recordatorios')
+    
+    context = {'recordatorio': recordatorio}
+    return render(request, 'inventario/completar_recordatorio_confirm.html', context)

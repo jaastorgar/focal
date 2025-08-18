@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from datetime import date
 
 # ===========================
 # DEFINICIÓN DE REGIONES Y COMUNAS POR REGIÓN
@@ -724,3 +725,107 @@ class DetalleOrden(models.Model):
 
     def __str__(self):
         return f"{self.cantidad} x {self.producto.producto.nombre} en Venta #{self.orden.id}"
+    
+class Recordatorio(models.Model):
+    """
+    Modelo para gestionar recordatorios y obligaciones del almacenero.
+    """
+    TIPO_OBLIGACION_CHOICES = [
+        ('fija', 'Obligación Fija'),
+        ('variable', 'Obligación Variable'),
+        ('acuerdo', 'Basada en Acuerdo'),
+    ]
+    
+    PERIODICIDAD_CHOICES = [
+        ('diaria', 'Diaria'),
+        ('semanal', 'Semanal'),
+        ('quincenal', 'Quincenal'),
+        ('mensual', 'Mensual'),
+        ('bimestral', 'Bimestral'),
+        ('trimestral', 'Trimestral'),
+        ('semestral', 'Semestral'),
+        ('anual', 'Anual'),
+        ('bianual', 'Bianual'),
+    ]
+    
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='recordatorios')
+    nombre = models.CharField(max_length=200, help_text="Nombre de la obligación/recordatorio")
+    descripcion = models.TextField(blank=True, help_text="Descripción detallada de la obligación")
+    tipo_obligacion = models.CharField(max_length=20, choices=TIPO_OBLIGACION_CHOICES, default='variable')
+    periodicidad = models.CharField(max_length=20, choices=PERIODICIDAD_CHOICES, blank=True)
+    dia_mes = models.PositiveIntegerField(null=True, blank=True, help_text="Día del mes (1-31)")
+    mes_anio = models.PositiveIntegerField(null=True, blank=True, help_text="Mes del año (1-12)")
+    fecha_primera_ejecucion = models.DateField(help_text="Primera fecha de ejecución/recordatorio")
+    fecha_ultima_ejecucion = models.DateField(null=True, blank=True)
+    proxima_fecha_ejecucion = models.DateField(help_text="Próxima fecha de ejecución")
+    dias_anticipacion_alerta = models.PositiveIntegerField(default=5, help_text="Días antes para enviar alerta")
+    activo = models.BooleanField(default=True)
+    creado = models.DateTimeField(auto_now_add=True)
+    modificado = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Recordatorio"
+        verbose_name_plural = "Recordatorios"
+        ordering = ['proxima_fecha_ejecucion']
+    
+    def __str__(self):
+        return f"{self.nombre} - {self.empresa.nombre_almacen}"
+    
+    def calcular_proxima_fecha(self):
+        """Calcula la próxima fecha de ejecución basada en la periodicidad"""
+        from dateutil.relativedelta import relativedelta
+        
+        if not self.fecha_primera_ejecucion:
+            return None
+            
+        hoy = date.today()
+        
+        # Si ya pasó la próxima fecha, calcular la siguiente
+        if self.proxima_fecha_ejecucion and self.proxima_fecha_ejecucion < hoy:
+            base_fecha = self.proxima_fecha_ejecucion
+        else:
+            base_fecha = self.fecha_primera_ejecucion
+            
+        delta = None
+        if self.periodicidad == 'diaria':
+            delta = relativedelta(days=1)
+        elif self.periodicidad == 'semanal':
+            delta = relativedelta(weeks=1)
+        elif self.periodicidad == 'quincenal':
+            delta = relativedelta(weeks=2)
+        elif self.periodicidad == 'mensual':
+            delta = relativedelta(months=1)
+        elif self.periodicidad == 'bimestral':
+            delta = relativedelta(months=2)
+        elif self.periodicidad == 'trimestral':
+            delta = relativedelta(months=3)
+        elif self.periodicidad == 'semestral':
+            delta = relativedelta(months=6)
+        elif self.periodicidad == 'anual':
+            delta = relativedelta(years=1)
+        elif self.periodicidad == 'bianual':
+            delta = relativedelta(years=2)
+            
+        if delta:
+            # Calcular próxima fecha
+            while base_fecha <= hoy:
+                base_fecha += delta
+            return base_fecha
+        return self.proxima_fecha_ejecucion
+    
+    def dias_para_vencer(self):
+        """Calcula días restantes para la próxima ejecución"""
+        if self.proxima_fecha_ejecucion:
+            delta = self.proxima_fecha_ejecucion - date.today()
+            return delta.days
+        return None
+    
+    def estado_alerta(self):
+        """Devuelve el estado de alerta del recordatorio"""
+        dias_restantes = self.dias_para_vencer()
+        if dias_restantes is not None:
+            if dias_restantes < 0:
+                return 'vencido'
+            elif dias_restantes <= self.dias_anticipacion_alerta:
+                return 'proxima'
+        return 'normal'

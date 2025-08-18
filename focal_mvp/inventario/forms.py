@@ -7,6 +7,7 @@ from .models import (
     Almacenero,
     Empresa,
     Proveedor,
+    Recordatorio,
     REGIONES_COMUNAS,
 )
 import re
@@ -284,5 +285,59 @@ class ProveedorForm(forms.ModelForm):
             raise forms.ValidationError("Debe seleccionar una comuna de la región.")
         return cleaned_data
 
-class ArchivoVentasForm(forms.Form):
-    archivo = forms.FileField()
+class RecordatorioForm(forms.ModelForm):
+    class Meta:
+        model = Recordatorio
+        fields = [
+            'nombre', 'descripcion', 'tipo_obligacion', 'periodicidad',
+            'dia_mes', 'mes_anio', 'fecha_primera_ejecucion',
+            'proxima_fecha_ejecucion', 'dias_anticipacion_alerta', 'activo'
+        ]
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la obligación'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción detallada'}),
+            'tipo_obligacion': forms.Select(attrs={'class': 'form-select'}),
+            'periodicidad': forms.Select(attrs={'class': 'form-select'}),
+            'dia_mes': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Día (1-31)', 'min': 1, 'max': 31}),
+            'mes_anio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Mes (1-12)', 'min': 1, 'max': 12}),
+            'fecha_primera_ejecucion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'proxima_fecha_ejecucion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'dias_anticipacion_alerta': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 30, 'placeholder': '5'}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            if not isinstance(field.widget, (forms.Select, forms.SelectMultiple, forms.CheckboxInput)):
+                if 'class' not in field.widget.attrs:
+                    field.widget.attrs['class'] = 'form-control'
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo_obligacion = cleaned_data.get('tipo_obligacion')
+        periodicidad = cleaned_data.get('periodicidad')
+        dia_mes = cleaned_data.get('dia_mes')
+        mes_anio = cleaned_data.get('mes_anio')
+        fecha_primera_ejecucion = cleaned_data.get('fecha_primera_ejecucion')
+        proxima_fecha_ejecucion = cleaned_data.get('proxima_fecha_ejecucion')
+        
+        if tipo_obligacion in ['fija', 'variable'] and not periodicidad:
+            raise forms.ValidationError("Debe seleccionar una periodicidad para obligaciones fijas o variables.")
+        
+        if tipo_obligacion == 'fija':
+            if dia_mes and (dia_mes < 1 or dia_mes > 31):
+                raise forms.ValidationError("El día del mes debe estar entre 1 y 31.")
+            if mes_anio and (mes_anio < 1 or mes_anio > 12):
+                raise forms.ValidationError("El mes del año debe estar entre 1 y 12.")
+        
+        if not fecha_primera_ejecucion:
+            raise forms.ValidationError("Debe ingresar la fecha de primera ejecución.")
+        
+        if not proxima_fecha_ejecucion:
+            raise forms.ValidationError("Debe ingresar la próxima fecha de ejecución.")
+        
+        if proxima_fecha_ejecucion < fecha_primera_ejecucion:
+            raise forms.ValidationError("La próxima fecha de ejecución no puede ser anterior a la fecha de primera ejecución.")
+        
+        return cleaned_data    
