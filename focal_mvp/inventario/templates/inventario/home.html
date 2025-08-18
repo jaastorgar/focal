@@ -13,7 +13,6 @@
         <nav class="navbar">
             <div class="navbar-brand">FOCAL</div>
             <ul class="navbar-menu">
-                <li><a href="{% url 'inventario' %}">Inventario</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">Mi Cuenta</a>
                     <ul class="dropdown-menu">
@@ -38,61 +37,39 @@
                     {% endif %}
                 </span>
             </h1>
-            <p>Aquí tienes un resumen de las alertas importantes de tu inventario.</p>
+            <p>Selecciona una opción para comenzar a gestionar tu negocio.</p>
         </section>
 
-        <!-- Contenedor de Alertas -->
-        <section class="alerts-grid">
-            <!-- Tarjeta de Alertas de Vencimiento -->
-            <div class="alert-card warning">
-                <div class="alert-header">
-                    <div class="alert-icon">⚠️</div>
-                    <h2>Próximos Vencimientos</h2>
-                </div>
-                <div class="alert-content">
-                    {% if alertas_vencimiento %}
-                        <ul class="alert-list">
-                            {% for lote in alertas_vencimiento %}
-                                <li>
-                                    <span class="alert-product">{{ lote.producto.nombre }}</span>
-                                    <span class="alert-details">
-                                        ({{ lote.cantidad }} un.) vence el 
-                                        <span class="alert-date">{{ lote.fecha_vencimiento|date:"d/m/Y" }}</span>
-                                    </span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="no-alerts">¡Todo en orden! No hay lotes próximos a vencer.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Tarjeta de Alertas de Stock Bajo -->
-            <div class="alert-card danger">
-                <div class="alert-header">
-                    <div class="alert-icon">📉</div>
-                    <h2>Stock Bajo</h2>
-                </div>
-                <div class="alert-content">
-                    {% if alertas_stock_bajo %}
-                        <ul class="alert-list">
-                            {% for producto in alertas_stock_bajo %}
-                                <li>
-                                    <span class="alert-product">{{ producto.nombre }}</span>
-                                    <span class="alert-details">
-                                        Quedan 
-                                        <span class="alert-stock">{{ producto.stock_total|default:0 }}</span> unidades.
-                                    </span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="no-alerts">¡Buen trabajo! No hay productos con bajo stock.</p>
-                    {% endif %}
-                </div>
+        <!-- === NUEVO: Menú de Navegación Principal (Tarjetas) === -->
+        <section class="main-navigation">
+            <div class="card-grid">
+                <a href="{% url 'inventario' %}" class="card">
+                    <div class="card-icon">📦</div>
+                    <h3 class="card-title">Inventario</h3>
+                    <p class="card-description">Gestiona tus productos y stock.</p>
+                </a>
+                
+                <a href="{% url 'gestionar_proveedores_precios' %}" class="card">
+                    <div class="card-icon">🚚</div>
+                    <h3 class="card-title">Gestión de Proveedores y Lotes</h3>
+                    <p class="card-description">Administra proveedores, precios y lotes.</p>
+                </a>
+                
+                <a href="#" class="card"> 
+                    <div class="card-icon">🔔</div>
+                    <h3 class="card-title">Recordatorios</h3>
+                    <p class="card-description">Alertas y obligaciones pendientes.</p>
+                </a>
+                
+                <a href="#" class="card"> 
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">Métricas</h3>
+                    <p class="card-description">Analiza el rendimiento de tu inventario.</p>
+                </a>
             </div>
         </section>
+        <!-- ========================================= -->
+
     </main>
 
     <footer class="app-footer">
