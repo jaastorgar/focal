@@ -255,21 +255,25 @@ def agregar_lote_producto(request):
     
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
-        return redirect('inventario') 
+        return redirect('inventario')
 
     if request.method == 'POST':
+        # === PASAR empresa_usuario AL FORMULARIO ===
         form = LoteProductoForm(request.POST, empresa_usuario=empresa_usuario)
+        # =========================================
 
         if form.is_valid():
-            lote = form.save() 
-            
+            lote = form.save()
             messages.success(request, f"Lote para '{lote.producto.producto.nombre}' agregado.")
             return redirect('inventario')
         else:
+            # Para debugging - puedes remover después
             print("Form errors:", form.errors)
             print("Form data:", request.POST)
     else:
+        # === PASAR empresa_usuario AL FORMULARIO PARA GET ===
         form = LoteProductoForm(empresa_usuario=empresa_usuario)
+        # ==================================================
 
     context = {'form': form}
     return render(request, 'inventario/agregar_lote.html', context)
@@ -432,7 +436,6 @@ def logout_view(request):
     messages.info(request, "Has cerrado sesión correctamente.")
     return redirect('landing')
 
-
 # --- Vistas de API ---
 
 @login_required
@@ -456,7 +459,6 @@ def obtener_datos_sku_api(request, sku):
         }
         return JsonResponse(data)
     return JsonResponse({'status': 'nuevo'})
-
 
 @login_required
 def buscar_producto_api(request, codigo_barras):

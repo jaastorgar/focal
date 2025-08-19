@@ -93,57 +93,49 @@ body {
 
 /* --- Encabezado --- */
 .app-header {
-    background-color: var(--header-footer-bg);
-    color: var(--white);
-    padding: 1rem 0;
-    box-shadow: 0 2px 5px var(--shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
-.nav-bar {
+.app-header nav.container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 15px;
 }
-
-.logo {
-    font-family: var(--font-primary);
-    font-weight: 700;
-    font-size: 1.8rem;
+.app-header .logo {
+  color: var(--white);
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+.app-header .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+    gap: 0.5rem 1rem;
+}
+.app-header .nav-links a {
     color: var(--white);
     text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
 }
-
-.nav-links {
-    display: flex;
-    list-style: none;
-}
-
-.nav-links li {
-    margin-left: 20px;
-}
-
-.nav-links a {
-    color: var(--light-purple);
-    text-decoration: none;
-    font-family: var(--font-primary);
-    font-weight: 300;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: var(--hover-light-purple);
+.app-header .nav-links a:hover {
+    background-color: rgba(255,255,255,0.1);
 }
 
 /* --- Contenido Principal --- */
 main {
-    flex: 1; /* Ocupa el espacio disponible entre header y footer */
-    padding: 2rem 0 4rem 0; /* Espacio arriba y abajo */
+    flex: 1; 
+    padding: 2rem 0 4rem 0; 
     max-width: 1200px;
     margin: 0 auto;
     width: 90%;
@@ -356,12 +348,12 @@ h1 {
 
 /* --- Pie de Página --- */
 .app-footer {
-    background-color: var(--header-footer-bg);
-    color: var(--white);
-    text-align: center;
-    padding: 1.5rem 0;
-    margin-top: auto;
-    font-size: 0.9rem;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
 }
 
 /* ==========================================================================
