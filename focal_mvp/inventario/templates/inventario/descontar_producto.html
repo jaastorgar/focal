@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descontar Producto | FOCAL</title>
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'inventario/css/descontar_producto.css' %}">
+</head>
+<body>
+
+<header class="app-header">
+    <nav class="container">
+        <a href="{% url 'home' %}" class="logo">FOCAL</a>
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Inicio</a></li>
+            <li><a href="{% url 'inventario' %}">Inventario</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="form-wrapper">
+    <div class="form-card">
+        <h1>Descontar Producto del Inventario</h1>
+        <p>Escanea o ingresa manualmente el código de barras (SKU) y la cantidad a descontar.</p>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" id="descontar-form">
+            {% csrf_token %}
+            
+            <div class="form-grid-2cols">
+                <div class="form-group">
+                    <label for="id_sku">Código de Barras (SKU)</label>
+                    <input type="text" id="id_sku" name="sku" class="form-control" placeholder="Ej: 1234567890123" autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_cantidad">Cantidad a Descontar</label>
+                    <input type="number" id="id_cantidad" name="cantidad" class="form-control" min="1" placeholder="Ej: 5">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'inventario' %}" class="btn btn-cancel" role="button">Cancelar</a>
+                <button type="submit" class="btn btn-submit">Descontar Producto</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer class="app-footer">
+    <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+</footer>
+
+<script src="{% static 'inventario/js/descontar_producto.js' %}"></script>
+
+</body>
+</html>

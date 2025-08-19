@@ -18,7 +18,7 @@ from .forms import (
 # Se importan los modelos correctos
 from .models import (
     SuscripcionUsuario, Producto, LoteProducto, OfertaProducto,
-    PlanSuscripcion, Recordatorio
+    PlanSuscripcion, Recordatorio, MovimientoStock
 )
 from .utils import obtener_empresa_del_usuario
 
@@ -628,3 +628,99 @@ def completar_recordatorio(request, recordatorio_id):
     
     context = {'recordatorio': recordatorio}
     return render(request, 'inventario/completar_recordatorio_confirm.html', context)
+
+@login_required
+def descontar_producto_view(request):
+    """
+    Vista para descontar productos del inventario usando lector de código de barras o entrada manual.
+    """
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    if not empresa_usuario:
+        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        sku = request.POST.get('sku', '').strip()
+        cantidad_a_descontar = request.POST.get('cantidad', '').strip()
+
+        if not sku:
+            messages.error(request, "Debes ingresar o escanear un código de barras (SKU).")
+            return render(request, 'inventario/descontar_producto.html')
+
+        if not cantidad_a_descontar:
+            messages.error(request, "Debes ingresar la cantidad a descontar.")
+            return render(request, 'inventario/descontar_producto.html')
+
+        try:
+            cantidad_a_descontar = int(cantidad_a_descontar)
+            if cantidad_a_descontar <= 0:
+                raise ValueError("La cantidad debe ser un número positivo.")
+        except ValueError:
+            messages.error(request, "La cantidad debe ser un número entero positivo.")
+            return render(request, 'inventario/descontar_producto.html')
+
+        try:
+            with transaction.atomic():
+                # 1. Buscar el producto global por SKU
+                producto = get_object_or_404(Producto, sku=sku)
+                
+                # 2. Verificar que el producto esté en el inventario de la empresa
+                oferta_producto = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
+                
+                # 3. Buscar lotes disponibles con stock (FIFO - First In, First Out)
+                lotes_disponibles = LoteProducto.objects.filter(
+                    producto=oferta_producto,
+                    cantidad__gt=0
+                ).order_by('fecha_vencimiento')  # Ordenar por fecha de vencimiento ascendente
+
+                if not lotes_disponibles.exists():
+                    messages.error(request, f"No hay stock disponible para el producto '{producto.nombre}'.")
+                    return render(request, 'inventario/descontar_producto.html')
+
+                # 4. Descontar la cantidad solicitada
+                cantidad_restante = cantidad_a_descontar
+                lotes_actualizados = []
+                
+                for lote in lotes_disponibles:
+                    if cantidad_restante <= 0:
+                        break
+                    
+                    # Determinar cuánto se puede descontar de este lote
+                    descuento = min(lote.cantidad, cantidad_restante)
+                    
+                    # Actualizar el lote
+                    lote.cantidad -= descuento
+                    lote.save()
+                    lotes_actualizados.append(lote)
+                    
+                    # Registrar movimiento de stock
+                    MovimientoStock.objects.create(
+                        lote=lote,
+                        cantidad=descuento,
+                        tipo='SALIDA',
+                        descripcion=f"Descontado manualmente por {request.user.email}"
+                    )
+                    
+                    cantidad_restante -= descuento
+
+                # 5. Verificar si se descontó todo
+                if cantidad_restante > 0:
+                    messages.warning(
+                        request, 
+                        f"Stock parcialmente descontado. Solo se pudieron descontar {cantidad_a_descontar - cantidad_restante} de {cantidad_a_descontar} unidades de '{producto.nombre}'."
+                    )
+                else:
+                    messages.success(
+                        request, 
+                        f"Se han descontado {cantidad_a_descontar} unidades de '{producto.nombre}' correctamente."
+                    )
+
+                return redirect('inventario')
+                
+        except Exception as e:
+            messages.error(request, f"Error al descontar el producto: {str(e)}")
+            return render(request, 'inventario/descontar_producto.html')
+
+    # Para solicitudes GET, mostrar el formulario vacío
+    context = {}
+    return render(request, 'inventario/descontar_producto.html', context)

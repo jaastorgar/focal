@@ -6,7 +6,7 @@ from .views import (
     retirar_lote, descargar_plantilla_ventas, buscar_producto_api, verificar_producto_api, 
     obtener_datos_sku_api, gestionar_proveedores_precios, agregar_proveedor,
     lista_recordatorios, agregar_recordatorio, editar_recordatorio, eliminar_recordatorio,
-    completar_recordatorio
+    completar_recordatorio, descontar_producto_view
 )
 
 urlpatterns = [
@@ -34,4 +34,5 @@ urlpatterns = [
     path('recordatorios/<int:recordatorio_id>/editar/', editar_recordatorio, name='editar_recordatorio'),
     path('recordatorios/<int:recordatorio_id>/eliminar/', eliminar_recordatorio, name='eliminar_recordatorio'),
     path('recordatorios/<int:recordatorio_id>/completar/', completar_recordatorio, name='completar_recordatorio'),
+    path('descontar-producto/', descontar_producto_view, name='descontar_producto'),
 ]
