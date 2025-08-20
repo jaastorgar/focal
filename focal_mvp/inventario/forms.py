@@ -157,17 +157,28 @@ class EmpresaForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        exclude = ('empresas',)
+        exclude = ('empresas',)  
 
-    def __init__(self, empresa=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.empresa = kwargs.pop('empresa_usuario', None)
         super().__init__(*args, **kwargs)
-        self.empresa = empresa
+        
+        for field_name, field in self.fields.items():
+            if not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
+                if 'class' not in field.widget.attrs:
+                    field.widget.attrs['class'] = 'form-control'
 
     def clean_sku(self):
         sku = self.cleaned_data.get('sku')
-        if sku:
-            if OfertaProducto.objects.filter(producto__sku=sku, empresa=self.empresa).exists():
-                raise forms.ValidationError("Este SKU ya existe en tu inventario.")
+        
+        if sku and self.empresa:
+            qs = OfertaProducto.objects.filter(producto__sku=sku, empresa=self.empresa)
+            
+            if self.instance and self.instance.pk:
+                qs = qs.exclude(producto=self.instance)
+            if qs.exists():
+                raise forms.ValidationError("Este SKU ya está siendo utilizado por otro producto en tu inventario.")
+        
         return sku
 
 class OfertaProductoForm(forms.ModelForm):

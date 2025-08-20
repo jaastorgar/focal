@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from datetime import date, timedelta
 import time
+import logging
 from .forms import (
     ProductoForm, 
     LoteProductoForm, 
@@ -123,71 +124,82 @@ def inventario_view(request):
 
 # --- CRUD de Productos ---
 
+# Configurar logger
+logger = logging.getLogger(__name__)
+
 @login_required
 @transaction.atomic
 def agregar_producto(request):
     """
     Vista para agregar un nuevo producto al inventario de la empresa del usuario.
     """
+    logger.info(f"Iniciando agregar_producto para usuario: {request.user.email}")
+    
+    # --- Esta parte inicial de validaciones de empresa y suscripción es correcta y se mantiene ---
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
+        logger.error(f"Usuario {request.user.email} no está asociado a una empresa válida.")
         messages.error(request, "Debes estar asociado a una empresa para agregar productos.")
         return redirect('home')
 
-    # Verificar límite de productos del plan
     try:
         suscripcion = SuscripcionUsuario.objects.get(empresa=empresa_usuario, activa=True)
         productos_actuales = Producto.objects.filter(empresas=empresa_usuario).count()
         if suscripcion.plan.max_productos != 0 and productos_actuales >= suscripcion.plan.max_productos:
+            logger.warning(f"Usuario {request.user.email} ha alcanzado límite de productos ({suscripcion.plan.max_productos})")
             messages.error(request, f"Has alcanzado el límite de productos para tu plan ({suscripcion.plan.max_productos}).")
             return redirect('inventario')
     except SuscripcionUsuario.DoesNotExist:
+        logger.error(f"Usuario {request.user.email} no tiene suscripción activa")
         messages.error(request, "No tienes una suscripción activa.")
         return redirect('home')
+    # --- Fin de las validaciones iniciales ---
 
     if request.method == 'POST':
-        form_prod = ProductoForm(request.POST, empresa=empresa_usuario)
-        form_oferta = OfertaProductoForm(request.POST)
+        logger.info(f"Procesando POST de agregar_producto para usuario: {request.user.email}")
+        form_prod = ProductoForm(request.POST, empresa_usuario=empresa_usuario)
+        
+        if form_prod.is_valid():
+            
+            sku = form_prod.cleaned_data.get('sku')
+            
+            producto, creado = Producto.objects.get_or_create(
+                sku=sku,
+                defaults={
+                    'nombre': form_prod.cleaned_data.get('nombre'),
+                    'marca': form_prod.cleaned_data.get('marca'),
+                    'categoria': form_prod.cleaned_data.get('categoria'),
+                    'dramage': form_prod.cleaned_data.get('dramage'),
+                    'unidad_medida': form_prod.cleaned_data.get('unidad_medida'),
+                }
+            )
+            
+            # Finalmente, creamos la relación entre el producto (nuevo o existente) y la empresa.
+            OfertaProducto.objects.create(
+                producto=producto,
+                empresa=empresa_usuario
+            )
 
-        if form_prod.is_valid() and form_oferta.is_valid():
-            sku = form_prod.cleaned_data['sku']
-
-            # 1. Intentar obtener el Producto existente por SKU
-            try:
-                producto = Producto.objects.get(sku=sku)
-                # 2. Verificar si ya está asociado a esta empresa
-                if OfertaProducto.objects.filter(producto=producto, empresa=empresa_usuario).exists():
-                    messages.error(request, f"Este producto (SKU: {sku}) ya existe en tu inventario.")
-                    context = {'form_prod': form_prod, 'form_oferta': form_oferta}
-                    return render(request, 'inventario/agregar-producto.html', context)
-                else:
-                    # Producto existe globalmente pero no para esta empresa
-                    accion = "asociado"
-            except Producto.DoesNotExist:
-                # 3. Crear nuevo producto si no existe globalmente
-                producto = form_prod.save()
-                accion = "agregado"
-
-            # 4. Crear la OfertaProducto para asociar el producto a la empresa
-            oferta = form_oferta.save(commit=False)
-            oferta.producto = producto
-            oferta.empresa = empresa_usuario
-            oferta.save()
-
+            accion = "agregado" if creado else "asociado"
             messages.success(request, f"Producto '{producto.nombre}' {accion} a tu inventario.")
+            logger.info(f"Producto '{producto.nombre}' {accion} exitosamente para {empresa_usuario.nombre_almacen}")
             return redirect('inventario')
         else:
-            # Formulario no válido, volver a mostrar con errores
-            context = {'form_prod': form_prod, 'form_oferta': form_oferta}
-            return render(request, 'inventario/agregar-producto.html', context)
-    else:
-        # Solicitud GET - mostrar formulario vacío
-        form_prod = ProductoForm(empresa=empresa_usuario)
-        form_oferta = OfertaProductoForm()
+            logger.warning("Formulario de producto no válido")
+            logger.debug(f"Errores Form Prod: {form_prod.errors}")
+            
+            for field, errors in form_prod.errors.items():
+                for error in errors:
+                    messages.error(request, f"Error en {field}: {error}")
+            
+            for error in form_prod.non_field_errors():
+                messages.error(request, f"Error general en producto: {error}")
+
+    else: # GET request
+        form_prod = ProductoForm(empresa_usuario=empresa_usuario)
 
     context = {
         'form_prod': form_prod,
-        'form_oferta': form_oferta,
     }
     return render(request, 'inventario/agregar-producto.html', context)
 
@@ -679,10 +691,12 @@ def descontar_producto_view(request):
                     messages.error(request, f"No hay stock disponible para el producto '{producto.nombre}'.")
                     return render(request, 'inventario/descontar_producto.html')
 
-                # 4. Descontar la cantidad solicitada
+                # 4. === LÓGICA DE DESCONTEO CON ELIMINACIÓN AUTOMÁTICA ===
                 cantidad_restante = cantidad_a_descontar
-                lotes_actualizados = []
-                
+                lotes_afectados = []
+                movimientos_creados = []
+                lotes_eliminados = []
+
                 for lote in lotes_disponibles:
                     if cantidad_restante <= 0:
                         break
@@ -690,19 +704,28 @@ def descontar_producto_view(request):
                     # Determinar cuánto se puede descontar de este lote
                     descuento = min(lote.cantidad, cantidad_restante)
                     
-                    # Actualizar el lote
-                    lote.cantidad -= descuento
-                    lote.save()
-                    lotes_actualizados.append(lote)
-                    
-                    # Registrar movimiento de stock
-                    MovimientoStock.objects.create(
+                    # Registrar movimiento de stock ANTES de modificar el lote
+                    movimiento = MovimientoStock.objects.create(
                         lote=lote,
                         cantidad=descuento,
                         tipo='SALIDA',
-                        descripcion=f"Descontado manualmente por {request.user.email}"
+                        descripcion=f"Descontado automáticamente por venta/salida. Solicitado por {request.user.email}"
                     )
+                    movimientos_creados.append(movimiento)
                     
+                    # Actualizar el lote
+                    lote.cantidad -= descuento
+                    lote.save()
+                    lotes_afectados.append(lote)
+                    
+                    # === NUEVO: Eliminar lote si la cantidad llega a 0 ===
+                    if lote.cantidad == 0:
+                        lote_id = lote.id
+                        lote.delete() # Elimina el lote automáticamente
+                        lotes_eliminados.append(lote_id)
+                        messages.info(request, f"Lote #{lote_id} de {producto.nombre} agotado y eliminado.")
+                    # ===================================================
+
                     cantidad_restante -= descuento
 
                 # 5. Verificar si se descontó todo
@@ -712,10 +735,10 @@ def descontar_producto_view(request):
                         f"Stock parcialmente descontado. Solo se pudieron descontar {cantidad_a_descontar - cantidad_restante} de {cantidad_a_descontar} unidades de '{producto.nombre}'."
                     )
                 else:
-                    messages.success(
-                        request, 
-                        f"Se han descontado {cantidad_a_descontar} unidades de '{producto.nombre}' correctamente."
-                    )
+                    mensaje_exito = f"Se han descontado {cantidad_a_descontar} unidades de '{producto.nombre}' correctamente."
+                    if lotes_eliminados:
+                        mensaje_exito += f" ({len(lotes_eliminados)} lote(s) agotado(s) y eliminado(s))."
+                    messages.success(request, mensaje_exito)
 
                 return redirect('inventario')
                 
