@@ -133,12 +133,9 @@ def agregar_producto(request):
     """
     Vista para agregar un nuevo producto al inventario de la empresa del usuario.
     """
-    logger.info(f"Iniciando agregar_producto para usuario: {request.user.email}")
-    
     # --- Esta parte inicial de validaciones de empresa y suscripción es correcta y se mantiene ---
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
-        logger.error(f"Usuario {request.user.email} no está asociado a una empresa válida.")
         messages.error(request, "Debes estar asociado a una empresa para agregar productos.")
         return redirect('home')
 
@@ -146,17 +143,14 @@ def agregar_producto(request):
         suscripcion = SuscripcionUsuario.objects.get(empresa=empresa_usuario, activa=True)
         productos_actuales = Producto.objects.filter(empresas=empresa_usuario).count()
         if suscripcion.plan.max_productos != 0 and productos_actuales >= suscripcion.plan.max_productos:
-            logger.warning(f"Usuario {request.user.email} ha alcanzado límite de productos ({suscripcion.plan.max_productos})")
             messages.error(request, f"Has alcanzado el límite de productos para tu plan ({suscripcion.plan.max_productos}).")
             return redirect('inventario')
     except SuscripcionUsuario.DoesNotExist:
-        logger.error(f"Usuario {request.user.email} no tiene suscripción activa")
         messages.error(request, "No tienes una suscripción activa.")
         return redirect('home')
     # --- Fin de las validaciones iniciales ---
 
     if request.method == 'POST':
-        logger.info(f"Procesando POST de agregar_producto para usuario: {request.user.email}")
         form_prod = ProductoForm(request.POST, empresa_usuario=empresa_usuario)
         
         if form_prod.is_valid():
@@ -182,12 +176,9 @@ def agregar_producto(request):
 
             accion = "agregado" if creado else "asociado"
             messages.success(request, f"Producto '{producto.nombre}' {accion} a tu inventario.")
-            logger.info(f"Producto '{producto.nombre}' {accion} exitosamente para {empresa_usuario.nombre_almacen}")
             return redirect('inventario')
         else:
-            logger.warning("Formulario de producto no válido")
-            logger.debug(f"Errores Form Prod: {form_prod.errors}")
-            
+            # Mostrar errores en los mensajes de Django
             for field, errors in form_prod.errors.items():
                 for error in errors:
                     messages.error(request, f"Error en {field}: {error}")
