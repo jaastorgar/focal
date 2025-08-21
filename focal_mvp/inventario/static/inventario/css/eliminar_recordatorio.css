@@ -256,12 +256,12 @@ h2 {
 
 /* --- Pie de Página --- */
 .app-footer {
-    background-color: var(--header-footer-bg);
-    color: var(--white);
-    text-align: center;
-    padding: 1.5rem 0;
-    margin-top: auto;
-    font-size: 0.9rem;
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
 }
 
 /* --- Media Queries para Responsividad --- */

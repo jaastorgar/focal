@@ -82,10 +82,10 @@ body {
 }
 
 .app-footer {
-  background-color: transparent;
-  color: var(--muted-text);
+  background-color: var(--primary-purple);
+  color: var(--white);
   text-align: center;
-  padding: 2rem;
+  padding: 1.5rem;
   margin-top: auto;
   font-size: 0.9rem;
 }

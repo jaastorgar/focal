@@ -25,7 +25,7 @@
         <p>¿Estás seguro de que deseas eliminar permanentemente el siguiente lote?</p>
 
         <div class="details-card">
-            <p><strong>Producto:</strong> {{ lote.producto.nombre }}</p>
+            <p><strong>Producto:</strong> {{ lote.producto.producto.nombre }}</p>
             <p><strong>Cantidad:</strong> {{ lote.cantidad }}</p>
             <p><strong>Vencimiento:</strong> {{ lote.fecha_vencimiento|date:"d-m-Y" }}</p>
         </div>
