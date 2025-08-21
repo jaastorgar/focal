@@ -13,6 +13,14 @@
     --shadow-light: rgba(0, 0, 0, 0.08);
     --shadow-medium: rgba(0, 0, 0, 0.15);
     --shadow-dark: rgba(0, 0, 0, 0.3);
+    --danger-color: #dc3545; /* Rojo para mensajes de error/peligro */
+    --success-color: #28a745; /* Verde para mensajes de éxito */
+    --info-color: #17a2b8; /* Azul para mensajes de información */
+    --warning-color: #ffc107; /* Amarillo para mensajes de advertencia */
+
+    /* --- Definiciones de fuentes personalizadas --- */
+    --font-primary: 'InterTight', Arial, sans-serif; /* Para títulos y botones */
+    --font-secondary: 'HankenGrotesk', Arial, sans-serif; /* Para párrafos y contenido */
 }
 
 /* --- Definiciones de fuentes personalizadas --- */
@@ -46,7 +54,7 @@
     font-style: normal;
 }
 
-/* --- Estilos Generales --- */
+/* --- Estilos Generales del Documento --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -54,174 +62,34 @@
 }
 
 body {
-    font-family: 'HankenGrotesk', sans-serif;
-    line-height: 1.6;
+    font-family: var(--font-secondary);
+    font-weight: 300;
     color: var(--dark-text);
-    background-color: var(--white);
-    scroll-behavior: smooth;
+    background-color: #f8f9fa; /* Fondo suave */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .container {
+    width: 90%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 15px;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'InterTight', sans-serif;
-    color: var(--primary-purple);
-    margin-bottom: 1rem;
-    line-height: 1.2;
-}
-
-h1 {
-    font-size: 3.5rem;
-    font-weight: 700;
-}
-
-h2.section-title {
-    font-size: 3rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: var(--primary-purple);
-}
-
-.section-description {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto 3rem auto;
-    font-size: 1.15rem;
-    color: var(--muted-text);
-}
-
-a {
-    color: var(--primary-purple);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: var(--hover-dark-purple);
-}
-
-/* --- ESTILOS DE BOTONES UNIFICADOS --- */
-/* Base para todos los botones */
-.btn {
-    display: inline-block;
-    padding: 1rem 2.5rem; /* Padding base, puede ajustarse si es necesario */
-    border-radius: 50px; /* Bordes redondeados para todos los .btn */
-    font-family: 'InterTight', sans-serif;
-    font-weight: 700;
-    text-align: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 1rem;
-    border: 2px solid; /* Base para el borde */
-}
-
-/* Botón Principal (VER PLANES en header, CTA) */
-.btn-primary {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    border-color: var(--primary-purple);
-}
-
-.btn-primary:hover {
-    background-color: var(--hover-dark-purple);
-    border-color: var(--hover-dark-purple);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Botón Secundario (INICIAR SESIÓN en header) */
-.btn-secondary {
-    background-color: transparent;
-    color: var(--white); /* Texto blanco para botones secundarios en fondo oscuro */
-    border-color: var(--white); /* Borde blanco para botones secundarios en fondo oscuro */
-}
-
-.btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Fondo sutil al pasar el ratón */
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Ajustes específicos para los botones del header (ya que tienen el background oscuro) */
-.main-nav .btn-primary,
-.main-nav .btn-secondary {
-    padding: 0.7rem 1.8rem; /* Padding más compacto para el header */
-    font-size: 0.95rem; /* Fuente más pequeña para el header */
-    border-radius: 8px; /* Menos redondeado para el header */
-    margin-left: 10px; /* Espacio entre ellos */
-}
-
-/* Asegurar que el .btn-secondary del header mantenga el color de texto correcto */
-.main-nav .btn-secondary {
-    color: var(--light-purple); /* Color del texto del botón secundario en el header */
-    border-color: var(--light-purple); /* Color del borde del botón secundario en el header */
-}
-
-.main-nav .btn-secondary:hover {
-    background-color: var(--light-purple);
-    color: var(--primary-purple); /* Cambiar a morado al pasar el ratón */
-    border-color: var(--light-purple);
-}
-
-
-/* Botón CTA (Call to Action) - En la sección CTA */
-.btn-cta {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    border-color: var(--primary-purple);
-    padding: 1.2rem 3rem;
-    font-size: 1.2rem;
-    border-radius: 10px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
-.btn-cta:hover {
-    background-color: var(--hover-dark-purple);
-    border-color: var(--hover-dark-purple);
-    transform: scale(1.05);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* Botón de Submit en formularios */
-.btn-submit {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    border: none;
-    padding: 1rem 2.5rem;
-    width: 100%;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-family: 'InterTight', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-submit:hover {
-    background-color: var(--hover-dark-purple);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
-}
-
-
-/* --- Header / Navbar --- */
+/* === ESTILOS PARA EL HEADER Y NAVBAR === */
 .main-header {
     background-color: var(--header-footer-bg);
-    color: var(--light-purple);
+    color: var(--white);
     padding: 1rem 0;
     position: fixed;
     width: 100%;
     top: 0;
     left: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px var(--shadow-light);
 }
 
 .main-header .container {
@@ -231,10 +99,10 @@ a:hover {
 }
 
 .logo {
-    font-family: 'InterTight', sans-serif;
+    font-family: var(--font-primary);
     font-weight: 700;
     font-size: 1.8rem;
-    color: var(--light-purple);
+    color: var(--white);
     text-decoration: none;
     letter-spacing: -0.05em;
 }
@@ -292,7 +160,7 @@ a:hover {
     cursor: pointer;
 }
 
-/* --- Hero Section --- */
+/* === ESTILOS PARA LA SECCIÓN HERO === */
 .hero-section {
     background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
     color: var(--white); /* Aseguramos que el texto general del hero sea blanco */
@@ -339,34 +207,71 @@ a:hover {
     gap: 20px;
 }
 
-/* Ajustes específicos para los botones dentro de .hero-actions */
-/* Botón "Comenzar Ahora" en Hero - Blanco con texto morado */
-.hero-actions .btn-primary {
-    background-color: var(--white);
-    color: var(--primary-purple);
-    border-color: var(--white);
+/* === ESTILOS PARA LOS BOTONES === */
+/* Base para todos los botones */
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    margin: 2px 0;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
 }
 
-.hero-actions .btn-primary:hover {
-    background-color: var(--light-purple);
-    border-color: var(--light-purple);
-    color: var(--primary-purple);
+/* Botón Primario (Ver Planes, Comenzar Ahora, Regístrate Ahora) */
+.btn-primary {
+    background-color: var(--primary-purple);
+    color: var(--white);
+    border-color: var(--primary-purple);
 }
 
-/* Botón "Descubre Más" en Hero - Transparente con borde y texto blanco */
-.hero-actions .btn-secondary {
+.btn-primary:hover {
+    background-color: var(--hover-dark-purple);
+    border-color: var(--hover-dark-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* Botón Secundario (Descubre Más, Iniciar Sesión) */
+.btn-secondary {
     background-color: transparent;
     color: var(--white);
     border-color: var(--white);
 }
 
-.hero-actions .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Fondo blanco transparente al pasar el ratón */
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
     border-color: var(--white);
     color: var(--white);
 }
 
+/* Botón CTA (Regístrate Ahora en CTA Section) */
+.btn-cta {
+    background-color: var(--primary-purple);
+    color: var(--white);
+    border-color: var(--primary-purple);
+    padding: 1.2rem 3rem;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
 
+.btn-cta:hover {
+    background-color: var(--hover-dark-purple);
+    border-color: var(--hover-dark-purple);
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px var(--shadow-medium);
+}
+
+/* === ESTILOS PARA LA IMAGEN DEL HERO === */
 .hero-image {
     flex: 1;
     display: flex;
@@ -381,7 +286,7 @@ a:hover {
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Features Section --- */
+/* === ESTILOS PARA LAS CARACTERÍSTICAS === */
 .features-section {
     background-color: var(--light-purple);
     padding: 80px 0;
@@ -434,7 +339,7 @@ a:hover {
     color: var(--muted-text);
 }
 
-/* --- Call to Action Section --- */
+/* === ESTILOS PARA LA SECCIÓN CTA === */
 .cta-section {
     background: linear-gradient(90deg, var(--secondary-purple), var(--primary-purple));
     color: var(--white);
@@ -452,7 +357,7 @@ a:hover {
     margin-bottom: 2.5rem;
 }
 
-/* --- About Section --- */
+/* === ESTILOS PARA LA SECCIÓN "ACERCA DE" === */
 .about-section {
     padding: 80px 0;
     background-color: var(--white);
@@ -463,7 +368,7 @@ a:hover {
     max-width: 800px;
 }
 
-/* --- Contact Section --- */
+/* === ESTILOS PARA LA SECCIÓN "CONTACTO" === */
 .contact-section {
     background-color: var(--light-purple);
     padding: 80px 0;
@@ -509,7 +414,7 @@ a:hover {
     padding: 15px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    font-family: 'HankenGrotesk', sans-serif;
+    font-family: var(--font-secondary);
     font-size: 1rem;
     color: var(--dark-text);
     background-color: var(--white);
@@ -529,7 +434,7 @@ a:hover {
     min-height: 120px;
 }
 
-/* --- Footer --- */
+/* === ESTILOS PARA EL FOOTER === */
 .main-footer {
     background-color: var(--header-footer-bg);
     color: var(--light-purple);
@@ -562,7 +467,7 @@ a:hover {
     color: var(--hover-light-purple);
 }
 
-/* --- Responsividad --- */
+/* === RESPONSIVIDAD === */
 @media (max-width: 992px) {
     .main-header .container {
         flex-wrap: wrap;
