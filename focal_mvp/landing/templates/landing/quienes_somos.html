@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FOCAL – Quiénes Somos</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'landing/css/team.css' %}">
+</head>
+<body>
+  <!-- Header igual al de la landing -->
+  <header class="main-header">
+    <div class="container">
+      <a href="#home" class="logo">FOCAL</a>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="{% url 'landing' %}#home">Inicio</a></li>
+          <li><a href="{% url 'landing' %}#features">Qué Ofrecemos</a></li>
+          <li><a href="{% url 'quienes_somos' %}">Quiénes Somos</a></li>
+          <li><a href="{% url 'landing' %}#contact">Contacto</a></li>
+          <li><a href="{% url 'planes' %}" class="btn btn-primary">Ver Planes</a></li>
+          <li><a href="{% url 'login' %}" class="btn btn-secondary">Iniciar Sesión</a></li>
+        </ul>
+      </nav>
+      <button class="menu-toggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+    </div>
+  </header>
+
+  <!-- Hero corto -->
+  <section class="team-hero">
+    <div class="container">
+      <h1>Quiénes Somos</h1>
+      <p>Personas reales construyendo tecnología simple para los almacenes de barrio.</p>
+    </div>
+  </section>
+
+  <!-- Cómo nace -->
+  <section class="origin-section">
+    <div class="container">
+      <div class="origin-box">
+        <h2>¿Cómo nace FOCAL?</h2>
+        <p>
+          FOCAL nace en Chile como un proyecto universitario multidisciplinario. Unimos
+          informática, diseño y finanzas para resolver un problema muy concreto:
+          <strong>dar a los almaceneros de barrio una herramienta simple para organizar su negocio</strong>.
+        </p>
+        <p>
+          Empezamos con un MVP de <em>gestión de inventario</em> y alertas de caducidad, y hoy
+          validamos en terreno con almacenes de la zona sur de Santiago. Nuestro trabajo se
+          alinea con el <strong>Desarrollo Comunitario</strong> digitalización inclusiva y
+          empoderamiento de líderes locales.
+        </p>
+        <p class="footnote">
+          *Funciones como modo offline y automatización inteligente están en desarrollo.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Equipo -->
+  <section class="team-section">
+    <div class="container">
+      <h2>Nuestro Equipo</h2>
+      <p class="section-description">
+        Seis personas, un mismo propósito: que la tecnología le simplifique la vida al almacenero.
+      </p>
+
+      <div class="team-grid">
+        {# Opción dinámica: iterar lista "team" desde la vista #}
+        {% if team %}
+          {% for m in team %}
+            <article class="team-card">
+              <div class="avatar-wrap">
+                <img src="{{ m.foto_url }}" alt="Foto de {{ m.nombre }}" loading="lazy">
+              </div>
+              <h3>{{ m.nombre }}</h3>
+              <p class="role">{{ m.rol }}</p>
+              {% if m.bio %}<p class="bio">{{ m.bio }}</p>{% endif %}
+            </article>
+          {% endfor %}
+        {% else %}
+        {# Fallback con 6 placeholders #}
+          <article class="team-card">
+            <div class="avatar-wrap">
+              <img src="{% static 'landing/img/team/javier.jpg' %}" alt="Foto de Javier" loading="lazy">
+            </div>
+            <h3>Javier Astorga</h3>
+            <p class="role">CTO · Ing. Informática (en proceso de titulación)</p>
+            <p class="bio">Dirección tecnológica, arquitectura y despliegues de la plataforma.</p>
+          </article>
+
+          <article class="team-card">
+            <div class="avatar-wrap">
+              <img src="{% static 'landing/img/team/nelly.jpg' %}" alt="Foto de Nelly" loading="lazy">
+            </div>
+            <h3>Nelly Briones</h3>
+            <p class="role">COO · Ing. Administración (Mención Finanzas, en proceso de titulación)</p>
+            <p class="bio">Operaciones, procesos y relación con la comunidad de almaceneros.</p>
+          </article>
+
+          <article class="team-card">
+            <div class="avatar-wrap">
+              <img src="{% static 'landing/img/team/sol.jpg' %}" alt="Foto de Sol" loading="lazy">
+            </div>
+            <h3>Solanch Vizcaino</h3>
+            <p class="role">CEO · Ing. Administración (Mención Finanzas, en proceso de titulación)</p>
+            <p class="bio">Estrategia, liderazgo y alianzas para la adopción de FOCAL.</p>
+          </article>
+
+          <article class="team-card">
+            <div class="avatar-wrap">
+              <img src="{% static 'landing/img/team/ali.jpg' %}" alt="Foto de Desarrollo" loading="lazy">
+            </div>
+            <h3>Alexandra Baeza</h3>
+            <p class="role">Diseño Web & Gráfico</p>
+            <p class="bio">UX/UI y comunicación visual. Titulada en Diseño Web; estudiante de Diseño Gráfico.</p>
+          </article>
+
+          <article class="team-card">
+            <div class="avatar-wrap">
+              <img src="{% static 'landing/img/team/design.jpg' %}" alt="Foto de Diseño" loading="lazy">
+            </div>
+            <h3>Lucas Niño</h3>
+            <p class="role">Diseño Gráfico</p>
+            <p class="bio">Identidad visual y materiales de marca.</p>
+          </article>
+
+          <article class="team-card">
+            <div class="avatar-wrap">
+              <img src="{% static 'landing/img/team/tomas.jpg' %}" alt="Foto de Finanzas" loading="lazy">
+            </div>
+            <h3>Tomás Yáñez</h3>
+            <p class="role">Consultor de Informática</p>
+            <p class="bio">Soporte técnico y buenas prácticas de desarrollo.</p>
+          </article>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="section-title">¿Hablamos?</h2>
+      <p class="section-description">Si quieres utilizar nuestra plataforma escribenos.</p>
+      <a href="{% url 'landing' %}#contact" class="btn btn-cta">Contactar</a>
+    </div>
+  </section>
+
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-top">
+        <p class="footer-copy">&copy; 2025 FOCAL. Todos los derechos reservados.</p>
+
+        <nav class="footer-social" aria-label="Redes sociales">
+          <a class="social-btn ig"
+             href="https://www.instagram.com/focal_cl"
+             target="_blank" rel="noopener"
+             aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/>
+              <circle cx="17.5" cy="6.5" r="1.6" fill="currentColor"/>
+            </svg>
+          </a>
+
+          <a class="social-btn wa"
+             href="https://wa.me/56986308519?text=Hola%20Focal%2C%20tengo%20una%20consulta"
+             target="_blank" rel="noopener"
+             aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M20.5 12a8.5 8.5 0 0 1-12.38 7.43L4 20l.66-4.02A8.49 8.49 0 1 1 20.5 12z" fill="none" stroke="currentColor" stroke-width="2"/>
+              <path d="M8.7 9.6c.2-.5.4-.6.7-.6h.6c.2 0 .4 0 .5.4l.5 1c.1.3.1.4 0 .6-.2.3-.3.4-.5.6 0 0 .5 1 1.3 1.7.8.7 1.8 1.1 1.8 1.1.2-.1.4-.3.7-.6.2-.2.4-.2.6-.1l1.1.5c.4.2.4.3.4.6v.6c0 .3-.1.5-.5.7-.9.5-2.1.3-3.7-.6s-2.7-2-3.6-3.6c-.9-1.6-1.1-2.8-.6-3.7z" fill="currentColor"/>
+            </svg>
+          </a>
+        </nav>
+      </div>
+
+      <hr class="footer-divider" />
+
+      <div class="footer-bottom">
+        <div class="footer-links" role="navigation" aria-label="Legales">
+          <a href="#">Términos de Servicio</a>
+          <a href="#">Política de Privacidad</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+  <script src="{% static 'landing/js/index.js' %}" defer></script>
+</body>
+</html>

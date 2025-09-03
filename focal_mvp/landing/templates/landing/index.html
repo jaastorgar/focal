@@ -17,7 +17,7 @@
         <ul>
           <li><a href="#home">Inicio</a></li>
           <li><a href="#features">Qué Ofrecemos</a></li>
-          <li><a href="#about">Quiénes Somos</a></li>
+          <li><a href="{% url 'quienes_somos' %}">Quiénes Somos</a></li>
           <li><a href="#contact">Contacto</a></li>
           <li><a href="{% url 'planes' %}" class="btn btn-primary">Ver Planes</a></li>
           <li><a href="{% url 'login' %}" class="btn btn-secondary">Iniciar Sesión</a></li>
@@ -79,22 +79,7 @@
     </div>
   </section>
 
-  <section id="about" class="about-section">
-    <div class="container">
-      <h2 class="section-title">¿Quiénes Somos?</h2>
-      <p class="section-description">
-        FOCAL nace como un proyecto universitario multidisciplinario en Chile, integrado por estudiantes de informática, finanzas, diseño gráfico y diseño web.
-      </p>
-      <p class="section-description">
-        Nuestro propósito es empoderar a los almaceneros de barrio mediante tecnología inclusiva, fácil de usar y pensada para resolver problemas cotidianos.
-      </p>
-      <p class="section-description">
-        Creemos en la innovación al servicio de la comunidad, conectando tradición y tecnología para que los almacenes sigan siendo el corazón de los barrios.
-      </p>
-    </div>
-  </section>
-
-  <!-- CTA CENTRADA -->
+  <!-- CTA -->
   <section class="cta-section">
     <div class="container cta-container">
       <h2 class="section-title">¿Listo para simplificar tu almacén?</h2>

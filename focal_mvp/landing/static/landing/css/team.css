@@ -1,0 +1,202 @@
+/* --- Variables de Colores de la Empresa --- */
+:root {
+  --primary-purple: #4A008B;
+  --secondary-purple: #7B1FA2;
+  --light-purple: #F3E8FF;
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --white: #FFFFFF;
+  --header-footer-bg: #2C0140;
+  --hover-dark-purple: #38006B;
+  --hover-light-purple: #E0B3FF;
+  --border-color: #dee2e6;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-dark: rgba(0, 0, 0, 0.3);
+
+  --font-primary: 'InterTight', Arial, sans-serif;
+  --font-secondary: 'HankenGrotesk', Arial, sans-serif;
+}
+
+/* Fuentes (opcional si existen en static) */
+@font-face { font-family: 'InterTight'; src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype'); font-weight: 700; }
+@font-face { font-family: 'InterTight'; src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype'); font-weight: 300; }
+@font-face { font-family: 'HankenGrotesk'; src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype'); font-weight: 400; }
+@font-face { font-family: 'HankenGrotesk'; src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype'); font-weight: 300; }
+
+/* =========================================================
+   QUIÉNES SOMOS – Estilos específicos (no pisa styles.css)
+   ========================================================= */
+
+/* Hero superior (evita que el header fijo lo tape) */
+.team-hero{
+  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+  color: var(--white);
+  padding: 140px 0 70px; /* margen superior por header fijo */
+  text-align: center;
+}
+.team-hero h1{
+  font-family: var(--font-primary);
+  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: .4rem;
+}
+.team-hero p{
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
+  opacity: .95;
+}
+
+/* Sección: ¿Cómo nace FOCAL? */
+.origin-section{
+  background-color: var(--white);
+  padding: 70px 0;
+}
+.origin-box{
+  max-width: 950px;
+  margin: 0 auto;
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: clamp(20px, 4vw, 32px) clamp(18px, 4vw, 28px);
+  box-shadow: 0 10px 30px var(--shadow-light);
+}
+.origin-box h2{
+  color: var(--primary-purple);
+  font-family: var(--font-primary);
+  margin-bottom: 12px;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+.origin-box p{
+  color: var(--dark-text);
+  line-height: 1.7;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+.origin-box .footnote{
+  color: var(--muted-text);
+  font-size: .95rem;
+}
+
+/* Sección: Equipo */
+.team-section{
+  background: var(--light-purple);
+  padding: 80px 0;
+  text-align: center;
+}
+.team-section h2{
+  color: var(--primary-purple);
+  font-family: var(--font-primary);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+.team-section .section-description{
+  max-width: 900px;
+  margin: 10px auto 32px;
+  color: var(--muted-text);
+}
+
+/* Grilla responsiva de 6 integrantes */
+.team-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  gap: 26px;
+}
+
+/* Tarjeta de integrante */
+.team-card{
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 8px 24px var(--shadow-light);
+  transition: transform .22s ease, box-shadow .22s ease;
+  outline: none;
+}
+.team-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px var(--shadow-medium);
+}
+.team-card:focus-within{
+  box-shadow: 0 0 0 4px rgba(74,0,139,.15), 0 12px 28px var(--shadow-medium);
+}
+
+/* Avatar circular */
+.avatar-wrap{
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 6px 18px var(--shadow-light);
+  border: 3px solid var(--light-purple);
+}
+.avatar-wrap img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Textos dentro de la tarjeta */
+.team-card h3{
+  margin-top: 6px;
+  font-family: var(--font-primary);
+  color: var(--dark-text);
+  font-size: clamp(1.05rem, 2.4vw, 1.2rem);
+}
+.team-card .role{
+  color: var(--primary-purple);
+  font-weight: 700;
+  margin: 4px 0 8px;
+  letter-spacing: .2px;
+}
+.team-card .bio{
+  color: var(--muted-text);
+  font-size: .98rem;
+  line-height: 1.6;
+}
+
+/* Estados de enlace dentro de tarjetas (si existieran) */
+.team-card a{
+  color: var(--primary-purple);
+  text-decoration: none;
+}
+.team-card a:hover{
+  color: var(--hover-dark-purple);
+  text-decoration: underline;
+}
+
+/* =========================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================= */
+
+/* Laptops / tablets horizontales */
+@media (max-width: 992px){
+  .team-hero{ padding: 120px 0 56px; }
+  .team-grid{ grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+  .origin-section{ padding: 60px 0; }
+}
+
+/* Tablets / móviles grandes */
+@media (max-width: 768px){
+  .team-hero p{ max-width: 680px; margin: 0 auto; padding: 0 12px; }
+  .origin-box{ padding: 22px 18px; }
+}
+
+/* Móviles */
+@media (max-width: 576px){
+  .team-grid{ grid-template-columns: 1fr; gap: 18px; }
+  .avatar-wrap{ width: 120px; height: 120px; }
+  .team-section{ padding: 60px 0; }
+}
+
+/* Muy pequeños / accesibilidad */
+@media (max-width: 360px){
+  .team-hero{ padding-top: 110px; }
+  .avatar-wrap{ width: 108px; height: 108px; }
+}
+
+/* Soporte para usuarios que prefieren menos animación */
+@media (prefers-reduced-motion: reduce){
+  .team-card,
+  .team-card:hover{ transition: none; transform: none; }
+}

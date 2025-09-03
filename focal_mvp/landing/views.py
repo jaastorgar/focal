@@ -117,3 +117,6 @@ def get_comunas(request):
         return JsonResponse({'comunas': []}, status=404)
 
     return JsonResponse({'comunas': comunas})
+
+def quienes_somos_view(request):
+    return render(request, "landing/quienes_somos.html")
