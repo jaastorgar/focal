@@ -1,58 +1,123 @@
 {% load static %}
 {% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FOCAL – Planes</title>
 
-{% block extra_head %}
-    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'landing/css/planes.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-{% endblock %}
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <!-- Estilos generales (navbar, tipografías, colores, burbujas flotantes) -->
+  <link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
+  <!-- Estilos específicos de planes -->
+  <link rel="stylesheet" href="{% static 'landing/css/planes.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
 
-{% block content %}
-<main>
+  <!-- NAVBAR -->
+  <header class="main-header">
+    <div class="container">
+      <a href="{% url 'landing' %}#home" class="logo">FOCAL</a>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="{% url 'landing' %}#home">Inicio</a></li>
+          <li><a href="{% url 'landing' %}#features">Qué Ofrecemos</a></li>
+          <li><a href="{% url 'quienes_somos' %}">Quiénes Somos</a></li>
+          <li><a href="{% url 'landing' %}#contact">Contacto</a></li>
+          <li><a href="{% url 'planes' %}" class="btn btn-primary">Ver Planes</a></li>
+          <li><a href="{% url 'login' %}" class="btn btn-secondary">Iniciar Sesión</a></li>
+        </ul>
+      </nav>
+      <button class="menu-toggle" aria-label="Abrir menú">
+        <span aria-hidden="true">☰</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENIDO -->
+  <main style="padding-top: 90px;"><!-- separa el contenido del header fijo -->
     <section class="planes-section">
-        <div class="container">
-            <!-- 2. ESTRUCTURA HTML CON LAS CLASES CORRECTAS -->
-            <h2>Elige el Plan Perfecto para Tu Negocio</h2>
-            <p class="subtitulo">Comienza a optimizar tu inventario hoy mismo con una solución a tu medida.</p>
+      <div class="container">
+        <h2>Elige el Plan Perfecto para Tu Negocio</h2>
+        <p class="subtitulo">Comienza a optimizar tu inventario hoy mismo con una solución a tu medida.</p>
 
-            <div class="planes-grid">
-                {% for plan in planes %}
-                <div class="plan-card">
-                    <div class="plan-header">
-                        <h3>{{ plan.nombre }}</h3>
-                        <p class="precio">${{ plan.precio|floatformat:0|intcomma }}<span>/mes</span></p>
-                    </div>
-                    <div class="plan-body">
-                        <ul>
-                            <li>
-                                <i class="fas fa-check-circle"></i> 
-                                {% if plan.max_productos == 0 %}
-                                    Productos Ilimitados
-                                {% else %}
-                                    Hasta {{ plan.max_productos }} productos
-                                {% endif %}
-                            </li>
-                            <li>
-                                <i class="fas fa-check-circle"></i> 
-                                {% if plan.max_lotes == 0 %}
-                                    Lotes Ilimitados
-                                {% else %}
-                                    Hasta {{ plan.max_lotes }} lotes
-                                {% endif %}
-                            </li>
-                            <li>
-                                <i class="fas fa-check-circle"></i> 
-                                Gestión de hasta {{ plan.max_empresas }} empresa(s)
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="plan-footer">
-                        <a href="{% url 'registro' %}?plan={{ plan.id }}" class="btn-seleccionar">Seleccionar Plan</a>
-                    </div>
-                </div>
-                {% endfor %}
+        <div class="planes-grid">
+          {% for plan in planes %}
+          <div class="plan-card">
+            <div class="plan-header">
+              <h3>{{ plan.nombre }}</h3>
+              <p class="precio">
+                ${{ plan.precio|floatformat:0|intcomma }}<span>/mes</span>
+              </p>
             </div>
+
+            <div class="plan-body">
+              <ul>
+                <li>
+                  <i class="fas fa-check-circle"></i>
+                  {% if plan.max_productos == 0 %}
+                    Productos Ilimitados
+                  {% else %}
+                    Hasta {{ plan.max_productos }} productos
+                  {% endif %}
+                </li>
+                <li>
+                  <i class="fas fa-check-circle"></i>
+                  {% if plan.max_lotes == 0 %}
+                    Lotes Ilimitados
+                  {% else %}
+                    Hasta {{ plan.max_lotes }} lotes
+                  {% endif %}
+                </li>
+                <li>
+                  <i class="fas fa-check-circle"></i>
+                  Gestión de hasta {{ plan.max_empresas }} empresa(s)
+                </li>
+              </ul>
+            </div>
+
+            <div class="plan-footer">
+              <a href="{% url 'registro' %}?plan={{ plan.id }}" class="btn-seleccionar">
+                Seleccionar Plan
+              </a>
+            </div>
+          </div>
+          {% empty %}
+          <p>No hay planes disponibles en este momento.</p>
+          {% endfor %}
         </div>
+      </div>
     </section>
-</main>
-{% endblock %}
+  </main>
+
+  <!-- BURBUJAS FLOTANTES (IG / WhatsApp) -->
+  <div class="floating-social" aria-label="Redes sociales">
+    <a class="float-btn ig"
+       href="https://www.instagram.com/focal_cl"
+       target="_blank" rel="noopener"
+       aria-label="Instagram">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="17.5" cy="6.5" r="1.6" fill="currentColor"/>
+      </svg>
+    </a>
+
+    <a class="float-btn wa"
+       href="https://wa.me/56986308519?text=Hola%20Focal%2C%20tengo%20una%20consulta"
+       target="_blank" rel="noopener"
+       aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <path d="M20.5 12a8.5 8.5 0 0 1-12.38 7.43L4 20l.66-4.02A8.49 8.49 0 1 1 20.5 12z" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M8.7 9.6c.2-.5.4-.6.7-.6h.6c.2 0 .4 0 .5.4l.5 1c.1.3.1.4 0 .6-.2.3-.3.4-.5.6 0 0 .5 1 1.3 1.7.8.7 1.8 1.1 1.8 1.1.2-.1.4-.3.7-.6.2-.2.4-.2.6-.1l1.1.5c.4.2.4.3.4.6v.6c0 .3-.1 .5-.5 .7-.9 .5-2.1 .3-3.7-.6s-2.7-2-3.6-3.6c-.9-1.6-1.1-2.8-.6-3.7z" fill="currentColor"/>
+      </svg>
+    </a>
+  </div>
+  <!-- /BURBUJAS FLOTANTES -->
+
+  <!-- JS (toggle del menú móvil si lo usas en styles.css) -->
+  <script src="{% static 'landing/js/index.js' %}" defer></script>
+</body>
+</html>
