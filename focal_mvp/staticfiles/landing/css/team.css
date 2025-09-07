@@ -110,10 +110,6 @@
   box-shadow: 0 8px 24px var(--shadow-light);
   transition: transform .22s ease, box-shadow .22s ease;
   outline: none;
-
-  /* necesario para el overlay de la bio en desktop */
-  position: relative;
-  overflow: hidden;
 }
 .team-card:hover{
   transform: translateY(-6px);
@@ -153,80 +149,10 @@
   margin: 4px 0 8px;
   letter-spacing: .2px;
 }
-
-/* ===============================
-   BIO: comportamiento por defecto (mobile-first)
-   En móviles/no-hover se muestra normal dentro de la tarjeta
-   =============================== */
 .team-card .bio{
   color: var(--muted-text);
   font-size: .98rem;
   line-height: 1.6;
-  margin: 0;                 /* limpia margen si venía de otro estilo */
-  padding-top: 2px;
-  background: transparent;
-}
-
-/* ===============================
-   REVEAL DE BIO POR HOVER (DESKTOP)
-   =============================== */
-@media (hover:hover) {
-  /* La bio se comporta como overlay que aparece al pasar el mouse */
-  .team-card .bio{
-    position: absolute;
-    inset: 0;                          /* top right bottom left = 0 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-
-    padding: 18px 20px;
-    background: rgba(255,255,255,.96);
-    backdrop-filter: saturate(120%) blur(1px);
-
-    color: var(--muted-text);
-    font-size: .98rem;
-    line-height: 1.65;
-
-    opacity: 0;
-    transform: translateY(10px);
-    pointer-events: none;
-    transition: opacity .22s ease, transform .22s ease;
-
-    overflow: auto;                    /* por si la bio es larga */
-  }
-
-  .team-card:hover .bio,
-  .team-card:focus-within .bio{
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
-  /* Atenúa elementos de fondo cuando la bio está visible */
-  .team-card:hover .avatar-wrap,
-  .team-card:hover h3,
-  .team-card:hover .role{
-    filter: blur(.4px);
-    opacity: .25;
-    transition: opacity .18s ease, filter .18s ease;
-  }
-}
-
-/* ===============================
-   MÓVILES / TOUCH (sin hover)
-   – la bio queda visible bajo el rol
-   =============================== */
-@media (hover:none) {
-  .team-card .bio{
-    position: static;
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    background: transparent;
-    padding: 6px 0 0;
-    text-align: left;
-  }
 }
 
 /* Estados de enlace dentro de tarjetas (si existieran) */
@@ -273,5 +199,4 @@
 @media (prefers-reduced-motion: reduce){
   .team-card,
   .team-card:hover{ transition: none; transform: none; }
-  .team-card .bio{ transition: none; }
 }

@@ -1,0 +1,546 @@
+/* ==========================================================================
+   FOCAL - Hoja de Estilos para Descontar Producto
+   ========================================================================== */
+
+/* 1. Variables y Configuración Base
+   -------------------------------------------------------------------------- */
+:root {
+  /* --- Colores de la Empresa --- */
+  --primary-purple: #4A008B; /* Morado Oscuro / Principal */
+  --secondary-purple: #7B1FA2; /* Morado Intermedio / Degradado */
+  --light-purple: #F3E8FF; /* Morado Claro / Accent (usado para fondos sutiles o texto sobre oscuro) */
+  --dark-text: #343A40; /* Gris Oscuro para texto principal */
+  --muted-text: #555555; /* Gris para texto secundario */
+  --white: #FFFFFF; /* Blanco */
+  --header-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer (nombre unificado) */
+  --hover-dark-purple: #38006B; /* Tono más oscuro para hover de botones */
+  --hover-light-purple: #E0B3FF; /* Morado claro para hover de enlaces */
+  
+  --border-color: #dee2e6;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-dark: rgba(0, 0, 0, 0.3);
+  --danger-color: #dc3545; /* Rojo para mensajes de error/peligro */
+  --success-color: #28a745; /* Verde para mensajes de éxito */
+  --info-color: #17a2b8; /* Azul para mensajes de información */
+  --warning-color: #ffc107; /* Amarillo para mensajes de advertencia */
+
+  /* --- Colores de estado para las filas de la tabla --- */
+  --danger-bg: #ffebee;   /* Rojo muy claro para 'vencido' */
+  --warning-bg: #fffde7;  /* Amarillo muy claro para 'proximo-vencer' */
+  --info-bg: #e3f2fd;     /* Azul muy claro para 'stock-bajo' */
+  
+  /* --- Definiciones de fuentes personalizadas --- */
+  --font-primary: 'InterTight', Arial, sans-serif; /* Para títulos y botones */
+  --font-secondary: 'HankenGrotesk', Arial, sans-serif; /* Para párrafos y contenido */
+}
+
+/* --- Definiciones de fuentes personalizadas --- */
+/* InterTight – títulos y botones */
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* HankenGrotesk – párrafos y contenido */
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* --- Estilos Generales del Documento --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-secondary);
+    font-weight: 300;
+    color: var(--dark-text);
+    background-color: #f8f9fa; /* Fondo suave */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* --- Encabezado --- */
+.app-header {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.app-header nav.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.app-header .logo {
+  color: var(--white);
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+.app-header .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+    gap: 0.5rem 1rem;
+}
+.app-header .nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+.app-header .nav-links a:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* --- Contenido Principal --- */
+main {
+    flex: 1; 
+    padding: 2rem 0 4rem 0; 
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 90%;
+}
+
+h1 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: var(--primary-purple);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* --- Tarjeta del Formulario --- */
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-card {
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-light);
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.form-card h1 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--primary-purple);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.form-card p {
+    text-align: center;
+    color: var(--muted-text);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+/* --- Mensajes de Django (Alertas) --- */
+.alert {
+    position: relative;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+}
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+}
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    padding: 1.25rem 1rem;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.alert-close:hover {
+    opacity: 0.75;
+}
+
+/* ==========================================================================
+   2. Estilos para el Formulario de Descontar Producto
+   ========================================================================== */
+#descontar-form {
+    width: 100%;
+}
+
+.form-grid-2cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    color: var(--muted-text);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-purple);
+    box-shadow: 0 0 0 0.25rem rgba(74, 0, 139, 0.25);
+}
+
+.form-control:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+}
+
+/* --- Mensajes de Error de Campo --- */
+.error-message {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    font-weight: bold;
+}
+
+.form-text {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.text-muted {
+    color: var(--muted-text);
+}
+
+/* --- Acciones del Formulario --- */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    margin: 2px 0;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+/* Botón Cancelar */
+.btn-cancel {
+    background-color: var(--muted-text);
+    color: var(--white);
+}
+
+.btn-cancel:hover {
+    background-color: #3d3d3d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* Botón Submit */
+.btn-submit {
+    background-color: var(--primary-purple);
+    color: var(--white);
+}
+
+.btn-submit:hover {
+    background-color: var(--hover-dark-purple);
+    border-color: var(--hover-dark-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* --- Pie de Página --- */
+.app-footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   3. Media Queries para Responsividad
+   ========================================================================== */
+
+/* Para tablets */
+@media (max-width: 768px) {
+    .container, main, .form-card {
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .form-card {
+        padding: 1.5rem;
+    }
+
+    .form-grid-2cols {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        font-size: 0.95rem;
+        padding: 0.7rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .nav-bar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+
+    .logo {
+        font-size: 1.6rem;
+    }
+
+    .nav-links {
+        margin-top: 0.5rem;
+    }
+
+    .nav-links li {
+        margin: 0 10px;
+    }
+
+    .app-footer {
+        font-size: 0.85rem;
+        padding: 1.2rem 0;
+    }
+}
+
+/* Para móviles medianos */
+@media (max-width: 576px) {
+    main {
+        padding: 1.5rem 0 3rem 0;
+        margin: 1.5rem auto;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    .form-card {
+        padding: 1.2rem;
+    }
+
+    .form-grid-2cols {
+        gap: 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.85rem;
+    }
+
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+    }
+
+    .error-message, .form-text {
+        font-size: 0.8rem;
+    }
+
+    .btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+        min-width: 100px;
+    }
+
+    .nav-bar {
+        padding: 0.8rem 0;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+    }
+
+    .nav-links li {
+        margin: 3px;
+    }
+
+    .nav-links a {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .app-footer {
+        font-size: 0.8rem;
+        padding: 1rem 0;
+    }
+}
+
+/* Para móviles pequeños */
+@media (max-width: 400px) {
+    .container, main, .form-card {
+        width: 98%;
+        padding: 0 10px;
+    }
+
+    .nav-bar {
+        padding: 0.8rem 0;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+    }
+
+    .nav-links li {
+        margin: 3px;
+    }
+
+    .nav-links a {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    .form-card {
+        padding: 1rem;
+    }
+
+    .form-grid-2cols {
+        gap: 0.8rem;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+    }
+
+    .form-control {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+
+    .error-message, .form-text {
+        font-size: 0.75rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        min-width: 80px;
+    }
+
+    .app-footer {
+        font-size: 0.75rem;
+        padding: 0.8rem 0;
+    }
+}

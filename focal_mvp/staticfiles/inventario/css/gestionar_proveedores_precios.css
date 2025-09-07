@@ -1,0 +1,630 @@
+/* ==========================================================================
+   1. Variables y Configuración Base
+   ========================================================================== */
+:root {
+  /* --- Variables de Colores de la Empresa --- */
+  --primary-purple: #4A008B; /* Morado Oscuro / Principal */
+  --secondary-purple: #7B1FA2; /* Morado Intermedio / Degradado */
+  --light-purple: #F3E8FF; /* Morado Claro / Accent (usado para fondos sutiles o texto sobre oscuro) */
+  --dark-text: #343A40; /* Gris Oscuro para texto principal */
+  --muted-text: #555555; /* Gris para texto secundario */
+  --white: #FFFFFF; /* Blanco */
+  --header-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer (nombre unificado) */
+  --hover-dark-purple: #38006B; /* Tono más oscuro para hover de botones */
+  --hover-light-purple: #E0B3FF; /* Morado claro para hover de enlaces */
+  --border-color: #dee2e6;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-dark: rgba(0, 0, 0, 0.3);
+  --danger-color: #dc3545; /* Rojo para mensajes de error/peligro */
+  --success-color: #28a745; /* Verde para mensajes de éxito */
+  --info-color: #17a2b8; /* Azul para mensajes de información */
+  --warning-color: #ffc107; /* Amarillo para mensajes de advertencia */
+
+  /* --- Colores de estado para las filas de la tabla --- */
+  --danger-bg: #ffebee;   /* Rojo muy claro para 'vencido' */
+  --warning-bg: #fffde7;  /* Amarillo muy claro para 'proximo-vencer' */
+  --info-bg: #e3f2fd;     /* Azul muy claro para 'stock-bajo' */
+  
+  /* --- Definiciones de fuentes personalizadas --- */
+  --font-primary: 'InterTight', Arial, sans-serif; /* Para títulos y botones */
+  --font-secondary: 'HankenGrotesk', Arial, sans-serif; /* Para párrafos y contenido */
+}
+
+/* --- Definiciones de fuentes personalizadas --- */
+/* InterTight – títulos y botones */
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'InterTight';
+    src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* HankenGrotesk – párrafos y contenido */
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'HankenGrotesk';
+    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* --- Estilos Generales del Documento --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-secondary);
+    font-weight: 300;
+    color: var(--dark-text);
+    background-color: #f8f9fa; /* Fondo suave */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* --- Encabezado --- */
+.app-header {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.app-header nav.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.app-header .logo {
+  color: var(--white);
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+.app-header .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
+    gap: 0.5rem 1rem;
+}
+.app-header .nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+.app-header .nav-links a:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* --- Contenido Principal --- */
+main {
+    flex: 1; /* Ocupa el espacio disponible entre header y footer */
+    padding: 2rem 0 4rem 0; /* Espacio arriba y abajo */
+}
+
+h1 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: var(--primary-purple);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* --- Mensajes de Django (Alertas de Bootstrap) --- */
+.alert {
+    position: relative;
+    padding: 1rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+}
+.alert-info {
+    color: #055160;
+    background-color: #cff4fc;
+    border-color: #b6effb;
+}
+.alert-heading {
+    color: inherit;
+    margin-top: 0;
+}
+.btn-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    padding: 1.25rem 1rem;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.btn-close:hover {
+    opacity: 0.75;
+}
+
+/* ==========================================================================
+   2. Estilos para la Sección de Búsqueda por SKU
+   ========================================================================== */
+.sku-search-section {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-light);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.sku-search-section h2 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    color: var(--primary-purple);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Contenedor del formulario de búsqueda */
+.search-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espacio entre elementos */
+}
+
+/* Etiqueta del campo de entrada */
+.search-container label {
+    font-weight: bold;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+/* Campo de entrada de texto */
+#id_sku_busqueda {
+    width: 100%;
+    max-width: 300px; /* Limitar el ancho en pantallas grandes */
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+}
+
+/* Botón de búsqueda */
+#btn-buscar-sku, .search-container button[type="submit"] {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--primary-purple);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+#btn-buscar-sku:hover, .search-container button[type="submit"]:hover {
+    background-color: var(--hover-dark-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* Mensaje de validación debajo del campo */
+#sku-validation-message, .validation-message {
+    min-height: 1.5rem; /* Espacio para mensajes */
+    margin-top: 0.5rem;
+}
+#sku-validation-message.info, .validation-message.info { color: #0d6efd; }    /* Azul para info */
+#sku-validation-message.success, .validation-message.success { color: #198754; } /* Verde para éxito */
+#sku-validation-message.warning, .validation-message.warning { color: #ffc107; }/* Amarillo para advertencia */
+#sku-validation-message.error, .validation-message.error { color: #dc3545; }  /* Rojo para error */
+
+
+/* ==========================================================================
+   3. Estilos para la Sección de Información del Producto
+   ========================================================================== */
+.product-info-section {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-light);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.product-info-section h2 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    color: var(--primary-purple);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Cuadrícula para la información base del producto */
+.base-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Elemento individual de información */
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Etiqueta de la información */
+.info-label {
+    font-weight: bold;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+/* Valor de la información */
+.info-value {
+    font-size: 1.1rem;
+    color: var(--dark-text);
+}
+
+
+/* ==========================================================================
+   4. Estilos para la Sección de Lotes y Proveedores
+   ========================================================================== */
+.lotes-proveedores {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow-light);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.lotes-proveedores h3 {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    color: var(--primary-purple);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Encabezado de la sección con acciones */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+}
+
+/* Grupo de botones de acciones */
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   5. Estilos de la Tabla de Lotes
+   ========================================================================== */
+
+/* OPTIMIZACIÓN CRÍTICA: Contenedor responsivo para la tabla. */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Permite el desplazamiento horizontal en pantallas pequeñas. */
+    -webkit-overflow-scrolling: touch; /* Desplazamiento suave en iOS. */
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+}
+
+.tabla-inventario {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--white);
+    min-width: 700px; /* Asegura que la tabla tenga un ancho mínimo antes de hacer scroll. */
+}
+
+.tabla-inventario thead {
+    background-color: var(--primary-purple);
+    color: var(--white);
+    font-family: var(--font-primary);
+}
+
+.tabla-inventario th, .tabla-inventario td {
+    padding: 1rem 1.2rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap; /* Evita que el contenido de las celdas se rompa en varias líneas. */
+}
+
+.tabla-inventario tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.tabla-inventario tbody tr:hover {
+    background-color: #f1eaff; /* Morado muy claro al pasar el mouse. */
+}
+
+/* Estilos de estado de las filas */
+.vencido { background-color: var(--danger-bg) !important; }
+.proximo-vencer { background-color: var(--warning-bg) !important; }
+.stock-bajo { background-color: var(--info-bg) !important; }
+
+/* Mensaje cuando no hay lotes */
+.sin-lotes {
+    text-align: center;
+    color: var(--muted-text);
+    font-style: italic;
+    padding: 2rem 0;
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   6. Estilos de los Botones de Acción
+   ========================================================================== */
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Botón base */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 2px 0;
+    font-family: var(--font-primary);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+/* Botón Primario */
+.btn-primary {
+    background-color: var(--primary-purple);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-dark-purple);
+    border-color: var(--hover-dark-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* Botón Secundario */
+.btn-secondary {
+    background-color: var(--muted-text);
+    color: var(--white);
+}
+
+.btn-secondary:hover {
+    background-color: #3d3d3d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* Botón de Peligro */
+.btn-danger {
+    background-color: var(--danger-color);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #bd2130;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+/* Botón Pequeño */
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    min-width: auto;
+}
+
+
+/* ==========================================================================
+   7. Enlaces de Navegación Inferiores
+   ========================================================================== */
+.footer-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+
+/* ==========================================================================
+   8. Pie de Página
+   ========================================================================== */
+.app-footer {
+  background-color: var(--primary-purple);
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   9. Media Queries para Responsividad
+   ========================================================================== */
+
+/* Para tablets */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .product-info-section h2, .lotes-proveedores h3 {
+        font-size: 1.3rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .actions {
+        justify-content: center;
+    }
+
+    .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .base-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tabla-inventario th,
+    .tabla-inventario td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* Tabla tipo lista para móviles */
+    .tabla-inventario,
+    .tabla-inventario thead,
+    .tabla-inventario tbody,
+    .tabla-inventario th,
+    .tabla-inventario td,
+    .tabla-inventario tr {
+        display: block;
+    }
+
+    .tabla-inventario thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .tabla-inventario tr {
+        border: 1px solid var(--border-color);
+        margin-bottom: 15px;
+        border-radius: 8px;
+        background-color: var(--white);
+        box-shadow: 0 2px 5px var(--shadow-light);
+    }
+
+    .tabla-inventario td {
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        position: relative;
+        padding: 12px 15px 12px 40%;
+        text-align: right;
+    }
+
+    .tabla-inventario td:last-child {
+        border-bottom: none;
+    }
+
+    .tabla-inventario td::before {
+        content: attr(data-label) ": ";
+        position: absolute;
+        left: 15px;
+        top: 12px;
+        width: 35%;
+        text-align: left;
+        font-weight: bold;
+        color: var(--muted-text);
+    }
+
+    .acciones {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .footer-actions {
+        gap: 10px;
+    }
+}
+
+/* Para móviles pequeños */
+@media (max-width: 480px) {
+    main {
+        padding: 1rem 0 2rem 0;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    .product-info-section,
+    .lotes-proveedores {
+        padding: 1rem;
+    }
+
+    .product-info-section h2, .lotes-proveedores h3 {
+        font-size: 1.2rem;
+    }
+
+    .base-info-grid {
+        gap: 0.75rem;
+    }
+
+    .info-label, .info-value {
+        font-size: 0.95rem;
+    }
+
+    .tabla-inventario td {
+        padding: 10px 10px 10px 45%;
+        font-size: 0.8rem;
+    }
+
+    .tabla-inventario td::before {
+        font-size: 0.8rem;
+        left: 10px;
+        top: 10px;
+    }
+
+    .footer-actions {
+        gap: 10px;
+    }
+}
