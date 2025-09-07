@@ -94,15 +94,20 @@
   color: var(--muted-text);
 }
 
-/* Grilla responsiva de 6 integrantes */
+/* Grilla responsiva FLUIDA */
 .team-grid{
   display: grid;
-  grid-template-columns: repeat(3, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 28vw, 320px), 1fr));
   gap: 26px;
+  align-items: stretch;
 }
 
 /* Tarjeta de integrante */
 .team-card{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
   background: var(--white);
   border: 1px solid var(--border-color);
   border-radius: 16px;
@@ -111,7 +116,6 @@
   transition: transform .22s ease, box-shadow .22s ease;
   outline: none;
 
-  /* necesario para el overlay de la bio en desktop */
   position: relative;
   overflow: hidden;
 }
@@ -132,6 +136,7 @@
   overflow: hidden;
   box-shadow: 0 6px 18px var(--shadow-light);
   border: 3px solid var(--light-purple);
+  flex-shrink: 0;
 }
 .avatar-wrap img{
   width: 100%;
@@ -154,46 +159,42 @@
   letter-spacing: .2px;
 }
 
-/* ===============================
-   BIO: comportamiento por defecto (mobile-first)
-   En móviles/no-hover se muestra normal dentro de la tarjeta
-   =============================== */
+/* BIO por defecto (mobile-first): centrada y visible */
 .team-card .bio{
   color: var(--muted-text);
   font-size: .98rem;
   line-height: 1.6;
-  margin: 0;                 /* limpia margen si venía de otro estilo */
+  margin: 0;
   padding-top: 2px;
   background: transparent;
+
+  text-align: center;         /* <— centrado siempre */
+  max-width: 48ch;            /* mejor legibilidad de párrafos */
+  margin-inline: auto;        /* centra el bloque */
 }
 
-/* ===============================
-   REVEAL DE BIO POR HOVER (DESKTOP)
-   =============================== */
-@media (hover:hover) {
-  /* La bio se comporta como overlay que aparece al pasar el mouse */
+/* =========================================================
+   BIO tipo overlay SOLO en desktop (mejor legibilidad)
+   ========================================================= */
+@media (hover:hover) and (pointer:fine) {
   .team-card .bio{
     position: absolute;
-    inset: 0;                          /* top right bottom left = 0 */
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
 
     padding: 18px 20px;
     background: rgba(255,255,255,.96);
     backdrop-filter: saturate(120%) blur(1px);
-
-    color: var(--muted-text);
-    font-size: .98rem;
-    line-height: 1.65;
+    -webkit-overflow-scrolling: touch;
 
     opacity: 0;
     transform: translateY(10px);
     pointer-events: none;
     transition: opacity .22s ease, transform .22s ease;
 
-    overflow: auto;                    /* por si la bio es larga */
+    overflow: auto;
   }
 
   .team-card:hover .bio,
@@ -203,7 +204,7 @@
     pointer-events: auto;
   }
 
-  /* Atenúa elementos de fondo cuando la bio está visible */
+  /* Atenuar fondo de la tarjeta al mostrar bio */
   .team-card:hover .avatar-wrap,
   .team-card:hover h3,
   .team-card:hover .role{
@@ -213,40 +214,36 @@
   }
 }
 
-/* ===============================
-   MÓVILES / TOUCH (sin hover)
-   – la bio queda visible bajo el rol
-   =============================== */
-@media (hover:none) {
+/* =========================================================
+   Ajustes para TABLET/MÓVIL
+   ========================================================= */
+
+/* iPads y tablets: forzamos bio normal (algunas reportan hover) */
+@media (max-width: 1024px){
   .team-card .bio{
-    position: static;
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-    background: transparent;
+    position: static !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    background: transparent !important;
     padding: 6px 0 0;
-    text-align: left;
+    /* centrado también en tablet */
+    text-align: center !important;
+    margin-inline: auto;
+    max-width: 56ch;
+  }
+  .team-card:hover .avatar-wrap,
+  .team-card:hover h3,
+  .team-card:hover .role{
+    filter: none;
+    opacity: 1;
   }
 }
-
-/* Estados de enlace dentro de tarjetas (si existieran) */
-.team-card a{
-  color: var(--primary-purple);
-  text-decoration: none;
-}
-.team-card a:hover{
-  color: var(--hover-dark-purple);
-  text-decoration: underline;
-}
-
-/* =========================================================
-   RESPONSIVE BREAKPOINTS
-   ========================================================= */
 
 /* Laptops / tablets horizontales */
 @media (max-width: 992px){
   .team-hero{ padding: 120px 0 56px; }
-  .team-grid{ grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+  .team-grid{ gap: 22px; }
   .origin-section{ padding: 60px 0; }
 }
 
@@ -254,13 +251,20 @@
 @media (max-width: 768px){
   .team-hero p{ max-width: 680px; margin: 0 auto; padding: 0 12px; }
   .origin-box{ padding: 22px 18px; }
+  .team-grid{
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
 }
 
 /* Móviles */
 @media (max-width: 576px){
-  .team-grid{ grid-template-columns: 1fr; gap: 18px; }
+  .team-grid{
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
   .avatar-wrap{ width: 120px; height: 120px; }
-  .team-section{ padding: 60px 0; }
+  .team-section{ padding: 56px 0; }
 }
 
 /* Muy pequeños / accesibilidad */
@@ -269,7 +273,7 @@
   .avatar-wrap{ width: 108px; height: 108px; }
 }
 
-/* Soporte para usuarios que prefieren menos animación */
+/* Menos animación si el usuario lo pide */
 @media (prefers-reduced-motion: reduce){
   .team-card,
   .team-card:hover{ transition: none; transform: none; }
