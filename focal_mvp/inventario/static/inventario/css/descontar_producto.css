@@ -1,546 +1,189 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos para Descontar Producto
+   FOCAL – Descontar Producto: Estilos 100% responsivos
+   Archivo: descontar_producto.css
    ========================================================================== */
 
-/* 1. Variables y Configuración Base
-   -------------------------------------------------------------------------- */
-:root {
-  /* --- Colores de la Empresa --- */
-  --primary-purple: #4A008B; /* Morado Oscuro / Principal */
-  --secondary-purple: #7B1FA2; /* Morado Intermedio / Degradado */
-  --light-purple: #F3E8FF; /* Morado Claro / Accent (usado para fondos sutiles o texto sobre oscuro) */
-  --dark-text: #343A40; /* Gris Oscuro para texto principal */
-  --muted-text: #555555; /* Gris para texto secundario */
-  --white: #FFFFFF; /* Blanco */
-  --header-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer (nombre unificado) */
-  --hover-dark-purple: #38006B; /* Tono más oscuro para hover de botones */
-  --hover-light-purple: #E0B3FF; /* Morado claro para hover de enlaces */
-  
-  --border-color: #dee2e6;
-  --shadow-light: rgba(0, 0, 0, 0.08);
-  --shadow-medium: rgba(0, 0, 0, 0.15);
-  --shadow-dark: rgba(0, 0, 0, 0.3);
-  --danger-color: #dc3545; /* Rojo para mensajes de error/peligro */
-  --success-color: #28a745; /* Verde para mensajes de éxito */
-  --info-color: #17a2b8; /* Azul para mensajes de información */
-  --warning-color: #ffc107; /* Amarillo para mensajes de advertencia */
+/* 1) Variables de marca ---------------------------------------------------- */
+:root{
+  --primary-purple:#4A008B;
+  --secondary-purple:#7B1FA2;
+  --light-purple-bg:#f7f5fa;
+  --hover-dark-purple:#38006B;
+  --white:#FFFFFF;
+  --dark-text:#212529;
+  --muted-text:#6c757d;
+  --border-color:#e0e0e0;
+  --focus-shadow:rgba(74,0,139,.25);
+  --danger:#d32f2f;
 
-  /* --- Colores de estado para las filas de la tabla --- */
-  --danger-bg: #ffebee;   /* Rojo muy claro para 'vencido' */
-  --warning-bg: #fffde7;  /* Amarillo muy claro para 'proximo-vencer' */
-  --info-bg: #e3f2fd;     /* Azul muy claro para 'stock-bajo' */
-  
-  /* --- Definiciones de fuentes personalizadas --- */
-  --font-primary: 'InterTight', Arial, sans-serif; /* Para títulos y botones */
-  --font-secondary: 'HankenGrotesk', Arial, sans-serif; /* Para párrafos y contenido */
+  --shadow-1:0 6px 18px rgba(0,0,0,.08);
+  --shadow-2:0 10px 26px rgba(0,0,0,.12);
+
+  --font-primary:'InterTight', Arial, sans-serif;
+  --font-secondary:'HankenGrotesk', Arial, sans-serif;
 }
 
-/* --- Definiciones de fuentes personalizadas --- */
-/* InterTight – títulos y botones */
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
+/* 2) Base ------------------------------------------------------------------ */
+*,
+*::before,
+*::after{ box-sizing:border-box }
+
+@font-face{font-family:'InterTight';src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');font-weight:700}
+@font-face{font-family:'HankenGrotesk';src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');font-weight:400}
+
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  background:var(--light-purple-bg);
+  color:var(--dark-text);
+  line-height:1.6;
+  font-family:var(--font-secondary);
 }
 
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+.container{ width:min(1200px,92%); margin-inline:auto }
+
+/* 3) Header / navbar (mismo estilo que Inventario) ------------------------ */
+.app-header{
+  background:var(--primary-purple);
+  color:#fff;
+  position:sticky; top:0; z-index:10;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+.app-header nav.container{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.9rem 0; gap:.75rem;
+}
+.app-header .logo{
+  color:#fff; text-decoration:none;
+  font-family:var(--font-primary); font-weight:800;
+  letter-spacing:-.02em; font-size:1.5rem;
+}
+.nav-links{
+  list-style:none; display:flex; flex-wrap:wrap;
+  gap:.5rem .75rem; margin:0; padding:0;
+}
+/* Botones idénticos a Inventario */
+.nav-links a{
+  display:inline-block;
+  padding:.55rem .9rem;
+  border-radius:10px;
+  border:2px solid rgba(255,255,255,.25);
+  color:#fff; text-decoration:none;
+  font-family:var(--font-primary); font-weight:800; letter-spacing:.02em;
+  transition:background .2s ease, transform .15s ease, border-color .2s ease;
+}
+.nav-links a:hover{
+  background:rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.45);
+  transform:translateY(-1px);
 }
 
-/* HankenGrotesk – párrafos y contenido */
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
+/* 4) Main / tarjetas ------------------------------------------------------- */
+main{ flex:1; padding:2rem 0 3rem 0 }
+
+h1{
+  font-family:var(--font-primary);
+  font-weight:800;
+  font-size:clamp(1.6rem, 3vw, 2.2rem);
+  text-align:center; color:var(--dark-text);
+  letter-spacing:-.01em; margin:.3rem 0 1rem;
 }
 
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+.form-wrapper{ display:flex; justify-content:center }
+.form-card{
+  width:min(640px,100%);
+  background:#fff; border-radius:20px;
+  padding:clamp(1.5rem, 3.5vw, 2rem);
+  box-shadow:var(--shadow-1);
+}
+.form-card p{ color:var(--muted-text); text-align:center; margin:0 0 1.2rem }
+
+/* 5) Alertas (mensajes Django) -------------------------------------------- */
+.alert{ position:relative; padding:1rem; border:1px solid transparent; border-radius:12px; margin-bottom:1rem }
+.alert-success{ color:#155724; background:#d4edda; border-color:#c3e6cb }
+.alert-info{ color:#0c5460; background:#d1ecf1; border-color:#bee5eb }
+.alert-warning{ color:#856404; background:#fff3cd; border-color:#ffeaa7 }
+.alert-danger,.alert-error{ color:#721c24; background:#f8d7da; border-color:#f5c6cb }
+.alert-close{ position:absolute; top:.25rem; right:.25rem; background:transparent; border:0; cursor:pointer; opacity:.6 }
+.alert-close:hover{ opacity:.85 }
+
+/* 6) Formulario ------------------------------------------------------------ */
+#descontar-form{ width:100% }
+
+.form-grid-2cols{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:1rem 1.5rem;
+}
+.form-group{ display:flex; flex-direction:column; gap:.35rem }
+.form-group label{ color:var(--muted-text); font-weight:600; font-size:.92rem }
+
+.form-control{
+  width:100%; padding:.85rem 1rem;
+  border:1px solid var(--border-color); border-radius:10px;
+  background:#fdfdff; font:inherit;
+  transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.form-control:focus{
+  outline:none; border-color:var(--primary-purple);
+  box-shadow:0 0 0 4px var(--focus-shadow); background:#fff;
+}
+.form-control:disabled{ background:#f5f6f8; color:#9aa0a6 }
+
+/* campo help / error */
+.form-text{ font-size:.85rem; color:var(--muted-text) }
+.error-message{ color:var(--danger); font-size:.85rem }
+
+/* 7) Acciones -------------------------------------------------------------- */
+.form-actions{
+  display:flex; justify-content:center; gap:.8rem; flex-wrap:wrap;
+  margin-top:1.2rem;
+}
+.btn{
+  display:inline-block; text-decoration:none; text-align:center; cursor:pointer;
+  padding:.9rem 1.5rem; border-radius:10px; border:2px solid transparent;
+  font-family:var(--font-primary); font-weight:800; letter-spacing:.02em;
+  transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  min-width:180px;
+}
+.btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow-1) }
+.btn-submit{ background:var(--primary-purple); color:#fff; border-color:var(--primary-purple) }
+.btn-submit:hover{ background:var(--hover-dark-purple); border-color:var(--hover-dark-purple) }
+.btn-cancel{ background:#fff; color:var(--muted-text); border-color:var(--border-color) }
+.btn-cancel:hover{ background:#f3f4f6; color:var(--dark-text); border-color:#cfd4da }
+
+/* 8) Footer --------------------------------------------------------------- */
+.app-footer{
+  background:var(--primary-purple);
+  color:#fff; text-align:center;
+  padding:1.2rem 0; margin-top:auto; font-size:.95rem;
+}
+.app-footer p{ margin:0 }
+
+/* 9) Responsividad --------------------------------------------------------- */
+@media (max-width: 992px){
+  .form-grid-2cols{ gap:.9rem 1.2rem }
 }
 
-/* --- Estilos Generales del Documento --- */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+@media (max-width: 768px){
+  .app-header nav.container{ width:94% }
+  .nav-links{ gap:.5rem }
+  .nav-links a{ padding:.5rem .72rem } /* botones navbar compactos en móvil */
+
+  .form-card{ border-radius:16px; padding:1.25rem }
+  .form-grid-2cols{ grid-template-columns:1fr }
+  .form-actions{ flex-direction:column-reverse; gap:.6rem }
+  .form-actions .btn{ width:100% }
 }
 
-body {
-    font-family: var(--font-secondary);
-    font-weight: 300;
-    color: var(--dark-text);
-    background-color: #f8f9fa; /* Fondo suave */
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+@media (max-width: 380px){
+  .app-header .logo{ font-size:1.35rem }
+  .nav-links a{ font-size:.92rem }
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-/* --- Encabezado --- */
-.app-header {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.app-header nav.container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-.app-header .logo {
-  color: var(--white);
-  font-family: var(--font-primary);
-  font-size: 1.5rem;
-  text-decoration: none;
-  font-weight: 700;
-}
-.app-header .nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
-    gap: 0.5rem 1rem;
-}
-.app-header .nav-links a {
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-.app-header .nav-links a:hover {
-    background-color: rgba(255,255,255,0.1);
-}
-
-/* --- Contenido Principal --- */
-main {
-    flex: 1; 
-    padding: 2rem 0 4rem 0; 
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 90%;
-}
-
-h1 {
-    font-family: var(--font-primary);
-    font-weight: 700;
-    font-size: 2.2rem;
-    color: var(--primary-purple);
-    margin-bottom: 1rem;
-    text-align: center;
-}
-
-/* --- Tarjeta del Formulario --- */
-.form-wrapper {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.form-card {
-    background-color: var(--white);
-    border-radius: 12px;
-    box-shadow: 0 8px 25px var(--shadow-light);
-    padding: 2rem;
-    width: 100%;
-    max-width: 600px;
-}
-
-.form-card h1 {
-    font-family: var(--font-primary);
-    font-weight: 700;
-    font-size: 2rem;
-    color: var(--primary-purple);
-    margin-bottom: 1rem;
-    text-align: center;
-}
-
-.form-card p {
-    text-align: center;
-    color: var(--muted-text);
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-
-/* --- Mensajes de Django (Alertas) --- */
-.alert {
-    position: relative;
-    padding: 1rem 1rem;
-    margin-bottom: 1rem;
-    border: 1px solid transparent;
-    border-radius: 0.375rem;
-}
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-.alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
-}
-.alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeaa7;
-}
-.alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-}
-.alert-error {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-}
-.alert-close {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 2;
-    padding: 1.25rem 1rem;
-    color: inherit;
-    background: transparent;
-    border: 0;
-    opacity: 0.5;
-    cursor: pointer;
-}
-.alert-close:hover {
-    opacity: 0.75;
-}
-
-/* ==========================================================================
-   2. Estilos para el Formulario de Descontar Producto
-   ========================================================================== */
-#descontar-form {
-    width: 100%;
-}
-
-.form-grid-2cols {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    font-family: var(--font-primary);
-    font-weight: 700;
-    color: var(--muted-text);
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-family: var(--font-secondary);
-    font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--primary-purple);
-    box-shadow: 0 0 0 0.25rem rgba(74, 0, 139, 0.25);
-}
-
-.form-control:disabled {
-    background-color: #e9ecef;
-    opacity: 1;
-}
-
-/* --- Mensajes de Error de Campo --- */
-.error-message {
-    color: var(--danger-color);
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-    font-weight: bold;
-}
-
-.form-text {
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-}
-
-.text-muted {
-    color: var(--muted-text);
-}
-
-/* --- Acciones del Formulario --- */
-.form-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 2rem;
-}
-
-.btn {
-    display: inline-block;
-    padding: 0.8rem 1.5rem;
-    margin: 2px 0;
-    font-family: var(--font-primary);
-    font-weight: 700;
-    font-size: 1rem;
-    text-align: center;
-    text-decoration: none;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 120px;
-}
-
-/* Botón Cancelar */
-.btn-cancel {
-    background-color: var(--muted-text);
-    color: var(--white);
-}
-
-.btn-cancel:hover {
-    background-color: #3d3d3d;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-medium);
-}
-
-/* Botón Submit */
-.btn-submit {
-    background-color: var(--primary-purple);
-    color: var(--white);
-}
-
-.btn-submit:hover {
-    background-color: var(--hover-dark-purple);
-    border-color: var(--hover-dark-purple);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-medium);
-}
-
-/* --- Pie de Página --- */
-.app-footer {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  text-align: center;
-  padding: 1.5rem;
-  margin-top: auto;
-  font-size: 0.9rem;
-}
-
-/* ==========================================================================
-   3. Media Queries para Responsividad
-   ========================================================================== */
-
-/* Para tablets */
-@media (max-width: 768px) {
-    .container, main, .form-card {
-        width: 95%;
-    }
-
-    h1 {
-        font-size: 1.8rem;
-    }
-
-    .form-card {
-        padding: 1.5rem;
-    }
-
-    .form-grid-2cols {
-        grid-template-columns: 1fr;
-        gap: 1.2rem;
-    }
-
-    .form-group label {
-        font-size: 0.9rem;
-    }
-
-    .form-control {
-        font-size: 0.95rem;
-        padding: 0.7rem;
-    }
-
-    .form-actions {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .btn {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .nav-bar {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem 0;
-    }
-
-    .logo {
-        font-size: 1.6rem;
-    }
-
-    .nav-links {
-        margin-top: 0.5rem;
-    }
-
-    .nav-links li {
-        margin: 0 10px;
-    }
-
-    .app-footer {
-        font-size: 0.85rem;
-        padding: 1.2rem 0;
-    }
-}
-
-/* Para móviles medianos */
-@media (max-width: 576px) {
-    main {
-        padding: 1.5rem 0 3rem 0;
-        margin: 1.5rem auto;
-    }
-
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    .form-card {
-        padding: 1.2rem;
-    }
-
-    .form-grid-2cols {
-        gap: 1rem;
-    }
-
-    .form-group label {
-        font-size: 0.85rem;
-    }
-
-    .form-control {
-        font-size: 0.9rem;
-        padding: 0.6rem;
-    }
-
-    .error-message, .form-text {
-        font-size: 0.8rem;
-    }
-
-    .btn {
-        padding: 0.7rem 1.2rem;
-        font-size: 0.9rem;
-        min-width: 100px;
-    }
-
-    .nav-bar {
-        padding: 0.8rem 0;
-    }
-
-    .logo {
-        font-size: 1.4rem;
-    }
-
-    .nav-links li {
-        margin: 3px;
-    }
-
-    .nav-links a {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.6rem;
-    }
-
-    .app-footer {
-        font-size: 0.8rem;
-        padding: 1rem 0;
-    }
-}
-
-/* Para móviles pequeños */
-@media (max-width: 400px) {
-    .container, main, .form-card {
-        width: 98%;
-        padding: 0 10px;
-    }
-
-    .nav-bar {
-        padding: 0.8rem 0;
-    }
-
-    .logo {
-        font-size: 1.4rem;
-    }
-
-    .nav-links li {
-        margin: 3px;
-    }
-
-    .nav-links a {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.6rem;
-    }
-
-    h1 {
-        font-size: 1.4rem;
-    }
-
-    .form-card {
-        padding: 1rem;
-    }
-
-    .form-grid-2cols {
-        gap: 0.8rem;
-    }
-
-    .form-group label {
-        font-size: 0.8rem;
-    }
-
-    .form-control {
-        font-size: 0.85rem;
-        padding: 0.5rem;
-    }
-
-    .error-message, .form-text {
-        font-size: 0.75rem;
-    }
-
-    .btn {
-        padding: 0.6rem 1rem;
-        font-size: 0.85rem;
-        min-width: 80px;
-    }
-
-    .app-footer {
-        font-size: 0.75rem;
-        padding: 0.8rem 0;
-    }
+/* 10) Preferencias de usuario --------------------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  .btn, .nav-links a, .form-control{ transition:none }
 }

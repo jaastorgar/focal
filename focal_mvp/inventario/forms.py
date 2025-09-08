@@ -269,48 +269,24 @@ class LoteProductoForm(forms.ModelForm):
 class ProveedorForm(forms.ModelForm):
     class Meta:
         model = Proveedor
-        exclude = ('lotes',)
-
-    widgets = {
-        'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-        'razon_social': forms.TextInput(attrs={'class': 'form-control'}),
-        'rut': forms.TextInput(attrs={'class': 'form-control'}),
-        'contacto': forms.TextInput(attrs={'class': 'form-control'}),
-        'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-        'email': forms.EmailInput(attrs={'class': 'form-control'}),
-        'direccion': forms.TextInput(attrs={'class': 'form-control'}),
-        'region': forms.Select(attrs={'class': 'form-select'}),
-        'comuna': forms.Select(attrs={'class': 'form-select'}),
-    }
+        # Dejamos únicamente los campos que quieres usar en el formulario
+        fields = ['nombre', 'razon_social', 'rut', 'contacto', 'telefono', 'email']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre comercial'}),
+            'razon_social': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Razón social'}),
+            'rut': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '76.123.456-K'}),
+            'contacto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Persona de contacto'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+56912345678'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'proveedor@correo.com'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
-            if field_name not in ['region', 'comuna']:
-                field.widget.attrs['class'] = 'form-control'
-
-        # Cargar regiones
-        self.fields['region'].choices = [('', 'Seleccione la región')] + [(r, r) for r in REGIONES_COMUNAS.keys()]
-
-        # Cargar comunas según región (para edición)
-        if not self.data.get('region'):
-            self.fields['comuna'].choices = [('', 'Primero seleccione una región')]
-        else:
-            region = self.data.get('region')
-            comunas = REGIONES_COMUNAS.get(region, [])
-            self.fields['comuna'].choices = [('', 'Seleccione la comuna')] + list(comunas)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        region = cleaned_data.get('region')
-        comuna = cleaned_data.get('comuna')
-
-        if region and comuna:
-            if comuna not in dict(REGIONES_COMUNAS.get(region, [])):
-                raise forms.ValidationError("La comuna seleccionada no pertenece a la región elegida.")
-        elif region and not comuna:
-            raise forms.ValidationError("Debe seleccionar una comuna de la región.")
-        return cleaned_data
+        # Asegura clases en caso de que cambien widgets a futuro
+        for field in self.fields.values():
+            css = field.widget.attrs.get('class', '')
+            if 'form-control' not in css:
+                field.widget.attrs['class'] = (css + ' form-control').strip()
 
 class RecordatorioForm(forms.ModelForm):
     class Meta:

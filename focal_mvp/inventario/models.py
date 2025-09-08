@@ -534,9 +534,6 @@ class Proveedor(models.Model):
     contacto = models.CharField(max_length=100, blank=True, null=True, help_text="Nombre del contacto principal")
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    comuna = models.CharField(max_length=100, choices=COMUNA_CHOICES, blank=True, null=True)
-    region = models.CharField(max_length=100, choices=REGION_CHOICES, blank=True, null=True)
     creado = models.DateTimeField(auto_now_add=True)
     modificado = models.DateTimeField(auto_now=True)
 

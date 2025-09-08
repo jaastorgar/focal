@@ -2,129 +2,129 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionar Proveedores y Precios | FOCAL</title>
-    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/gestionar_proveedores_precios.css' %}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestionar Proveedores y Precios | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/gestionar_proveedores_precios.css' %}">
 </head>
 <body>
 
-<header class="app-header">
+  <!-- NAVBAR (se mantiene) -->
+  <header class="app-header">
     <nav class="container">
-        <a href="{% url 'home' %}" class="logo">FOCAL</a>
-        <ul class="nav-links">
-            <li><a href="{% url 'home' %}">Inicio</a></li>
-            <li><a href="{% url 'inventario' %}">Inventario</a></li>
-        </ul>
+      <a href="{% url 'home' %}" class="logo">FOCAL</a>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Inicio</a></li>
+        <li><a href="{% url 'inventario' %}">Inventario</a></li>
+      </ul>
     </nav>
-</header>
+  </header>
 
-<main class="container">
-    <h1>Gestionar Proveedores y Precios</h1>
+  <main class="container">
 
-    <!-- === Sección de Búsqueda por SKU === -->
-    <section class="sku-search-section">
-        <div class="search-container">
-            <h2>Buscar Producto por SKU</h2>
-            <form id="sku-search-form" action="{% url 'gestionar_proveedores_precios' %}" method="GET">
-                <label for="id_sku_busqueda">Ingresa o Escanea el SKU:</label>
-                <input type="text" id="id_sku_busqueda" name="sku" class="form-control" placeholder="Ej: 1234567890123" autofocus>
-                <button type="submit" class="btn btn-primary mt-2">Buscar Producto</button>
-            </form>
-            <div id="sku-validation-message" class="validation-message mt-2"></div>
+    <!-- Título de página -->
+    <header class="page-head">
+      <h1>Gestionar Proveedores y Precios</h1>
+      <p class="section-note">Busca un producto por SKU para gestionar sus lotes y precios por proveedor.</p>
+    </header>
+
+    <!-- TOOLBELT: Búsqueda por SKU -->
+    <section class="toolbelt card">
+      <div class="toolbelt-grid">
+        <div class="tool-text">
+          <h2>Buscar por SKU</h2>
+          <p class="muted">Escanea o ingresa el SKU de tu producto.</p>
         </div>
+
+        <form id="sku-search-form"
+              action="{% url 'gestionar_proveedores_precios' %}"
+              method="GET"
+              class="sku-form">
+          <label for="id_sku_busqueda" class="sr-only">SKU</label>
+          <input id="id_sku_busqueda" name="sku" type="text"
+                 placeholder="Ej: 7801234567890" autocomplete="off" autofocus>
+          <button class="btn btn-primary" type="submit">Buscar Producto</button>
+        </form>
+      </div>
+      <div id="sku-validation-message" class="validation-message"></div>
     </section>
-    <!-- =================================== -->
 
     {% if producto %}
-    <section class="product-info-section">
-        <h2>Producto: {{ producto.nombre }} (SKU: {{ producto.sku }})</h2>
-        
-        <div class="base-info-grid">
-            <div class="info-item">
-                <span class="info-label">Marca:</span>
-                <span class="info-value">{{ producto.marca|default:"N/A" }}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Categoría:</span>
-                <span class="info-value">{{ producto.get_categoria_display|default:"N/A" }}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Gramaje:</span>
-                <span class="info-value">{{ producto.dramage|default:"N/A" }}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Unidad de Medida:</span>
-                <span class="info-value">{{ producto.unidad_medida|default:"N/A" }}</span>
-            </div>
+      <!-- Resumen compacto del producto (solo nombre y SKU) -->
+      <section class="product-summary card">
+        <div class="summary-grid">
+          <h3 class="product-title">{{ producto.nombre }}</h3>
+          <span class="sku-pill">SKU: {{ producto.sku }}</span>
+          <a class="btn btn-secondary btn-sm" href="{% url 'detalle_producto' producto.id %}">
+            Ver detalle
+          </a>
         </div>
-    </section>
+      </section>
 
-    <section class="lotes-proveedores">
-        <div class="section-header d-flex justify-content-between align-items-center">
-            <h3>Lotes y Precios por Proveedor</h3>
-            <div class="actions">
-                <a href="{% url 'agregar_proveedor' %}" class="btn btn-primary">Agregar Nuevo Proveedor</a>
-                <a href="{% url 'agregar_lote' %}" class="btn btn-primary">Agregar Nuevo Lote</a>
-            </div>
+      <!-- Panel de lotes & proveedores -->
+      <section class="panel card">
+        <div class="panel-head">
+          <h3>Lotes y Precios por Proveedor</h3>
+          <div class="panel-actions">
+            <a href="{% url 'agregar_proveedor' %}" class="btn btn-primary">Agregar Proveedor</a>
+            <a href="{% url 'agregar_lote' %}" class="btn btn-primary">Agregar Lote</a>
+          </div>
         </div>
 
         {% if lotes %}
-            <div class="table-container">
-                <table class="tabla-inventario">
-                    <thead>
-                        <tr>
-                            <th>ID Lote</th>
-                            <th>Fecha Vencimiento</th>
-                            <th>Cantidad</th>
-                            <th>Proveedor</th>
-                            <th>Precio Compra</th>
-                            <th>Precio Venta</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lote in lotes %}
-                            <tr>
-                                <td>{{ lote.id }}</td>
-                                <td>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
-                                <td>{{ lote.cantidad }}</td>
-                                <td>{{ lote.proveedor.nombre|default:"No especificado" }}</td>
-                                <td>${{ lote.precio_compra|floatformat:0 }}</td>
-                                <td>${{ lote.precio_venta|floatformat:0 }}</td>
-                                <td class="acciones">
-                                    <a href="{% url 'editar_lote' lote.id %}" class="btn btn-secondary btn-sm">Editar</a>
-                                    <a href="{% url 'eliminar_lote' lote.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+          <div class="table-container">
+            <table class="tabla-inventario">
+              <thead>
+                <tr>
+                  <th>ID Lote</th>
+                  <th>Vencimiento</th>
+                  <th>Cantidad</th>
+                  <th>Proveedor</th>
+                  <th>Precio Compra</th>
+                  <th>Precio Venta</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for lote in lotes %}
+                <tr>
+                  <td>{{ lote.id }}</td>
+                  <td>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
+                  <td>{{ lote.cantidad }}</td>
+                  <td>{{ lote.proveedor.nombre|default:"No especificado" }}</td>
+                  <td>${{ lote.precio_compra|floatformat:0 }}</td>
+                  <td>${{ lote.precio_venta|floatformat:0 }}</td>
+                  <td class="acciones">
+                    <a href="{% url 'editar_lote' lote.id %}" class="btn btn-secondary btn-sm">Editar</a>
+                    <a href="{% url 'eliminar_lote' lote.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
         {% else %}
-            <p class="sin-lotes">No hay lotes registrados para este producto.</p>
+          <p class="empty-hint">No hay lotes registrados para este producto.</p>
         {% endif %}
-    </section>
+      </section>
 
-    <div class="footer-actions">
-        <a href="{% url 'inventario' %}" class="btn btn-secondary">Volver al Inventario</a>
-        <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-primary">Ver Detalle del Producto</a>
-    </div>
     {% else %}
-    <div class="alert alert-info" role="alert">
-        <h4 class="alert-heading">Producto no especificado</h4>
-        <p>No se ha cargado un producto para gestionar. Esto puede deberse a que se accedió directamente a la URL sin seleccionar un producto primero.</p>
+      <!-- Estado vacío -->
+      <section class="empty card">
+        <h3 class="empty-title">Producto no especificado</h3>
+        <p class="empty-text">Aún no has cargado un producto. Ingresa o escanea un SKU, o vuelve al inventario.</p>
         <a href="{% url 'inventario' %}" class="btn btn-primary">Ir al Inventario</a>
-    </div>
+      </section>
     {% endif %}
-</main>
 
-<footer class="app-footer">
+  </main>
+
+  <!-- FOOTER (se mantiene) -->
+  <footer class="app-footer">
     <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
-</footer>
+  </footer>
 
-<script src="{% static 'inventario/js/gestionar_proveedores_precios.js' %}" defer></script>
-
+  <script src="{% static 'inventario/js/gestionar_proveedores_precios.js' %}" defer></script>
 </body>
 </html>

@@ -1,210 +1,226 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos Maestra para Páginas de Confirmación
+   FOCAL — Confirmación (Eliminar / Éxito / Avisos)
+   Responsivo (móvil/tablet/desktop) + botón “Eliminar” rojo
    ========================================================================== */
 
-/* 1. Variables y Configuración Base
-   -------------------------------------------------------------------------- */
-:root {
-  --primary-purple: #4A008B;
-  --danger: #d32f2f;
-  --danger-dark: #c62828;
-  --danger-light-bg: #ffebee;
-  --light-purple: #f8f0ff;
-  --white: #FFFFFF;
-  --dark-text: #212529;
-  --muted-text: #6c757d;
-  --border-color: #dee2e6;
-  --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.09);
-  
-  --font-primary: 'InterTight', sans-serif;
-  --font-secondary: 'HankenGrotesk', sans-serif;
+/* 1) Variables de marca */
+:root{
+  --primary-purple:#4A008B;          /* barra superior / botones primarios */
+  --primary-purple-600:#3B0071;       /* hover primario */
+  --surface:#FFFFFF;                  /* tarjetas */
+  --page:#F3E8FF;                     /* fondo */
+  --ink:#212529;                      /* texto principal */
+  --muted:#6C757D;                    /* texto secundario */
+  --border:#DEE2E6;
+
+  --danger:#D32F2F;                   /* rojo principal */
+  --danger-700:#C62828;               /* rojo hover */
+  --danger-bg:#FFEBEE;                /* fondo advertencia */
+
+  --r-xxl:16px; --r-lg:12px; --r-md:10px;
+  --sh-sm:0 2px 8px rgba(0,0,0,.06);
+  --sh-md:0 8px 24px rgba(0,0,0,.12);
+
+  --font-primary:'InterTight', Arial, sans-serif;
+  --font-secondary:'HankenGrotesk', Arial, sans-serif;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+/* 2) Reset */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; min-height:100dvh;
+  display:flex; flex-direction:column;
+  background:var(--page); color:var(--ink);
+  font-family:var(--font-secondary); line-height:1.6;
 }
 
-@font-face {
-  font-family: 'InterTight';
-  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight: 700;
+/* 3) (Opcional) fuentes locales si existen en /static/... */
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight:700; font-style:normal; font-display:swap;
 }
-@font-face {
-  font-family: 'HankenGrotesk';
-  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight: 400;
-}
-
-body {
-  font-family: var(--font-secondary);
-  background-color: var(--light-purple);
-  color: var(--dark-text);
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight:400; font-style:normal; font-display:swap;
 }
 
-/* 2. Componentes Comunes (Header y Footer)
-   -------------------------------------------------------------------------- */
-.app-header {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* 4) Navbar (mismo estilo de la app) */
+.app-header{background:var(--primary-purple); color:#fff; box-shadow:var(--sh-sm)}
+.app-header nav{
+  max-width:1200px; margin-inline:auto; padding:14px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
 }
-.app-header nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
+.app-header .logo{
+  color:#fff; text-decoration:none; font-weight:800; letter-spacing:.2px;
+  font-family:var(--font-primary);
+  font-size:clamp(1.25rem,1vw+1rem,1.5rem);
 }
-.app-header .logo {
-  color: var(--white);
-  font-family: var(--font-primary);
-  font-size: 1.5rem;
-  text-decoration: none;
-  font-weight: 700;
+.app-header .nav-links{
+  list-style:none; display:flex; gap:12px; margin:0; padding:0;
+  flex-wrap:wrap; /* para tablets estrechas */
 }
-.app-header .nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    gap: 1.5rem;
+.app-header .nav-links a{
+  --py:.55rem; --px:1.05rem;
+  display:inline-block; padding:var(--py) var(--px);
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:999px; background:rgba(255,255,255,.08);
+  color:#fff; text-decoration:none; font-weight:800; font-family:var(--font-primary);
+  transition:background .18s ease, transform .18s ease, border-color .18s ease;
 }
-.app-header .nav-links a {
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s;
-}
-.app-header .nav-links a:hover {
-    color: #d1c4e9;
+.app-header .nav-links a:hover{
+  background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.34);
+  transform:translateY(-1px);
 }
 
-.app-footer {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  text-align: center;
-  padding: 1.5rem;
-  margin-top: auto;
-  font-size: 0.9rem;
+/* 5) Contenedor principal */
+main.confirmation-container{
+  width:min(100%, 720px);
+  margin:clamp(14px,5vw,28px) auto;
+  background:var(--surface); border-radius:var(--r-xxl);
+  box-shadow:var(--sh-md);
+  padding:clamp(16px,4vw,28px);
+}
+main.confirmation-container h1{
+  margin:0 0 .5rem 0; font-family:var(--font-primary); font-weight:800;
+  letter-spacing:.2px; color:var(--danger);
+  font-size:clamp(1.4rem,1.1rem + 1.4vw,2.1rem);
+}
+main.confirmation-container p{
+  margin:.25rem 0 1rem; color:var(--muted);
+  font-size:clamp(.95rem,.9rem + .25vw,1.05rem);
 }
 
-/* 3. Contenedor Principal de Confirmación
-   -------------------------------------------------------------------------- */
-main.confirmation-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 3rem auto;
-  padding: 2.5rem;
-  background-color: var(--white);
-  border-radius: 16px;
-  box-shadow: var(--box-shadow);
-  text-align: center;
+/* Tarjeta de detalle/advertencia */
+.details-card{
+  margin:1.1rem 0 1.5rem; padding:1rem 1.1rem;
+  background:var(--danger-bg); border-left:4px solid var(--danger);
+  border-radius:var(--r-lg); color:var(--ink);
+}
+.details-card p{margin:.35rem 0}
+.details-card strong{color:var(--danger-700)}
+.warning-text{margin:1.1rem 0; font-weight:800; color:var(--danger-700)}
+
+/* 6) Botones — diseño consistente + variantes */
+.actions, .delete-form-actions{
+  display:flex; gap:.8rem; justify-content:center; align-items:center; flex-wrap:wrap;
+  margin-top:1.15rem;
+}
+.btn, .btn-accion{
+  --py:.78rem; --px:1.25rem;
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  padding:var(--py) var(--px);
+  border-radius:10px; border:1px solid transparent; cursor:pointer;
+  text-decoration:none; font-family:var(--font-primary); font-weight:800; letter-spacing:.2px;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+}
+.btn:hover, .btn-accion:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.btn:active, .btn-accion:active{transform:none; box-shadow:none}
+
+.btn-primary{background:var(--primary-purple); border-color:var(--primary-purple); color:#fff}
+.btn-primary:hover{background:var(--primary-purple-600); border-color:var(--primary-purple-600)}
+.btn-primary:focus-visible{outline:3px solid rgba(74,0,139,.35); outline-offset:2px}
+
+.btn-secondary, .btn-secundario{background:#F8F9FA; color:#2D2D2D; border-color:#DBE1E6}
+.btn-secondary:hover, .btn-secundario:hover{background:#ECEFF2; border-color:#CED6DD}
+.btn-secondary:focus-visible, .btn-secundario:focus-visible{outline:3px solid rgba(0,0,0,.15); outline-offset:2px}
+
+/* === Danger: fuerza el rojo para múltiples nombres y casos sin clase === */
+.btn-danger,
+.btn-peligro,
+.btn.danger,
+.btn--danger,
+button.delete,
+button.confirm-delete,
+.delete-btn,
+.confirm-delete,
+.action-danger,
+form.delete-form button[type="submit"],
+form[action*="eliminar" i] button[type="submit"],
+form[action*="eliminar" i] input[type="submit"],
+button[name*="eliminar" i],
+button[value*="eliminar" i],
+input[type="submit"].btn-danger,
+input[type="submit"][value*="eliminar" i],
+input[type="submit"][value*="Eliminar" i],
+#confirm-delete,
+#btnEliminar{
+  background:var(--danger)!important;
+  border-color:var(--danger)!important;
+  color:#fff!important;
+}
+.btn-danger:hover,
+.btn-peligro:hover,
+.btn.danger:hover,
+.btn--danger:hover,
+button.delete:hover,
+button.confirm-delete:hover,
+.delete-btn:hover,
+.confirm-delete:hover,
+.action-danger:hover,
+form.delete-form button[type="submit"]:hover,
+form[action*="eliminar" i] button[type="submit"]:hover,
+form[action*="eliminar" i] input[type="submit"]:hover,
+button[name*="eliminar" i]:hover,
+button[value*="eliminar" i]:hover,
+input[type="submit"].btn-danger:hover,
+input[type="submit"][value*="eliminar" i]:hover,
+input[type="submit"][value*="Eliminar" i]:hover,
+#confirm-delete:hover,
+#btnEliminar:hover{
+  background:var(--danger-700)!important;
+  border-color:var(--danger-700)!important;
+}
+.btn-danger:focus-visible,
+.btn-peligro:focus-visible,
+#confirm-delete:focus-visible{outline:3px solid rgba(211,47,47,.35); outline-offset:2px}
+
+/* 7) Footer */
+.app-footer{
+  margin-top:auto; background:var(--primary-purple); color:#fff;
+  text-align:center; padding:18px 14px; font-size:.95rem;
 }
 
-main.confirmation-container h1 {
-  font-family: var(--font-primary);
-  font-size: 2rem;
-  color: var(--danger);
-  margin-top: 0;
-  margin-bottom: 1rem;
+/* 8) Inputs básicos dentro del main por si vienen sin clases */
+.confirmation-container input[type="text"],
+.confirmation-container input[type="search"],
+.confirmation-container input[type="number"],
+.confirmation-container input[type="date"],
+.confirmation-container select,
+.confirmation-container textarea{
+  width:100%; padding:.82rem .95rem; border:1px solid var(--border);
+  border-radius:10px; background:#fff; color:var(--ink); font:inherit;
 }
+.confirmation-container label{display:block; font-weight:700; margin:.35rem 0 .4rem}
 
-main.confirmation-container p {
-    color: var(--muted-text);
-    margin-bottom: 1.5rem;
+/* 9) Responsividad */
+@media (max-width: 1200px){
+  .app-header nav{padding:12px 16px}
 }
+@media (max-width: 1024px){
+  main.confirmation-container{width:min(96%, 760px)}
+}
+@media (max-width: 768px){
+  .app-header .nav-links{gap:8px}
+  .app-header .nav-links a{--py:.5rem; --px:.9rem; font-size:.95rem}
 
-/* 4. Tarjeta de Detalles y Texto de Advertencia
-   -------------------------------------------------------------------------- */
-.details-card {
-  background-color: var(--danger-light-bg);
-  border-left: 4px solid var(--danger);
-  padding: 1.5rem;
-  margin: 2rem 0;
-  border-radius: 8px;
-  text-align: left;
-}
-.details-card p {
-    margin: 0.5rem 0;
-    color: var(--dark-text);
-}
-.details-card strong {
-    color: var(--danger-dark);
-}
-
-.warning-text {
-  font-weight: 600;
-  color: var(--danger-dark);
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-/* 5. Botones de Acción
-   -------------------------------------------------------------------------- */
-.delete-form-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.btn-accion {
-  padding: 0.8rem 2rem;
-  border: 1px solid;
-  border-radius: 8px;
-  font-family: var(--font-primary);
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease-in-out;
-}
-.btn-accion:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.btn-peligro {
-  background-color: var(--danger);
-  border-color: var(--danger);
-  color: var(--white);
-}
-.btn-peligro:hover {
-  background-color: var(--danger-dark);
-  border-color: var(--danger-dark);
-}
-
-.btn-secundario {
-  background-color: #f8f9fa;
-  color: var(--muted-text);
-  border-color: #dee2e6;
-}
-.btn-secundario:hover {
-  background-color: #e9ecef;
-  border-color: #ced4da;
-}
-
-/* 6. Responsividad
-   -------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-  main.confirmation-container {
-    margin: 1rem;
-    padding: 1.5rem;
+  main.confirmation-container{
+    margin:14px auto 18px; padding:18px 16px; border-radius:14px; width:92%;
   }
-  main.confirmation-container h1 {
-    font-size: 1.8rem;
-  }
-  .delete-form-actions {
-    flex-direction: column-reverse; /* Apila botones en móvil */
-  }
-  .btn-accion {
-    width: 100%;
-  }
+  .details-card{padding:.95rem .9rem; margin:.9rem 0 1.2rem; border-radius:10px}
+  .actions,.delete-form-actions{flex-direction:column-reverse; align-items:stretch}
+  .btn, .btn-accion{width:100%}
+}
+@media (max-width: 420px){
+  .app-header .logo{font-size:1.2rem}
+  .app-header .nav-links a{font-size:.9rem; padding:.46rem .8rem}
+  main.confirmation-container h1{font-size:1.45rem}
+  .app-footer{font-size:.9rem}
+}
+
+/* 10) Accesibilidad – menos movimiento */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important;}
 }

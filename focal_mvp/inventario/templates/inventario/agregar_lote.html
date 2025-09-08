@@ -2,141 +2,136 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Lote | FOCAL</title>
-    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agregar Lote | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
-    <header class="app-header">
-        <nav class="container">
-            <a href="{% url 'home' %}" class="logo">FOCAL</a>
-            <ul class="nav-links">
-                <li><a href="{% url 'home' %}">Inicio</a></li>
-                <li><a href="{% url 'inventario' %}">Inventario</a></li>
-            </ul>
-        </nav>
-    </header>
+  <!-- NAVBAR -->
+  <header class="app-header">
+    <nav class="container">
+      <a href="{% url 'home' %}" class="logo">FOCAL</a>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Inicio</a></li>
+        <li><a href="{% url 'inventario' %}">Inventario</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <main class="form-wrapper">
-        <div class="form-card">
-            <h1>Registrar Lote de Producto</h1>
-            
-            <form method="post" id="lote-form">
-                {% csrf_token %}
-                
-                {% if form.non_field_errors %}
-                    <div class="alert-error">{{ form.non_field_errors|striptags }}</div>
-                {% endif %}
+  <!-- CONTENIDO -->
+  <main class="form-wrapper">
+    <div class="form-card">
+      <h1>Registrar Lote de Producto</h1>
 
-                <!-- Sección 1: Escaneo de Producto -->
-                <fieldset>
-                    <legend><strong>1. Identificación del Producto</strong></legend>
-                    
-                    <div class="form-group">
-                        <label for="id_codigo_barras">Escanea el Código de Barras (SKU)</label>
-                        <input type="text" id="id_codigo_barras" class="form-control" autofocus>
-                    </div>
+      <form method="post" id="lote-form" novalidate>
+        {% csrf_token %}
 
-                    <div class="form-group">
-                        <label for="id_nombre_producto">Nombre del Producto</label>
-                        <input type="text" id="id_nombre_producto" class="form-control" readonly disabled>
-                    </div>
+        {% if form.non_field_errors %}
+          <div class="alert-error">{{ form.non_field_errors|striptags }}</div>
+        {% endif %}
 
-                    <!-- Campo oculto para el ID de OfertaProducto -->
-                    <input type="hidden" name="producto" id="id_producto_id">
-                    
-                    <!-- Mostrar errores del campo producto si los hay -->
-                    {% if form.producto.errors %}
-                        <small class="error-message">{{ form.producto.errors|striptags }}</small>
-                    {% endif %}
-                </fieldset>
+        <!-- 1) IDENTIFICACIÓN DEL PRODUCTO -->
+        <fieldset>
+          <legend><strong>1. Identificación del Producto</strong></legend>
 
-                <hr>
+          <!-- Campo manual: Aseguramos id y for para evitar el warning del navegador -->
+          <div class="form-group" data-span="2">
+            <label for="id_codigo_barras">Escanea el Código de Barras (SKU)</label>
+            <input type="text" id="id_codigo_barras" class="form-control" autocomplete="off" inputmode="numeric" />
+          </div>
 
-                <!-- Sección 2: Detalles del Lote -->
-                <fieldset>
-                    <legend><strong>2. Detalles del Lote</strong></legend>
-                    
-                    <div class="form-grid">
-                        <!-- Campo de Cantidad -->
-                        <div class="form-group">
-                            <label for="{{ form.cantidad.id_for_label }}">{{ form.cantidad.label }}</label>
-                            {{ form.cantidad }}
-                            {% if form.cantidad.errors %}
-                                <small class="error-message">{{ form.cantidad.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
+          <div class="form-group" data-span="2">
+            <label for="id_nombre_producto">Nombre del Producto</label>
+            <input type="text" id="id_nombre_producto" class="form-control" readonly disabled />
+          </div>
 
-                        <!-- Campo de Proveedor -->
-                        <div class="form-group">
-                            <label for="{{ form.proveedor.id_for_label }}">{{ form.proveedor.label }}</label>
-                            {{ form.proveedor }}
-                            {% if form.proveedor.errors %}
-                                <small class="error-message">{{ form.proveedor.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
+          <!-- Campo oculto que enviamos al backend. No lleva <label> -->
+          <input type="hidden" name="producto" id="id_producto_id">
+          {% if form.producto.errors %}
+            <small class="error-message">{{ form.producto.errors|striptags }}</small>
+          {% endif %}
+        </fieldset>
 
-                        <!-- Campo de Precio de Compra -->
-                        <div class="form-group">
-                            <label for="{{ form.precio_compra.id_for_label }}">{{ form.precio_compra.label }}</label>
-                            {{ form.precio_compra }}
-                            {% if form.precio_compra.errors %}
-                                <small class="error-message">{{ form.precio_compra.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
+        <hr>
 
-                        <!-- Campo de Precio de Venta -->
-                        <div class="form-group">
-                            <label for="{{ form.precio_venta.id_for_label }}">{{ form.precio_venta.label }}</label>
-                            {{ form.precio_venta }}
-                            {% if form.precio_venta.errors %}
-                                <small class="error-message">{{ form.precio_venta.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
+        <!-- 2) DETALLES DEL LOTE -->
+        <fieldset>
+          <legend><strong>2. Detalles del Lote</strong></legend>
 
-                        <!-- Campo de Fecha de Vencimiento (Ocupa las 2 columnas) -->
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label for="{{ form.fecha_vencimiento.id_for_label }}">{{ form.fecha_vencimiento.label }}</label>
-                            {{ form.fecha_vencimiento }}
-                            {% if form.fecha_vencimiento.errors %}
-                                <small class="error-message">{{ form.fecha_vencimiento.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Campo de Número de Factura (Ocupa las 2 columnas) -->
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label for="{{ form.numero_factura.id_for_label }}">{{ form.numero_factura.label }}</label>
-                            {{ form.numero_factura }}
-                            {% if form.numero_factura.errors %}
-                                <small class="error-message">{{ form.numero_factura.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Campo de Lote del Proveedor (Ocupa las 2 columnas) -->
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label for="{{ form.lote_proveedor.id_for_label }}">{{ form.lote_proveedor.label }}</label>
-                            {{ form.lote_proveedor }}
-                            {% if form.lote_proveedor.errors %}
-                                <small class="error-message">{{ form.lote_proveedor.errors|striptags }}</small>
-                            {% endif %}
-                        </div>
-                    </div>
-                </fieldset>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="{{ form.cantidad.id_for_label }}">{{ form.cantidad.label }}</label>
+              {{ form.cantidad }}
+              {% if form.cantidad.errors %}
+                <small class="error-message">{{ form.cantidad.errors|striptags }}</small>
+              {% endif %}
+            </div>
 
-                <div class="form-actions">
-                    <a href="{% url 'gestionar_proveedores_precios' %}" class="btn btn-cancel" role="button">Cancelar</a>
-                    <button type="submit" class="btn btn-submit">Guardar Lote</button>
-                </div>
-            </form>
+            <div class="form-group">
+              <label for="{{ form.proveedor.id_for_label }}">{{ form.proveedor.label }}</label>
+              {{ form.proveedor }}
+              {% if form.proveedor.errors %}
+                <small class="error-message">{{ form.proveedor.errors|striptags }}</small>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.precio_compra.id_for_label }}">{{ form.precio_compra.label }}</label>
+              {{ form.precio_compra }}
+              {% if form.precio_compra.errors %}
+                <small class="error-message">{{ form.precio_compra.errors|striptags }}</small>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.precio_venta.id_for_label }}">{{ form.precio_venta.label }}</label>
+              {{ form.precio_venta }}
+              {% if form.precio_venta.errors %}
+                <small class="error-message">{{ form.precio_venta.errors|striptags }}</small>
+              {% endif %}
+            </div>
+
+            <div class="form-group" data-span="2">
+              <label for="{{ form.fecha_vencimiento.id_for_label }}">{{ form.fecha_vencimiento.label }}</label>
+              {{ form.fecha_vencimiento }}
+              {% if form.fecha_vencimiento.errors %}
+                <small class="error-message">{{ form.fecha_vencimiento.errors|striptags }}</small>
+              {% endif %}
+            </div>
+
+            <div class="form-group" data-span="2">
+              <label for="{{ form.numero_factura.id_for_label }}">{{ form.numero_factura.label }}</label>
+              {{ form.numero_factura }}
+              {% if form.numero_factura.errors %}
+                <small class="error-message">{{ form.numero_factura.errors|striptags }}</small>
+              {% endif %}
+            </div>
+
+            <div class="form-group" data-span="2">
+              <label for="{{ form.lote_proveedor.id_for_label }}">{{ form.lote_proveedor.label }}</label>
+              {{ form.lote_proveedor }}
+              {% if form.lote_proveedor.errors %}
+                <small class="error-message">{{ form.lote_proveedor.errors|striptags }}</small>
+              {% endif %}
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="form-actions">
+          <a href="{% url 'gestionar_proveedores_precios' %}" class="btn btn-secondary" role="button">Cancelar</a>
+          <button type="submit" class="btn btn-submit">Guardar Lote</button>
         </div>
-    </main>
+      </form>
+    </div>
+  </main>
 
-    <footer class="app-footer">
-        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
-    </footer>
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+  </footer>
 
-    <script src="{% static 'inventario/js/agregar_lote.js' %}"></script>
+  <script src="{% static 'inventario/js/agregar_lote.js' %}"></script>
 </body>
 </html>

@@ -97,7 +97,7 @@ class LoteProductoAdmin(admin.ModelAdmin):
 class ProveedorAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'rut', 'contacto', 'telefono', 'email')
     search_fields = ('nombre', 'rut', 'contacto')
-    list_filter = ('region',)
+    list_filter = ('nombre',)
 
 # --- Registros de Modelos Adicionales (sin cambios) ---
 admin.site.register(PlanSuscripcion)
