@@ -205,49 +205,47 @@ class LoteProductoForm(forms.ModelForm):
         widgets = {
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'precio_compra': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01',
-                'placeholder': '0.00'
+                'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'
             }),
             'precio_venta': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'step': '0.01',
-                'placeholder': '0.00'
+                'class': 'form-control', 'step': '0.01', 'placeholder': '0.00'
             }),
             'fecha_vencimiento': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
+                'class': 'form-control', 'type': 'date'
             }),
             'numero_factura': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Número de factura (opcional)'
+                'class': 'form-control', 'placeholder': 'Número de factura (opcional)'
             }),
             'proveedor': forms.Select(attrs={'class': 'form-select'}),
             'producto': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, **kwargs):
-        # === EXTRAER empresa_usuario de kwargs ===
+        # <-- importante para filtrar opciones por empresa
         self.empresa_usuario = kwargs.pop('empresa_usuario', None)
-        # =======================================
-        
         super().__init__(*args, **kwargs)
 
-        # Aplicar clases CSS a todos los campos si no están definidas en widgets
-        for field_name, field in self.fields.items():
+        # Asegura clases CSS en todos los campos de texto/numéricos
+        for name, field in self.fields.items():
             if not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
                 if 'class' not in field.widget.attrs:
                     field.widget.attrs['class'] = 'form-control'
 
-        # === FILTRAR LOS PRODUCTOS DISPONIBLES PARA LA EMPRESA ===
-        if self.empresa_usuario:
-            self.fields['producto'].queryset = OfertaProducto.objects.filter(
-                empresa=self.empresa_usuario
-            ).select_related('producto')
+        # ===== MODO EDICIÓN =====
+        # Si estamos editando un lote existente, NO pedimos 'producto'
+        if self.instance and self.instance.pk:
+            # Quitamos el campo para que no lo valide ni lo pida en el POST
+            self.fields.pop('producto', None)
         else:
-            # Si no hay empresa, mostrar un queryset vacío
-            self.fields['producto'].queryset = OfertaProducto.objects.none()
-        # =======================================================
+            # ===== MODO CREACIÓN =====
+            # Filtramos 'producto' (Ofertas) por la empresa actual
+            if 'producto' in self.fields:
+                if self.empresa_usuario:
+                    self.fields['producto'].queryset = OfertaProducto.objects.filter(
+                        empresa=self.empresa_usuario
+                    ).select_related('producto')
+                else:
+                    self.fields['producto'].queryset = OfertaProducto.objects.none()
 
     def clean(self):
         cleaned_data = super().clean()
@@ -257,13 +255,10 @@ class LoteProductoForm(forms.ModelForm):
 
         if cantidad is None or cantidad <= 0:
             raise forms.ValidationError("La cantidad debe ser mayor que cero.")
-
         if precio_compra is None or precio_compra < 0:
             raise forms.ValidationError("El precio de compra no puede ser negativo.")
-
         if precio_venta is None or precio_venta < 0:
             raise forms.ValidationError("El precio de venta no puede ser negativo.")
-
         return cleaned_data
 
 class ProveedorForm(forms.ModelForm):

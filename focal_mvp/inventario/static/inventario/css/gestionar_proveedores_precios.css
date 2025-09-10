@@ -1,7 +1,6 @@
 /* ==========================================================================
    FOCAL – Gestionar Proveedores y Precios
-   Vista responsiva con tabla “normal” en desktop y “tarjetas” en móvil.
-   Mantiene navbar/footer y paleta de FOCAL.
+   Tabla morada completa en desktop + tarjetas en móvil/tablet
    ========================================================================== */
 
 /* ------------------------ Variables de marca ----------------------------- */
@@ -69,7 +68,7 @@ body{
 .nav-links a:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.45);transform:translateY(-1px)}
 .nav-links a:focus-visible{outline:0;box-shadow:0 0 0 3px rgba(255,255,255,.55)}
 
-/* ------------------------------ Headings -------------------------------- */
+/* ------------------------------ Contenido -------------------------------- */
 main{flex:1;padding:2rem 0 3rem}
 .page-head h1{
   margin:0 0 .35rem;
@@ -141,24 +140,36 @@ main{flex:1;padding:2rem 0 3rem}
 
 .tabla-inventario{
   width:100%;
-  min-width: 620px;
+  min-width: 720px;
   border-collapse:collapse;background:#fff;
 }
+
+/* Encabezado completamente morado */
 .tabla-inventario thead{
   position:sticky; top:0; z-index:2;
-  background:linear-gradient(0deg, var(--primary-purple), var(--primary-purple));
-  color:#fff;font-family:var(--font-primary);
+  background:var(--primary-purple);
+  color:#fff; font-family:var(--font-primary);
 }
+.tabla-inventario thead tr{background:var(--primary-purple)}
 .tabla-inventario th{
   position:sticky; top:0; white-space:nowrap; padding:1rem 1.2rem; font-weight:800;
+  background:var(--primary-purple); color:#fff;
 }
-.tabla-inventario th:first-child,
-.tabla-inventario td:first-child{
-  position:sticky; left:0; z-index:1; background:#fff; box-shadow: 1px 0 0 var(--border);
+/* La PRIMERA celda del ENCABEZADO también es morada (y pegajosa a la izquierda) */
+.tabla-inventario th:first-child{
+  left:0; z-index:3; background:var(--primary-purple) !important;
+  box-shadow: 1px 0 0 rgba(0,0,0,0); /* sin línea clara */
 }
+
+/* Celdas del cuerpo */
 .tabla-inventario td{
   padding:1rem 1.2rem;border-bottom:1px solid var(--border);white-space:nowrap;font-variant-numeric: tabular-nums;
 }
+/* La PRIMERA celda del CUERPO queda pegada a la izquierda con fondo blanco */
+.tabla-inventario td:first-child{
+  position:sticky; left:0; z-index:1; background:#fff; box-shadow: 1px 0 0 var(--border);
+}
+
 .tabla-inventario tbody tr{transition:background .2s}
 .tabla-inventario tbody tr:hover{background:#F7F2FF}
 .tabla-inventario td.acciones .btn{margin-right:.35rem}
@@ -169,7 +180,7 @@ main{flex:1;padding:2rem 0 3rem}
 .stock-bajo{background:#E3F2FD !important}
 
 /* ------------------------ Transformación a “tarjetas” ------------------- */
-/* A partir de 640px hacia abajo convertimos la tabla a cards sin tocar HTML */
+/* A partir de 640px hacia abajo convertimos la tabla en cards sin tocar HTML */
 @media (max-width:640px){
 
   .table-container{border:none;box-shadow:none;background:transparent}
@@ -195,14 +206,12 @@ main{flex:1;padding:2rem 0 3rem}
   }
   .tabla-inventario td:last-child{border-bottom:0}
 
-  /* Etiquetas simulando los <th> (ajustar si cambia el orden de columnas) */
+  /* Etiquetas simulando los <th> por posición */
   .tabla-inventario td::before{
     content:attr(data-label);
     flex:0 0 46%;
     color:var(--muted-text);font-weight:600;letter-spacing:.01em;
   }
-
-  /* Si el template NO trae data-labels, usa títulos por posición: */
   .tabla-inventario td:nth-child(1)::before{content:"ID Lote";}
   .tabla-inventario td:nth-child(2)::before{content:"Fecha Vencimiento";}
   .tabla-inventario td:nth-child(3)::before{content:"Cantidad";}

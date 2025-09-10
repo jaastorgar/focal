@@ -283,31 +283,27 @@ def agregar_lote_producto(request):
 
 @login_required
 def editar_lote(request, lote_id):
-    """
-    Vista para editar un lote de producto existente.
-    La OfertaProducto (producto) asociada NO se puede cambiar aquí.
-    """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     lote = get_object_or_404(
-        LoteProducto.objects.select_related('producto__producto', 'proveedor'), 
-        id=lote_id, 
+        LoteProducto.objects.select_related('producto__producto', 'proveedor'),
+        id=lote_id,
         producto__empresa=empresa_usuario
     )
 
     if request.method == 'POST':
-        form = LoteProductoForm(request.POST, instance=lote)
+        form = LoteProductoForm(request.POST, instance=lote, empresa_usuario=empresa_usuario)
         if form.is_valid():
             lote_actualizado = form.save()
             messages.success(request, "Lote actualizado correctamente.")
-            return redirect('detalle_producto', producto_id=lote_actualizado.producto.producto.id)
+            return redirect('inventario', producto_id=lote_actualizado.producto.producto.id)
         else:
             print("Form errors (editar_lote):", form.errors)
             print("Form non-field errors:", form.non_field_errors())
             print("Form data:", request.POST)
             messages.error(request, "Por favor, corrige los errores en el formulario.")
     else:
-        form = LoteProductoForm(instance=lote)
-        
+        form = LoteProductoForm(instance=lote, empresa_usuario=empresa_usuario)
+
     return render(request, 'inventario/editar_lote.html', {'form': form, 'lote': lote})
 
 @login_required
