@@ -1,0 +1,281 @@
+/* ==========================================================================
+   FOCAL — MÉTRICAS (CSS personalizado y responsivo)
+   ========================================================================== */
+
+/* 1) Variables y tipografías
+   -------------------------------------------------------------------------- */
+:root {
+  /* Colores corporativos */
+  --primary-purple: #4A008B;      /* Principal (Botones/acentos) */
+  --secondary-purple: #7B1FA2;    /* Degradados/acentos */
+  --light-purple: #F3E8FF;        /* Fondos suaves */
+  --header-footer-bg: #2C0140;    /* Navbar/Footer */
+  --hover-dark-purple: #38006B;   /* Hover botones */
+  --hover-light-purple: #E0B3FF;  /* Hover enlaces */
+
+  /* Texto / UI */
+  --dark-text: #343A40;
+  --muted-text: #555555;
+  --white: #FFFFFF;
+  --border-color: #E6E6EF;
+  --page-bg: #F6F2FA;
+
+  /* Sombras */
+  --shadow-light: 0 6px 18px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 10px 24px rgba(0, 0, 0, 0.12);
+
+  /* Estados */
+  --danger-color: #DC3545;
+  --success-color: #28A745;
+  --info-color: #17A2B8;
+  --warning-color: #FFC107;
+
+  /* Estados para filas/alertas en tablas */
+  --danger-bg: #F8D7DA;
+  --danger-border: #F1AEB5;
+  --warning-bg: #FFF3CD;
+  --warning-border: #FFECB5;
+
+  /* Ring focus */
+  --focus-ring: rgba(74, 0, 139, 0.28);
+}
+
+/* InterTight – títulos/botones */
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'InterTight';
+  src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* HankenGrotesk – texto/cuerpo */
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'HankenGrotesk';
+  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* 2) Reset/estructura base
+   -------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--dark-text);
+  font-family: 'HankenGrotesk', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+}
+.container {
+  width: min(1200px, 92%);
+  margin-inline: auto;
+}
+
+/* 3) Header / Navbar
+   -------------------------------------------------------------------------- */
+.app-header {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--header-footer-bg);
+  color: var(--white);
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+.app-header nav.container {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem 0;
+}
+.logo {
+  color: var(--white); text-decoration: none;
+  font-family: 'InterTight', sans-serif; font-weight: 700; letter-spacing: -.02em;
+  font-size: 1.5rem;
+}
+.nav-links {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; gap: .6rem .8rem;
+}
+.nav-links a {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: .55rem .9rem; border-radius: 10px;
+  border: 2px solid rgba(255,255,255,.25);
+  color: var(--white); text-decoration: none;
+  font-family: 'InterTight'; font-weight: 700;
+  transition: background .2s, border-color .2s, transform .15s;
+}
+.nav-links a:hover {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.45);
+  transform: translateY(-1px);
+}
+
+/* 4) Sección principal
+   -------------------------------------------------------------------------- */
+main { flex: 1; padding: 2rem 0 3rem; }
+.page-head h1 {
+  margin: 0 0 .35rem;
+  font-family: 'InterTight'; font-weight: 700;
+  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+}
+.page-head .muted {
+  color: var(--muted-text);
+  margin: .2rem 0 1.1rem;
+}
+
+/* Tarjetas genéricas */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: var(--shadow-light);
+  padding: 1.2rem;
+}
+
+/* 5) Filtros
+   -------------------------------------------------------------------------- */
+.filters .filters-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
+}
+.field { display: flex; flex-direction: column; gap: .35rem; }
+.field--sku { grid-column: span 2; }
+.field label { font-weight: 700; letter-spacing: .01em; }
+.field input,
+.field select {
+  width: 100%;
+  padding: .8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--white);
+  font: inherit;
+}
+.field input:focus,
+.field select:focus {
+  outline: 0;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+.filters .actions { display: flex; align-items: end; gap: .6rem; }
+
+/* Botones */
+.btn {
+  display: inline-block; text-decoration: none; text-align: center; cursor: pointer;
+  padding: .8rem 1.1rem; border-radius: 10px; border: 2px solid transparent;
+  font-family: 'InterTight'; font-weight: 700; letter-spacing: .02em;
+  transition: transform .15s, box-shadow .2s, background .2s, border-color .2s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary {
+  background: var(--primary-purple); color: var(--white); border-color: var(--primary-purple);
+}
+.btn-primary:hover { background: var(--hover-dark-purple); border-color: var(--hover-dark-purple); }
+.btn-secondary {
+  background: var(--white); color: var(--muted-text); border-color: var(--border-color);
+}
+.btn-secondary:hover { background: #F3F4F6; color: #2F3640; }
+
+/* 6) KPIs
+   -------------------------------------------------------------------------- */
+.kpis {
+  display: grid; gap: 1rem; margin: 1.25rem 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.kpi { display: flex; flex-direction: column; gap: .4rem; }
+.kpi h3 { margin: 0; font-size: .95rem; color: var(--muted-text); }
+.kpi-value {
+  font-family: 'InterTight'; font-weight: 700;
+  font-size: clamp(1.4rem, 3.1vw, 1.9rem);
+}
+.delta { margin: 0; font-size: .88rem; }
+.delta.up   { color: var(--success-color); }
+.delta.down { color: var(--danger-color); }
+
+/* 7) Gráficos
+   -------------------------------------------------------------------------- */
+.charts {
+  display: grid; gap: 1rem;
+  grid-template-columns: 2fr 2fr 1.4fr;
+}
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 0 0 .7rem;
+}
+.card-head h3 {
+  margin: 0; font-family: 'InterTight'; font-weight: 700; font-size: 1.05rem;
+}
+.hint { color: var(--muted-text); font-size: .85rem; }
+
+/* altura controlada para evitar “página infinita” */
+.chart-body { height: clamp(240px, 40vh, 340px); }
+.chart-body canvas { width: 100% !important; height: 100% !important; }
+
+/* 8) Tablas
+   -------------------------------------------------------------------------- */
+.tables {
+  display: grid; gap: 1rem; margin: 1rem 0;
+  grid-template-columns: 1.6fr 1.2fr 1.2fr;
+}
+.table-wrap {
+  overflow: auto; border-radius: 12px; border: 1px solid var(--border-color);
+  max-height: 360px; /* scroll interno */
+}
+.table {
+  width: 100%; min-width: 620px; border-collapse: collapse; background: var(--white);
+}
+.table thead {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--primary-purple); color: var(--white);
+}
+.table th, .table td {
+  padding: .9rem 1rem; text-align: left; white-space: nowrap;
+  border-bottom: 1px solid var(--border-color);
+}
+.table tbody tr:hover { background: #F7F2FF; }
+.table .empty { color: var(--muted-text); text-align: center; }
+
+/* Estados visuales en filas */
+.table tr.warn  { background: var(--warning-bg); }
+.table tr.warn  td { border-bottom-color: var(--warning-border); }
+.table tr.alert { background: var(--danger-bg); }
+.table tr.alert td { border-bottom-color: var(--danger-border); }
+
+/* 9) Footer
+   -------------------------------------------------------------------------- */
+.app-footer {
+  background: var(--header-footer-bg);
+  color: var(--white); text-align: center; padding: 1.2rem 0; margin-top: auto;
+}
+.app-footer p { margin: 0; }
+
+/* 10) Responsividad
+   -------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .charts { grid-template-columns: 1fr 1fr; }
+  .tables { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+  .filters .filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .field--sku { grid-column: span 2; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  .charts, .tables { grid-template-columns: 1fr; }
+  .nav-links a { padding: .5rem .75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn, .nav-links a { transition: none; }
+}

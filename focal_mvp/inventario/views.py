@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from datetime import date, timedelta
 import time
 import logging
+import json
 from .forms import (
     ProductoForm, 
     LoteProductoForm, 
@@ -19,7 +20,7 @@ from .forms import (
 # Se importan los modelos correctos
 from .models import (
     SuscripcionUsuario, Producto, LoteProducto, OfertaProducto,
-    PlanSuscripcion, Recordatorio, MovimientoStock
+    PlanSuscripcion, Recordatorio, MovimientoStock, Proveedor
 )
 from .utils import obtener_empresa_del_usuario
 
@@ -736,3 +737,222 @@ def descontar_producto_view(request):
     # Para solicitudes GET, mostrar el formulario vacío
     context = {}
     return render(request, 'inventario/descontar_producto.html', context)
+
+def metrics_view(request):
+    from datetime import date, datetime, timedelta
+    from django.shortcuts import render
+    from django.db.models import Q, F, Sum, Count, DecimalField, ExpressionWrapper
+    from django.db.models.functions import TruncMonth
+    from django.core.serializers.json import DjangoJSONEncoder
+    from .models import Producto, Proveedor, LoteProducto
+    import json
+
+    # --- Helper local: convierte 'YYYY-MM-DD' -> date o None
+    def _parse_iso_date(value):
+        if not value:
+            return None
+        try:
+            return datetime.strptime(value, "%Y-%m-%d").date()
+        except ValueError:
+            return None
+
+    """
+    Dashboard de Métricas / KPIs con filtros:
+      - q: texto libre (SKU o nombre de producto)
+      - categoria: código/valor categoría de Producto
+      - proveedor: id del proveedor
+      - desde / hasta: fechas ISO (YYYY-MM-DD) para filtrar por fecha_vencimiento
+    """
+    # ----------------------------- 1) Filtros -----------------------------
+    q = (request.GET.get("q") or "").strip()
+    categoria = (request.GET.get("categoria") or "").strip()
+    proveedor_id = (request.GET.get("proveedor") or "").strip()
+    desde = _parse_iso_date(request.GET.get("desde"))
+    hasta = _parse_iso_date(request.GET.get("hasta"))
+    hoy = date.today()
+
+    # LoteProducto -> OfertaProducto (FK: producto) -> Producto (FK interno: producto)
+    lotes = (
+        LoteProducto.objects
+        .select_related("producto__producto", "proveedor")
+        .all()
+    )
+
+    if q:
+        lotes = lotes.filter(
+            Q(producto__producto__sku__icontains=q) |
+            Q(producto__producto__nombre__icontains=q)
+        )
+    if categoria:
+        lotes = lotes.filter(producto__producto__categoria=categoria)
+    if proveedor_id:
+        lotes = lotes.filter(proveedor_id=proveedor_id)
+    if desde:
+        lotes = lotes.filter(fecha_vencimiento__gte=desde)
+    if hasta:
+        lotes = lotes.filter(fecha_vencimiento__lte=hasta)
+
+    # ----------------------------- 2) KPIs -----------------------------
+    stock_total = lotes.aggregate(total=Sum("cantidad"))["total"] or 0
+
+    valor_compra = lotes.aggregate(
+        total=Sum(
+            ExpressionWrapper(
+                F("cantidad") * F("precio_compra"),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            )
+        )
+    )["total"] or 0
+
+    valor_venta = lotes.aggregate(
+        total=Sum(
+            ExpressionWrapper(
+                F("cantidad") * F("precio_venta"),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            )
+        )
+    )["total"] or 0
+
+    margen_potencial = (valor_venta or 0) - (valor_compra or 0)
+    vencidos = lotes.filter(fecha_vencimiento__lt=hoy).count()
+    proximos = lotes.filter(
+        fecha_vencimiento__gte=hoy,
+        fecha_vencimiento__lte=hoy + timedelta(days=15)
+    ).count()
+
+    productos_bajos = (
+        Producto.objects
+        .annotate(stock=Sum("ofertaproducto__lotes__cantidad"))
+        .filter(stock__lte=5)
+        .count()
+    )
+
+    kpis = {
+        "stock_total": int(stock_total),
+        "valor_compra": float(valor_compra),
+        "valor_venta": float(valor_venta),
+        "margen_potencial": float(margen_potencial),
+        "vencidos": int(vencidos),
+        "proximos": int(proximos),
+        "productos_bajos": int(productos_bajos),
+    }
+
+    # ----------------------------- 3) Tablas -----------------------------
+    # Top productos por stock (mantengo claves "compat" que espera tu template)
+    top_qs = (
+        lotes.values(
+            prod_id=F("producto__producto__id"),
+            nombre=F("producto__producto__nombre"),
+            sku=F("producto__producto__sku"),
+        )
+        .annotate(stock=Sum("cantidad"))
+        .order_by("-stock")[:10]
+    )
+    top_productos_stock = []
+    for r in top_qs:
+        top_productos_stock.append({
+            # claves simples
+            "prod_id": r["prod_id"],
+            "nombre": r["nombre"],
+            "sku": r["sku"],
+            "stock": r["stock"],
+            # compat con tu template actual
+            "producto__producto__id": r["prod_id"],
+            "producto__producto__nombre": r["nombre"],
+            "producto__producto__sku": r["sku"],
+            "producto__nombre": r["nombre"],
+            "producto__sku": r["sku"],
+        })
+
+    # Lotes por vencer (primero posicionales y luego kwargs en .values())
+    vencer_qs = (
+        lotes.filter(fecha_vencimiento__gte=hoy)
+        .order_by("fecha_vencimiento")
+        .values(
+            "id",
+            "fecha_vencimiento",
+            "cantidad",
+            producto=F("producto__producto__nombre"),
+            proveedor=F("proveedor__nombre"),
+        )[:10]
+    )
+    lotes_por_vencer = []
+    for r in vencer_qs:
+        lotes_por_vencer.append({
+            "id": r["id"],
+            "producto": r["producto"],
+            "proveedor": r["proveedor"],
+            "fecha_vencimiento": r["fecha_vencimiento"],
+            "cantidad": r["cantidad"],
+            # compat con template
+            "producto__producto__nombre": r["producto"],
+            "proveedor__nombre": r["proveedor"],
+            "producto__nombre": r["producto"],
+        })
+
+    # Proveedores con más unidades
+    top_proveedores = list(
+        lotes.values("proveedor__id", "proveedor__nombre")
+        .annotate(unidades=Sum("cantidad"), lotes=Count("id"))
+        .order_by("-unidades")[:10]
+    )
+
+    # ----------------------------- 4) Gráficos -----------------------------
+    stock_por_categoria_qs = (
+        lotes.values("producto__producto__categoria")
+        .annotate(unidades=Sum("cantidad"))
+        .order_by("producto__producto__categoria")
+    )
+    bar_labels = [
+        row["producto__producto__categoria"] or "Sin categoría"
+        for row in stock_por_categoria_qs
+    ]
+    bar_values = [int(row["unidades"] or 0) for row in stock_por_categoria_qs]
+
+    stock_por_proveedor_qs = (
+        lotes.values("proveedor__nombre")
+        .annotate(unidades=Sum("cantidad"))
+        .order_by("-unidades")[:8]
+    )
+    pie_labels = [row["proveedor__nombre"] or "Sin proveedor" for row in stock_por_proveedor_qs]
+    pie_values = [int(row["unidades"] or 0) for row in stock_por_proveedor_qs]
+
+    cad_por_mes_qs = (
+        lotes.annotate(mes=TruncMonth("fecha_vencimiento"))
+        .values("mes")
+        .annotate(total=Count("id"))
+        .order_by("mes")
+    )
+    line_labels = [(row["mes"].strftime("%Y-%m") if row["mes"] else "Sin fecha") for row in cad_por_mes_qs]
+    line_values = [int(row["total"] or 0) for row in cad_por_mes_qs]
+
+    chart_data = {
+        "bar_stock_categoria": {"labels": bar_labels, "values": bar_values},
+        "pie_stock_proveedor": {"labels": pie_labels, "values": pie_values},
+        "line_caducidad_mes": {"labels": line_labels, "values": line_values},
+    }
+    chart_payload_json = json.dumps(chart_data, cls=DjangoJSONEncoder)
+
+    # ----------------------------- 5) Selects -----------------------------
+    proveedores = list(Proveedor.objects.order_by("nombre").values("id", "nombre"))
+    categorias = list(Producto.objects.order_by().values_list("categoria", flat=True).distinct())
+
+    # ----------------------------- 6) Render -----------------------------
+    context = {
+        "f": {
+            "q": q,
+            "categoria": categoria,
+            "proveedor": proveedor_id,
+            "desde": request.GET.get("desde") or "",
+            "hasta": request.GET.get("hasta") or "",
+        },
+        "proveedores": proveedores,
+        "categorias": categorias,
+        "kpis": kpis,
+        "top_productos_stock": top_productos_stock,
+        "lotes_por_vencer": lotes_por_vencer,
+        "top_proveedores": top_proveedores,
+        "chart_payload_json": chart_payload_json,
+        "today": hoy,  # útil si haces comparaciones en el template
+    }
+    return render(request, "inventario/metrics.html", context)

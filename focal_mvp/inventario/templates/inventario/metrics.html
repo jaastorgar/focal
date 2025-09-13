@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Métricas | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/metrics.css' %}">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="app-header">
+    <nav class="container">
+      <a class="logo" href="{% url 'home' %}">FOCAL</a>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Inicio</a></li>
+        <li><a href="{% url 'inventario' %}">Inventario</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Título -->
+    <section class="page-head">
+      <h1>Métricas</h1>
+      <p class="muted">Analiza el rendimiento de tu inventario con KPIs, gráficos y tablas.</p>
+    </section>
+
+    <!-- Filtros -->
+    <section class="filters card">
+      <form id="metrics-filters" class="filters-grid" method="get" action="{% url 'metrics' %}">
+        <div class="field field--sku">
+          <label for="f_q">SKU o nombre</label>
+          <input id="f_q" name="q" type="search" placeholder="Ej: 7801234567890 o 'Coca Cola'" value="{{ f.q|default:'' }}">
+        </div>
+
+        <div class="field">
+          <label for="f_categoria">Categoría</label>
+          <select id="f_categoria" name="categoria">
+            <option value="">Todas</option>
+            {% for c in categorias %}
+              <option value="{{ c }}" {% if f.categoria == c %}selected{% endif %}>{{ c|default:"Sin categoría" }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="f_proveedor">Proveedor</label>
+          <select id="f_proveedor" name="proveedor">
+            <option value="">Todos</option>
+            {% for p in proveedores %}
+              <option value="{{ p.id }}" {% if f.proveedor == p.id|stringformat:'s' %}selected{% endif %}>{{ p.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="f_desde">Desde</label>
+          <input id="f_desde" name="desde" type="date" value="{{ f.desde|default:'' }}">
+        </div>
+
+        <div class="field">
+          <label for="f_hasta">Hasta</label>
+          <input id="f_hasta" name="hasta" type="date" value="{{ f.hasta|default:'' }}">
+        </div>
+
+        <div class="actions" style="grid-column: 1 / -1;">
+          <button type="submit" class="btn btn-primary">Aplicar filtros</button>
+          <a class="btn btn-secondary" href="{% url 'metrics' %}">Limpiar</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- KPIs -->
+    <section class="kpis">
+      <div class="card kpi">
+        <h3>Ventas (CLP)</h3>
+        <p class="delta" id="delta-ventas">—</p>
+        <div class="kpi-value" id="kpi-ventas">$0</div>
+      </div>
+      <div class="card kpi">
+        <h3>Órdenes</h3>
+        <p class="delta" id="delta-ordenes">—</p>
+        <div class="kpi-value" id="kpi-ordenes">0</div>
+      </div>
+      <div class="card kpi">
+        <h3>Ticket Promedio</h3>
+        <p class="delta" id="delta-ticket">—</p>
+        <div class="kpi-value" id="kpi-ticket">$0</div>
+      </div>
+      <div class="card kpi">
+        <h3>Valor Stock</h3>
+        <p class="delta" id="delta-stock">—</p>
+        <div class="kpi-value" id="kpi-stock">$0</div>
+      </div>
+    </section>
+
+    <!-- Gráficos -->
+    <section class="charts">
+      <article class="card">
+        <div class="card-head">
+          <h3>Ventas por Mes</h3>
+          <span class="hint">Línea</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chart-line"></canvas>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h3>Top 5 Productos por Ventas</h3>
+          <span class="hint">Barras</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chart-bar"></canvas>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h3>Ventas por Categoría</h3>
+          <span class="hint">Donut</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chart-donut"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <!-- Tablas -->
+    <section class="tables">
+      <article class="card">
+        <div class="card-head"><h3>Top productos por stock</h3></div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>SKU</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if top_productos_stock %}
+                {% for p in top_productos_stock %}
+                <tr>
+                  <!-- OJO: viene desde LoteProducto -> OfertaProducto -> Producto -->
+                  <td>{{ p.producto__producto__nombre }}</td>
+                  <td>{{ p.producto__producto__sku }}</td>
+                  <td>{{ p.stock }}</td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr><td class="empty" colspan="3">Sin datos para los filtros actuales.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><h3>Lotes por vencer</h3></div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Proveedor</th>
+                <th>Vencimiento</th>
+                <th>Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if lotes_por_vencer %}
+                {% for l in lotes_por_vencer %}
+                <tr>
+                  <td>{{ l.producto__producto__nombre }}</td>
+                  <td>{{ l.proveedor__nombre|default:"No especificado" }}</td>
+                  <td>{{ l.fecha_vencimiento|date:'d-m-Y' }}</td>
+                  <td>{{ l.cantidad }}</td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr><td class="empty" colspan="4">No hay lotes próximos a vencer.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><h3>Top proveedores (unidades)</h3></div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Proveedor</th>
+                <th>Unidades</th>
+                <th>Lotes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if top_proveedores %}
+                {% for p in top_proveedores %}
+                <tr>
+                  <td>{{ p.proveedor__nombre|default:"No especificado" }}</td>
+                  <td>{{ p.unidades }}</td>
+                  <td>{{ p.lotes }}</td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr><td class="empty" colspan="3">Sin datos de proveedores para el filtro.</td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- Datos desde el backend (opcional). Si no llega nada, JS usa fallback demo -->
+  <script id="metrics-data" type="application/json">
+    {
+      {% if chart_payload_json %}
+        {{ chart_payload_json|safe }}
+      {% else %}
+        {}
+      {% endif %}
+    }
+  </script>
+
+  <!-- Chart.js + lógica -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="{% static 'inventario/js/metrics.js' %}"></script>
+</body>
+</html>
