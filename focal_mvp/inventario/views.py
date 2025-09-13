@@ -740,13 +740,10 @@ def descontar_producto_view(request):
 
 def metrics_view(request):
     from datetime import date, datetime, timedelta
-    from django.shortcuts import render
     from django.db.models import Q, F, Sum, Count, DecimalField, ExpressionWrapper
     from django.db.models.functions import TruncMonth
     from django.core.serializers.json import DjangoJSONEncoder
-    from .models import Producto, Proveedor, LoteProducto
-    import json
-
+    
     # --- Helper local: convierte 'YYYY-MM-DD' -> date o None
     def _parse_iso_date(value):
         if not value:
@@ -820,6 +817,7 @@ def metrics_view(request):
         fecha_vencimiento__lte=hoy + timedelta(days=15)
     ).count()
 
+    # Producto -> OfertaProducto (reverso: ofertaproducto) -> LoteProducto (reverso: lotes)
     productos_bajos = (
         Producto.objects
         .annotate(stock=Sum("ofertaproducto__lotes__cantidad"))
@@ -838,7 +836,7 @@ def metrics_view(request):
     }
 
     # ----------------------------- 3) Tablas -----------------------------
-    # Top productos por stock (mantengo claves "compat" que espera tu template)
+    # Top productos por stock
     top_qs = (
         lotes.values(
             prod_id=F("producto__producto__id"),
@@ -856,7 +854,7 @@ def metrics_view(request):
             "nombre": r["nombre"],
             "sku": r["sku"],
             "stock": r["stock"],
-            # compat con tu template actual
+            # compat con el template actual
             "producto__producto__id": r["prod_id"],
             "producto__producto__nombre": r["nombre"],
             "producto__producto__sku": r["sku"],
@@ -864,7 +862,7 @@ def metrics_view(request):
             "producto__sku": r["sku"],
         })
 
-    # Lotes por vencer (primero posicionales y luego kwargs en .values())
+    # Lotes por vencer (usa aliases que NO choquen con campos reales)
     vencer_qs = (
         lotes.filter(fecha_vencimiento__gte=hoy)
         .order_by("fecha_vencimiento")
@@ -872,22 +870,22 @@ def metrics_view(request):
             "id",
             "fecha_vencimiento",
             "cantidad",
-            producto=F("producto__producto__nombre"),
-            proveedor=F("proveedor__nombre"),
+            prod_nombre=F("producto__producto__nombre"),
+            prov_nombre=F("proveedor__nombre"),
         )[:10]
     )
     lotes_por_vencer = []
     for r in vencer_qs:
         lotes_por_vencer.append({
             "id": r["id"],
-            "producto": r["producto"],
-            "proveedor": r["proveedor"],
+            "producto": r["prod_nombre"],
+            "proveedor": r["prov_nombre"],
             "fecha_vencimiento": r["fecha_vencimiento"],
             "cantidad": r["cantidad"],
-            # compat con template
-            "producto__producto__nombre": r["producto"],
-            "proveedor__nombre": r["proveedor"],
-            "producto__nombre": r["producto"],
+            # compat con el template
+            "producto__producto__nombre": r["prod_nombre"],
+            "proveedor__nombre": r["prov_nombre"],
+            "producto__nombre": r["prod_nombre"],
         })
 
     # Proveedores con más unidades
@@ -953,6 +951,6 @@ def metrics_view(request):
         "lotes_por_vencer": lotes_por_vencer,
         "top_proveedores": top_proveedores,
         "chart_payload_json": chart_payload_json,
-        "today": hoy,  # útil si haces comparaciones en el template
+        "today": hoy,
     }
     return render(request, "inventario/metrics.html", context)
