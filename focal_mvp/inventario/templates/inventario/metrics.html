@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,7 +26,7 @@
     <!-- Título -->
     <section class="page-head">
       <h1>Métricas</h1>
-      <p class="muted">Analiza el rendimiento de tu inventario con KPIs, gráficos y tablas.</p>
+      <p class="muted">Monitorea tu inventario: stock disponible, costos, vencimientos y distribución por proveedor/categoría.</p>
     </section>
 
     <!-- Filtros -->
@@ -73,59 +74,75 @@
       </form>
     </section>
 
-    <!-- KPIs -->
+    <!-- KPIs (sin ventas) -->
     <section class="kpis">
       <div class="card kpi">
-        <h3>Ventas (CLP)</h3>
-        <p class="delta" id="delta-ventas">—</p>
-        <div class="kpi-value" id="kpi-ventas">$0</div>
+        <h3>Stock Total (unid.)</h3>
+        <p class="delta muted">Unidades disponibles</p>
+        <div class="kpi-value">{{ kpis.stock_total|intcomma }}</div>
       </div>
+
       <div class="card kpi">
-        <h3>Órdenes</h3>
-        <p class="delta" id="delta-ordenes">—</p>
-        <div class="kpi-value" id="kpi-ordenes">0</div>
+        <h3>Valor de Compra</h3>
+        <p class="delta muted">Costo total del stock</p>
+        <div class="kpi-value">${{ kpis.valor_compra|floatformat:0|intcomma }}</div>
       </div>
+
       <div class="card kpi">
-        <h3>Ticket Promedio</h3>
-        <p class="delta" id="delta-ticket">—</p>
-        <div class="kpi-value" id="kpi-ticket">$0</div>
+        <h3>Valor Potencial</h3>
+        <p class="delta muted">Precio de venta estimado</p>
+        <div class="kpi-value">${{ kpis.valor_venta|floatformat:0|intcomma }}</div>
       </div>
+
       <div class="card kpi">
-        <h3>Valor Stock</h3>
-        <p class="delta" id="delta-stock">—</p>
-        <div class="kpi-value" id="kpi-stock">$0</div>
+        <h3>Margen Potencial</h3>
+        <p class="delta {% if kpis.margen_potencial >= 0 %}text-success{% else %}text-danger{% endif %}">
+          {% if kpis.margen_potencial >= 0 %}+{% endif %}${{ kpis.margen_potencial|floatformat:0|intcomma }}
+        </p>
+        <div class="kpi-value">${{ kpis.margen_potencial|floatformat:0|intcomma }}</div>
       </div>
+    </section>
+
+    <!-- Chips de estado -->
+    <section class="chips-row">
+      <span class="chip chip-danger">Vencidos: <strong>{{ kpis.vencidos|intcomma }}</strong></span>
+      <span class="chip chip-warning">Próx. a vencer (≤15 días): <strong>{{ kpis.proximos|intcomma }}</strong></span>
+      <span class="chip chip-info">Productos con stock bajo (≤5): <strong>{{ kpis.productos_bajos|intcomma }}</strong></span>
     </section>
 
     <!-- Gráficos -->
     <section class="charts">
       <article class="card">
         <div class="card-head">
-          <h3>Ventas por Mes</h3>
+          <h3>Vencimientos por Mes</h3>
           <span class="hint">Línea</span>
         </div>
         <div class="chart-body">
-          <canvas id="chart-line"></canvas>
+          <!-- canvas + estado vacío (IDs que espera el JS) -->
+          <canvas id="lineCaducidad"></canvas>
+          <div id="empty-lineCaducidad" class="empty-state">Sin datos para este gráfico.</div>
         </div>
       </article>
 
       <article class="card">
         <div class="card-head">
-          <h3>Top 5 Productos por Ventas</h3>
+          <h3>Stock por Categoría</h3>
           <span class="hint">Barras</span>
         </div>
         <div class="chart-body">
-          <canvas id="chart-bar"></canvas>
+          <canvas id="barCategorias"></canvas>
+          <div id="empty-barCategorias" class="empty-state">Sin datos para este gráfico.</div>
         </div>
       </article>
 
       <article class="card">
         <div class="card-head">
-          <h3>Ventas por Categoría</h3>
+          <h3>Stock por Proveedor</h3>
           <span class="hint">Donut</span>
         </div>
         <div class="chart-body">
-          <canvas id="chart-donut"></canvas>
+          <canvas id="pieProveedores"></canvas>
+          <div id="empty-pieProveedores" class="empty-state">Sin datos para este gráfico.</div>
         </div>
       </article>
     </section>
@@ -147,10 +164,9 @@
               {% if top_productos_stock %}
                 {% for p in top_productos_stock %}
                 <tr>
-                  <!-- OJO: viene desde LoteProducto -> OfertaProducto -> Producto -->
                   <td>{{ p.producto__producto__nombre }}</td>
                   <td>{{ p.producto__producto__sku }}</td>
-                  <td>{{ p.stock }}</td>
+                  <td>{{ p.stock|intcomma }}</td>
                 </tr>
                 {% endfor %}
               {% else %}
@@ -180,7 +196,7 @@
                   <td>{{ l.producto__producto__nombre }}</td>
                   <td>{{ l.proveedor__nombre|default:"No especificado" }}</td>
                   <td>{{ l.fecha_vencimiento|date:'d-m-Y' }}</td>
-                  <td>{{ l.cantidad }}</td>
+                  <td>{{ l.cantidad|intcomma }}</td>
                 </tr>
                 {% endfor %}
               {% else %}
@@ -207,8 +223,8 @@
                 {% for p in top_proveedores %}
                 <tr>
                   <td>{{ p.proveedor__nombre|default:"No especificado" }}</td>
-                  <td>{{ p.unidades }}</td>
-                  <td>{{ p.lotes }}</td>
+                  <td>{{ p.unidades|intcomma }}</td>
+                  <td>{{ p.lotes|intcomma }}</td>
                 </tr>
                 {% endfor %}
               {% else %}
@@ -226,15 +242,26 @@
     <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
   </footer>
 
-  <!-- Datos desde el backend (opcional). Si no llega nada, JS usa fallback demo -->
+  <!-- Datos desde el backend para los gráficos -->
   <script id="metrics-data" type="application/json">
-    {
-      {% if chart_payload_json %}
-        {{ chart_payload_json|safe }}
-      {% else %}
-        {}
-      {% endif %}
-    }
+    {% if chart_payload_json %}
+      {{ chart_payload_json|safe }}
+    {% else %}
+      {}
+    {% endif %}
+  </script>
+
+  <!-- Hidrata window.FOCAL_CHARTS antes de cargar el JS de gráficos -->
+  <script>
+    (function () {
+      try {
+        const raw = (document.getElementById('metrics-data')?.textContent || '{}').trim();
+        window.FOCAL_CHARTS = JSON.parse(raw || '{}');
+      } catch (e) {
+        console.error('metrics-data JSON inválido:', e);
+        window.FOCAL_CHARTS = {};
+      }
+    })();
   </script>
 
   <!-- Chart.js + lógica -->
