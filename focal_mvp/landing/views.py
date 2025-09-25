@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_POST
@@ -30,48 +30,57 @@ def contacto_submit_view(request):
     return redirect('landing')
 
 def vista_registro(request):
-    plan_id = request.GET.get('plan')
-    try:
-        plan = get_object_or_404(PlanSuscripcion, id=plan_id)
-    except (ValueError, TypeError):
-        messages.error(request, "El plan seleccionado no es válido.")
-        return redirect('planes')
+    # 1) Elegir automáticamente el plan por defecto
+    default_plan = (
+        PlanSuscripcion.objects.filter(precio=0).order_by("id").first()
+        or PlanSuscripcion.objects.order_by("precio", "id").first()
+    )
+    if not default_plan:
+        messages.error(request, "No hay planes de suscripción configurados.")
+        return redirect("home")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         user_form = RegistroAlmaceneroForm(request.POST)
         empresa_form = EmpresaForm(request.POST)
 
         if user_form.is_valid() and empresa_form.is_valid():
             try:
                 with transaction.atomic():
-                    user = user_form.save()
+                    # 2) Crear empresa
                     empresa = empresa_form.save()
-                    # Se asocia el Almacenero a la Empresa
-                    empresa.almaceneros.add(user)
 
+                    # 3) Crear usuario y asociarlo a la empresa
+                    user = user_form.save(commit=False)
+                    user.empresa = empresa
+                    user.save()
+
+                    # 4) Crear suscripción activa con el plan por defecto
                     SuscripcionUsuario.objects.create(
                         empresa=empresa,
-                        plan=plan,
-                        activa=True
+                        plan=default_plan,
+                        activa=True,
                     )
-                
-                # Se inicia sesión especificando el backend
-                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-                messages.success(request, f"¡Registro exitoso! Inicia Sesión.")
-                return redirect('login')
+
+                # 5) Login y redirección
+                login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                messages.success(request, "¡Registro exitoso! Bienvenido a FOCAL.")
+                return redirect("login")  # o la ruta que prefieras
 
             except Exception as e:
-                messages.error(request, f"Ocurrió un error inesperado durante el registro: {e}")
+                messages.error(request, f"Ocurrió un error durante el registro: {e}")
     else:
         user_form = RegistroAlmaceneroForm()
         empresa_form = EmpresaForm()
 
-    context = {
-        'user_form': user_form,
-        'empresa_form': empresa_form,
-        'plan': plan
-    }
-    return render(request, 'landing/registro.html', context)
+    return render(
+        request,
+        "landing/registro.html",
+        {
+            "user_form": user_form,
+            "empresa_form": empresa_form,
+            "plan": default_plan,  # por si lo quieres mostrar en el template
+        },
+    )
 
 def vista_login(request):
     if request.user.is_authenticated:

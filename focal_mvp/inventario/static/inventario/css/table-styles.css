@@ -1,5 +1,6 @@
 /* ==========================================================================
-   FOCAL - Estilos responsivos para vista de Inventario (tabla)
+   FOCAL - Estilos unificados (tabla + hub de pestañas)
+   Archivo único: inventario/css/table-styles.css
    ========================================================================== */
 
 /* 1) Variables y base ------------------------------------------------------ */
@@ -18,17 +19,9 @@
   --font-secondary: 'HankenGrotesk', Arial, sans-serif;
 }
 
-/* Fuentes locales (opcional si existen) */
-@font-face {
-  font-family: 'InterTight';
-  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight: 700;
-}
-@font-face {
-  font-family: 'HankenGrotesk';
-  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight: 400;
-}
+/* (Opcional) Fuentes locales si existen en /static */
+@font-face { font-family: 'InterTight'; src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype'); font-weight: 700; }
+@font-face { font-family: 'HankenGrotesk'; src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype'); font-weight: 400; }
 
 *,
 *::before,
@@ -80,6 +73,8 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Botones del header preexistentes */
 .btn-accion{
   display: inline-block;
   padding: .55rem .9rem;
@@ -112,7 +107,31 @@ main.container h1{
   margin: .2rem 0 1rem;
 }
 
-/* 4) Buscador -------------------------------------------------------------- */
+/* 4) Hub de pestañas (unificado desde hub.css) ----------------------------- */
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+.tab-btn{border:1px solid #e5e7eb;padding:.6rem .9rem;border-radius:.75rem;background:#fff;cursor:pointer}
+.tab-btn.active{background:var(--light-purple);border-color:var(--secondary-purple)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.card{background:#fff;border:1px solid var(--border-color);border-radius:1rem;padding:1rem}
+.toolbar,.sku-inline{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.pill{font-size:.85rem;background:#eef2ff;padding:.2rem .5rem;border-radius:.5rem}
+.muted{color:#6b7280}
+
+.grid{display:grid;gap:1rem}
+.grid-2{grid-template-columns:1fr}
+@media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
+
+/* Botones genéricos para tabs/paneles */
+.btn{padding:.55rem .85rem;border-radius:.6rem;border:1px solid #e5e7eb;background:#fff;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-primary{background:var(--secondary-purple);border-color:transparent;color:#fff}
+.btn-secondary{background:#fff;border-color:#e5e7eb;color:var(--dark-text)}
+.btn-sm{padding:.4rem .6rem;font-size:.9rem}
+.empty-hint{color:#6b7280;margin:.5rem 0}
+.acciones a{margin-right:.35rem}
+
+/* 5) Buscador -------------------------------------------------------------- */
 .search-section{ margin: 0 0 1.2rem; }
 .search-form{
   display: flex;
@@ -157,16 +176,16 @@ main.container h1{
 }
 .clear-search-button:hover{ background: #f3f4f6; }
 
-/* 5) Tabla (Desktop) ------------------------------------------------------- */
+/* 6) Tabla (Desktop) ------------------------------------------------------- */
 .table-container{
   background: #fff;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: var(--shadow-light);
 
-  /* Clave para 100+ filas: scroll interno con header sticky */
+  /* Importante para 100+ filas: scroll interno con header sticky */
   max-height: 72vh;
-  overflow: auto;              /* vertical y horizontal si hace falta */
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
 .tabla-inventario{
@@ -204,37 +223,25 @@ main.container h1{
 .tabla-inventario tbody tr{ border-bottom:1px solid #f1f3f5; }
 .tabla-inventario tbody tr:last-child{ border-bottom:0; }
 
-/* SKU largos + números monoespaciados para legibilidad */
-.tabla-inventario td:nth-child(2){
-  word-break: break-word;
-  font-feature-settings: "tnum";
-}
+/* SKU largos + números monoespaciados */
+.tabla-inventario td:nth-child(2){ word-break: break-word; font-feature-settings: "tnum"; }
 
-/* PRIMERA COLUMNA STICKY (Producto) */
+/* Primera columna sticky (Producto) */
 .tabla-inventario th:first-child,
 .tabla-inventario td:first-child{
   position: sticky;
   left: 0;
-  background: #fff;            /* tapa el contenido que pasa por detrás */
-  z-index: 3;                  /* por encima del resto */
-  box-shadow: 2px 0 0 #eee;    /* borde visual */
+  background: #fff;
+  z-index: 3;
+  box-shadow: 2px 0 0 #eee;
 }
 
-/* Estados (señales) */
-.tabla-inventario tr.vencido{
-  box-shadow: inset 4px 0 0 #c62828;
-  background: #fff5f5;
-}
-.tabla-inventario tr.proximo-vencer{
-  box-shadow: inset 4px 0 0 #f57c00;
-  background: #fff8e1;
-}
-.tabla-inventario tr.stock-bajo{
-  box-shadow: inset 4px 0 0 #1565c0;
-  background: #eef6ff;
-}
+/* Estados (señales por fila) */
+.tabla-inventario tr.vencido{ box-shadow: inset 4px 0 0 #c62828; background: #fff5f5; }
+.tabla-inventario tr.proximo-vencer{ box-shadow: inset 4px 0 0 #f57c00; background: #fff8e1; }
+.tabla-inventario tr.stock-bajo{ box-shadow: inset 4px 0 0 #1565c0; background: #eef6ff; }
 
-/* Acciones (si las usas dentro de la tabla) */
+/* Acciones en fila */
 .acciones{ display:flex; gap:.5rem; flex-wrap:wrap; }
 .btn-accion-tabla{
   display:inline-block; padding:.4rem .7rem; border-radius:8px;
@@ -243,18 +250,9 @@ main.container h1{
 .btn-accion-tabla:hover{ filter:brightness(.95); }
 .btn-peligro{ background:#c62828; }
 
-/* 6) Empty state ----------------------------------------------------------- */
-.empty-state-wrapper{
-  min-height: 58vh;
-  display: grid;
-  place-items: center;
-}
-.empty-state{
-  text-align: center;
-  max-width: 520px;
-  background: transparent;
-  padding: 1.5rem;
-}
+/* 7) Empty state ----------------------------------------------------------- */
+.empty-state-wrapper{ min-height: 58vh; display: grid; place-items: center; }
+.empty-state{ text-align: center; max-width: 520px; background: transparent; padding: 1.5rem; }
 .empty-state-icon svg{ stroke: var(--primary-purple); opacity: .25; margin-bottom: 1rem; }
 .empty-state-title{
   font-family: var(--font-primary);
@@ -264,19 +262,13 @@ main.container h1{
 }
 .empty-state-message{ color: var(--muted-text); margin-bottom: 1.4rem; }
 .btn-accion-principal{
-  display: inline-block;
-  padding: .9rem 1.4rem;
-  border-radius: 10px;
-  background: var(--primary-purple);
-  color: #fff;
-  text-decoration: none;
-  font-family: var(--font-primary);
-  font-weight: 800;
-  border: 2px solid var(--primary-purple);
+  display: inline-block; padding: .9rem 1.4rem; border-radius: 10px;
+  background: var(--primary-purple); color: #fff; text-decoration: none;
+  font-family: var(--font-primary); font-weight: 800; border: 2px solid var(--primary-purple);
 }
 .btn-accion-principal:hover{ background: #38006B; border-color: #38006B; transform: translateY(-1px); }
 
-/* 7) Footer --------------------------------------------------------------- */
+/* 8) Footer --------------------------------------------------------------- */
 .app-footer{
   background: var(--primary-purple);
   color: #fff;
@@ -286,18 +278,58 @@ main.container h1{
   font-size: .95rem;
 }
 
-/* 8) RESPONSIVE: tablet & móvil ------------------------------------------ */
-/* Tablet: compactar paddings y min-width de la tabla para reducir scroll */
+/* --- Ventana modal descontar --- */
+.modal{ position: fixed; inset:0; display:none; }
+.modal.is-open{ display:block; }
+.modal__backdrop{
+  position:absolute; inset:0; background: rgba(0,0,0,.45);
+}
+.modal__content{
+  position: relative;
+  max-width: 520px; width: calc(100% - 2rem);
+  margin: 8vh auto; background:#fff; border-radius: 14px;
+  border: 1px solid var(--border-color); box-shadow: var(--shadow-medium);
+  overflow: hidden;
+}
+.modal__header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: .9rem 1.1rem; background:#faf7ff; border-bottom:1px solid #eee;
+}
+.modal__header h3{ margin:0; font-family: var(--font-primary); }
+.modal__close{
+  border:0; background:transparent; font-size:1.6rem; line-height:1; cursor:pointer;
+}
+.modal__body{ padding: 1rem 1.1rem; }
+.modal__row{ display:grid; gap:.35rem; margin-bottom: .9rem; }
+.modal__footer{
+  display:flex; gap:.5rem; justify-content:flex-end; padding: .9rem 1.1rem;
+  border-top:1px solid #eee; background:#fff;
+}
+
+/* --- Stepper (+/−) --- */
+.stepper{ display:flex; align-items:center; gap:.4rem; max-width: 180px; }
+.stepper-btn{
+  flex:0 0 38px; height:38px; border-radius:8px;
+  border:1px solid var(--border-color); background:#fff; font-size:1.4rem; line-height:1;
+  cursor:pointer;
+}
+.stepper-btn:hover{ background: var(--light-purple); border-color: var(--secondary-purple); }
+.stepper input{
+  flex:1; text-align:center; font-size:1rem; padding:.4rem;
+  border-radius:6px; border:1px solid var(--border-color);
+}
+
+/* 9) RESPONSIVE ----------------------------------------------------------- */
+/* Tablet */
 @media (max-width: 1024px){
   .nav-links{ gap: .4rem; }
   .btn-accion{ padding: .5rem .72rem; }
-
   .tabla-inventario{ min-width: 820px; }
   .tabla-inventario th, .tabla-inventario td{ padding: .8rem .75rem; }
   .search-form{ max-width: 100%; }
 }
 
-/* MÓVIL: convertir la tabla en "tarjetas" legibles */
+/* Móvil: tabla como tarjetas */
 @media (max-width: 768px){
   main.container{ width: min(1100px, 94%); }
 
@@ -308,21 +340,20 @@ main.container h1{
 
   .table-container{
     border-radius: 12px;
-    overflow: hidden;              /* sin scroll horizontal: tarjetas */
-    max-height: none;              /* dejamos que el documento scrollee */
+    overflow: hidden;         /* sin scroll horizontal: tarjetas */
+    max-height: none;         /* deja que el documento scrollee */
   }
   .tabla-inventario{
     border-collapse: separate;
     border-spacing: 0 12px;
-    min-width: 0;                  /* anula min-width para móvil */
+    min-width: 0;
     width: 100%;
     font-size: 1rem;
   }
 
-  /* Escondemos encabezado y recreamos rótulos con ::before */
+  /* Escondemos thead y recreamos rótulos */
   .tabla-inventario thead{
-    position: absolute;
-    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute; clip: rect(1px,1px,1px,1px);
     width: 1px; height: 1px; overflow: hidden;
   }
 
@@ -334,7 +365,7 @@ main.container h1{
     box-shadow: var(--shadow-light);
     padding: .6rem .75rem;
     margin: 0 0 12px 0;
-    contain: content;              /* micro-optimización para listas largas */
+    contain: content;
   }
   .tabla-inventario td{
     display: grid;
@@ -353,12 +384,11 @@ main.container h1{
     font-family: var(--font-primary);
     font-weight: 800;
     color: var(--dark-text);
-    text-transform: none;
     letter-spacing: .2px;
     font-size: .92rem;
   }
 
-  /* Mapeo de etiquetas con nth-child (por si no usas data-label) */
+  /* Mapeo por nth-child (por si no añades data-label) */
   .tabla-inventario td:nth-child(1)::before{ content: "Producto"; }
   .tabla-inventario td:nth-child(2)::before{ content: "SKU"; }
   .tabla-inventario td:nth-child(3)::before{ content: "Marca"; }
@@ -368,6 +398,7 @@ main.container h1{
   .tabla-inventario td:nth-child(7)::before{ content: "Próximo Vencimiento"; }
   .tabla-inventario td:nth-child(8)::before{ content: "Stock Total"; }
   .tabla-inventario td:nth-child(9)::before{ content: "Cantidad Lotes"; }
+  .tabla-inventario td:nth-child(10)::before{ content: "Acciones"; }
 
   /* Estados: banda superior en tarjeta */
   .tabla-inventario tr.vencido{ box-shadow: 0 2px 0 #c62828 inset, var(--shadow-light); }

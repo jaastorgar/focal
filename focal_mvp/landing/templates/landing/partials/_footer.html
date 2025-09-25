@@ -1,0 +1,59 @@
+{% load static %}
+<footer class="main-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <p class="footer-text">
+          Herramientas simples para un control inteligente de tu inventario.
+        </p>
+
+        <ul class="contact-list">
+          <li>
+            <a class="contact-chip" href="mailto:soporte@soyfocal.cl">
+              <span class="chip-ico">📧</span> soporte@soyfocal.cl
+            </a>
+          </li>
+          <li>
+            <a class="contact-chip" href="mailto:ventas@soyfocal.cl">
+              <span class="chip-ico">🛒</span> ventas@soyfocal.cl
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-title">Producto</h4>
+        <nav class="footer-links">
+          <a href="{% url 'landing:landing' %}#features">Características</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-title">Compañía</h4>
+        <nav class="footer-links">
+          <a href="{% url 'landing:quienes_somos' %}">Nosotros</a>
+          <a href="{% url 'landing:landing' %}#contact">Contacto</a>
+          <a href="{% url 'landing:registro' %}">Registro</a>
+        </nav>
+      </div>
+    </div>
+
+    <hr class="footer-divider" />
+
+    <div class="footer-bottom">
+      <p class="footer-copy">
+        © <span id="year"></span> FOCAL. Todos los derechos reservados.
+      </p>
+    </div>
+  </div>
+
+  <!-- Botones flotantes (mismo estilo que el landing) -->
+  <div class="floating-social" aria-hidden="true">
+    <a class="float-btn ig" href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
+      <i class="bi bi-instagram"></i>
+    </a>
+    <a class="float-btn wa" href="https://wa.me/" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <i class="bi bi-whatsapp"></i>
+    </a>
+  </div>
+</footer>

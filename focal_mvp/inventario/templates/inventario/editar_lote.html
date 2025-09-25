@@ -110,7 +110,7 @@
                 </fieldset>
 
                 <div class="form-actions">
-                    <a href="{% url 'inventario' lote.producto.producto.id %}" class="btn btn-cancel" role="button">Cancelar</a>
+                    <a href="{% url 'inventario' %}?sku={{ lote.producto.producto.sku }}#tab-gestionar" class="btn btn-cancel">Cancelar</a>
                     <button type="submit" class="btn btn-submit">Guardar Cambios</button>
                 </div>
             </form>

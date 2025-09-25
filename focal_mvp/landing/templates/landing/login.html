@@ -1,67 +1,65 @@
+{% extends "landing/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión | FOCAL</title>
-    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'landing/css/login.css' %}">
-</head>
-<body>
 
-    <header class="app-header-minimal">
-        <a href="{% url 'landing' %}" class="logo">FOCAL</a>
-    </header>
+{% block title %}Iniciar sesión | FOCAL{% endblock %}
 
-    <main class="login-container">
-        <h2>Iniciar sesión</h2>
+{# CSS específico de la página #}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'landing/css/login.css' %}">
+<link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
+{% endblock %}
 
-        {# --- MEJORA: Contenedor para mostrar mensajes de alerta --- #}
-        {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        
-        <form method="post" class="login-form">
-            {% csrf_token %}
+{% block content %}
+<main class="login-page" id="main-content">
+  <section class="login-wrap container">
+    <div class="login-card" role="form" aria-labelledby="login-title">
+      <h1 id="login-title" class="login-title">Iniciar sesión</h1>
 
-            {# Muestra errores generales del formulario (ej. "credenciales incorrectas") #}
-            {% if form.non_field_errors %}
-                <div class="alert alert-error non-field-errors">
-                    {% for error in form.non_field_errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
+      {# Mensajes del framework #}
+      {% if messages %}
+        <div class="login-messages">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-            {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <div class="error-message">{{ field.errors|striptags }}</div>
-                    {% endif %}
-                </div>
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {# Errores no asociados a un campo #}
+        {% if form.non_field_errors %}
+          <div class="alert alert-error">
+            {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
             {% endfor %}
-            
-            <button type="submit" class="btn-submit">Ingresar</button>
+          </div>
+        {% endif %}
 
-            <div class="login-links">
-                <a href="{% url 'home' %}" class="forgot-password-link disabled-link">¿Has olvidado la contraseña?</a>
-                <span>¿No tienes cuenta? <a href="{% url 'planes' %}" class="register-link">Regístrate aquí</a></span>
-            </div>
-        </form>
-    </main>
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="field-error">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
 
-    <footer class="app-footer">
-        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
-    </footer>
+        <button type="submit" class="btn-primary-solid btn-block">Ingresar</button>
 
-    <!-- MEJORA: Enlazamos el nuevo archivo login.js -->
-    <script src="{% static 'landing/js/login.js' %}" defer></script>
-</body>
-</html>
+        <div class="login-links">
+          <a class="link-muted" href="#" aria-disabled="true">¿Has olvidado la contraseña?</a>
+          <span class="link-muted">¿No tienes cuenta?
+            <a class="link-strong" href="{% url 'landing:registro' %}">Regístrate aquí</a>
+          </span>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'landing/js/login.js' %}"></script>
+{% endblock %}

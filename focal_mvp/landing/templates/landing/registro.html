@@ -11,8 +11,30 @@
     <link rel="stylesheet" href="{% static 'landing/css/registro.css' %}">
 </head>
 <body>
-    <header class="app-header-minimal">
-        <a href="{% url 'landing' %}" class="logo">FOCAL</a>
+    <!-- =========================
+        HEADER / NAVBAR
+    ========================== -->
+    <header class="main-header" id="home">
+        <div class="container">
+        <a class="logo" href="#home" aria-label="Inicio">
+            <!-- Reemplazo del texto por logo, tal como indicaste -->
+            <img src="/static/landing/img/Focal_imagotipo.svg" alt="Bootstrap" width="30" height="24" style="vertical-align:middle;margin-right:.5rem">
+            <span class="logo-text sr-only">SOY FOCAL</span>
+        </a>
+
+        <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+
+        <nav class="main-nav" aria-label="Navegación principal">
+            <ul>
+            <li><a href="{% url 'landing:landing' %}">Inicio</a></li>
+            <li><a href="{% url 'landing:landing' %}#features">Qué ofrecemos</a></li>
+            <li><a href="{% url 'landing:quienes_somos' %}">Nosotros</a></li>
+            <li><a href="{% url 'landing:landing' %}#contact">Contacto</a></li>
+            <li><a class="btn btn-primary" href="{% url 'landing:login' %}">Iniciar sesión</a></li>
+            <li><a class="btn btn-secondary" href="{% url 'landing:registro' %}">Regístrate</a></li>
+            </ul>
+        </nav>
+        </div>
     </header>
 
     <main class="registration-container">
@@ -96,10 +118,76 @@
         </form>
     </main>
 
-    <footer class="app-footer">
-        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+    <!-- =========================
+        FOOTER
+    ========================== -->
+    <footer class="main-footer">
+        <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+            <a class="footer-logo" href="#home">
+                <img src="/static/landing/img/Focal_imagotipo.svg" alt="Bootstrap" width="30" height="24" style="vertical-align:middle;margin-right:.5rem">
+                <span class="sr-only">SOY FOCAL</span>
+            </a>
+            <p class="footer-text">
+                Herramientas simples para un control inteligente de tu inventario.
+            </p>
+
+            <ul class="contact-list">
+                <li>
+                <a class="contact-chip" href="mailto:soporte@soyfocal.cl">
+                    <span class="chip-ico">📧</span> soporte@soyfocal.cl
+                </a>
+                </li>
+                <li>
+                <a class="contact-chip" href="mailto:ventas@soyfocal.cl">
+                    <span class="chip-ico">🛒</span> ventas@soyfocal.cl
+                </a>
+                </li>
+            </ul>
+            </div>
+
+            <div class="footer-col">
+            <h4 class="footer-title">Producto</h4>
+            <nav class="footer-links">
+                <a href="#features">Características</a>
+                <a href="/metrics/">Métricas</a>
+                <a href="/inventario/">Inventario</a>
+            </nav>
+            </div>
+
+            <div class="footer-col">
+            <h4 class="footer-title">Compañía</h4>
+            <nav class="footer-links">
+                <a href="#cta">Nosotros</a>
+                <a href="#contact">Contacto</a>
+                <a href="/registro/">Registro</a>
+            </nav>
+            </div>
+        </div>
+
+        <hr class="footer-divider" />
+
+        <div class="footer-bottom">
+            <p class="footer-copy">© <span id="year"></span> FOCAL. Todos los derechos reservados.</p>
+        </div>    
+        </div>
     </footer>
 
+    <!-- Flotantes (Instagram / WhatsApp) -->
+    <div class="floating-social" aria-hidden="true">
+        <a class="float-btn ig" href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
+        <i class="bi bi-instagram"></i>
+        </a>
+        <a class="float-btn wa" href="https://wa.me/" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <i class="bi bi-whatsapp"></i>
+        </a>
+    </div>
+
+    <script>
+        // Año dinámico en el footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
     <!-- Registro JS -->
     <script src="{% static 'landing/js/registro.js' %}" defer></script>
 </body>

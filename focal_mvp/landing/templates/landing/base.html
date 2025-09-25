@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}FOCAL | Tu socio digital{% endblock %}</title>
+
+  <!-- Bootstrap Icons (usados en tarjetas y redes flotantes) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Estilos globales del sitio (landing) -->
+  <link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  {% include 'landing/partials/_navbar.html' %}
+
+  <main id="page-content" class="{% block page_class %}{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'landing/partials/_footer.html' %}
+
+  <!-- JS global (menú móvil, utilidades) -->
+  <script src="{% static 'landing/js/index.js' %}"></script>
+  <script>
+    // Año dinámico del footer (si existe el elemento)
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

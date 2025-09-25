@@ -2,194 +2,242 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FOCAL – Plataforma para Almaceneros de Barrio</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FOCAL | Tu socio digital</title>
 
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
+  <!-- Bootstrap Icons (para íconos de las tarjetas) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Estilos del landing -->
+  <link rel="stylesheet" href="static/landing/css/styles.css">
 </head>
 <body>
-  <header class="main-header">
+
+  <!-- =========================
+       HEADER / NAVBAR
+  ========================== -->
+  <header class="main-header" id="home">
     <div class="container">
-      <a href="#home" class="logo">FOCAL</a>
-      <nav class="main-nav">
+      <a class="logo" href="#home" aria-label="Inicio">
+        <!-- Reemplazo del texto por logo, tal como indicaste -->
+        <img src="/static/landing/img/Focal_imagotipo.svg" alt="Bootstrap" width="30" height="24" style="vertical-align:middle;margin-right:.5rem">
+        <span class="logo-text sr-only">SOY FOCAL</span>
+      </a>
+
+      <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+
+      <nav class="main-nav" aria-label="Navegación principal">
         <ul>
-          <li><a href="#home">Inicio</a></li>
-          <li><a href="#features">Qué Ofrecemos</a></li>
-          <li><a href="{% url 'quienes_somos' %}">Quiénes Somos</a></li>
-          <li><a href="#contact">Contacto</a></li>
-          <li><a href="{% url 'planes' %}" class="btn btn-primary">Ver Planes</a></li>
-          <li><a href="{% url 'login' %}" class="btn btn-secondary">Iniciar Sesión</a></li>
+          <li><a href="{% url 'landing:landing' %}">Inicio</a></li>
+          <li><a href="{% url 'landing:landing' %}#features">Qué ofrecemos</a></li>
+          <li><a href="{% url 'landing:quienes_somos' %}">Nosotros</a></li>
+          <li><a href="{% url 'landing:landing' %}#contact">Contacto</a></li>
+          <li><a class="btn btn-primary" href="{% url 'landing:login' %}">Iniciar sesión</a></li>
+          <li><a class="btn btn-secondary" href="{% url 'landing:registro' %}">Regístrate</a></li>
         </ul>
       </nav>
-      <button class="menu-toggle" aria-label="Abrir menú">
-        <span aria-hidden="true">☰</span>
-      </button>
     </div>
   </header>
 
-  <section id="home" class="hero-section">
+  <!-- =========================
+       HERO (SECCIÓN 1)
+       *Quité el texto “FOCAL” grande y dejé tarjeta para tu animación*
+  ========================== -->
+  <section class="hero-section section-odd">
     <div class="container">
       <div class="hero-content">
-        <h1>FOCAL: Tu socio digital para el almacén</h1>
+        <h1>Tu socio digital para el almacén</h1>
         <p class="subtitle">
           Organiza tu inventario, evita pérdidas por caducidad y mantén el control de tu negocio de forma simple e intuitiva.
         </p>
         <div class="hero-actions">
-          <a href="{% url 'planes' %}" class="btn btn-primary">Comenzar Ahora</a>
+          <a href="/registro/" class="btn btn-cta">Comenzar Ahora</a>
           <a href="#features" class="btn btn-secondary">Descubre Más</a>
         </div>
       </div>
+
+      <!-- Tarjeta/espacio para la animación (de momento un placeholder) -->
       <div class="hero-image">
-        <img src="{% static 'landing/Focal_imagotipo.svg' %}" alt="Interfaz de FOCAL" width="500" height="400" />
+        <div class="anim-card" aria-hidden="true">
+          <img src="{% static 'landing/img/comp-11.gif' %}" alt="" class="anim-gif">
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- QUÉ OFRECEMOS (con imágenes) -->
-  <section id="features" class="features-section">
+  <!-- =========================
+       FEATURES (SECCIÓN 2)
+       Título actualizado: “Lo que te ofrecemos”
+       Tarjetas son botones (enlaces) a páginas de detalle
+  ========================== -->
+  <section class="features-section section-even" id="features">
     <div class="container">
-      <h2 class="section-title">Lo que FOCAL te ofrece</h2>
+      <h2 class="section-title" style="text-align:center">Lo que te ofrecemos</h2>
       <p class="section-description">
         Diseñadas para mejorar la gestión de tu almacén.
       </p>
 
       <div class="features-grid">
-        <!-- 1. Inventario -->
-        <div class="feature-card">
-          <figure class="feature-media">
-            <picture>
-              <source srcset="{% static 'landing/img/features/inventario.jpg' %}" type="image/webp">
-              <img
-                src="{% static 'landing/img/features/inventario.jpg' %}"
-                alt="Pantalla de gestión de inventario de FOCAL"
-                class="feature-img"
-                loading="lazy" width="800" height="500">
-            </picture>
-          </figure>
+        <a class="feature-card" href="/detalle/gestion-inventario/">
+          <div class="feature-media">
+            <i class="bi bi-box-seam feature-icon" aria-hidden="true"></i>
+          </div>
           <h3>Gestión de Inventario</h3>
-          <p>Registra y controla el stock de tus productos en tiempo real para evitar quiebres y pérdidas.</p>
-        </div>
+          <p>Registra y controla el stock de tus productos en tiempo real.</p>
+        </a>
 
-        <!-- 2. Vencimientos -->
-        <div class="feature-card">
-          <figure class="feature-media">
-            <picture>
-              <source srcset="{% static 'landing/img/features/vencimientos.jpg' %}" type="image/webp">
-              <img
-                src="{% static 'landing/img/features/vencimientos.jpg' %}"
-                alt="Alertas de productos próximos a vencer"
-                class="feature-img"
-                loading="lazy" width="800" height="500">
-            </picture>
-          </figure>
+        <a class="feature-card" href="/detalle/alertas-vencimiento/">
+          <div class="feature-media">
+            <i class="bi bi-exclamation-triangle feature-icon" aria-hidden="true"></i>
+          </div>
           <h3>Alertas de Vencimiento</h3>
-          <p>Recibe notificaciones de productos próximos a caducar y reduce mermas en tu negocio.</p>
-        </div>
+          <p>Notificaciones de productos próximos a caducar para evitar pérdidas.</p>
+        </a>
 
-        <!-- 3. Recordatorios -->
-        <div class="feature-card">
-          <figure class="feature-media">
-            <picture>
-              <source srcset="{% static 'landing/img/features/recordatorios.jpg' %}" type="image/webp">
-              <img
-                src="{% static 'landing/img/features/recordatorios.jpg' %}"
-                alt="Recordatorios de pagos y compromisos"
-                class="feature-img"
-                loading="lazy" width="800" height="500">
-            </picture>
-          </figure>
-          <h3>Recordatorios Clave</h3>
-          <p>Organiza tus pagos y compromisos tributarios con recordatorios automáticos.</p>
-        </div>
+        <a class="feature-card" href="/detalle/metricas-reportes/">
+          <div class="feature-media">
+            <i class="bi bi-graph-up feature-icon" aria-hidden="true"></i>
+          </div>
+          <h3>Métricas y Reportes</h3>
+          <p>Toma decisiones con datos: KPIs, gráficos y exportaciones.</p>
+        </a>
 
-        <!-- 4. Reportes -->
-        <div class="feature-card">
-          <figure class="feature-media">
-            <picture>
-              <source srcset="{% static 'landing/img/features/reportes.jpg' %}" type="image/webp">
-              <img
-                src="{% static 'landing/img/features/reportes.jpg' %}"
-                alt="Reportes básicos para tomar decisiones"
-                class="feature-img"
-                loading="lazy" width="800" height="500">
-            </picture>
-          </figure>
-          <h3>Reportes Básicos</h3>
-          <p>Accede a reportes simples para entender el desempeño de tu negocio y tomar mejores decisiones.</p>
-        </div>
+        <a class="feature-card" href="/detalle/seguridad-datos/">
+          <div class="feature-media">
+            <i class="bi bi-shield-check feature-icon" aria-hidden="true"></i>
+          </div>
+          <h3>Seguridad</h3>
+          <p>Tus datos siempre protegidos con buenas prácticas y cifrado.</p>
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="cta-section">
+  <!-- =========================
+       CTA (SECCIÓN 3)
+       Texto actualizado y más alto para “poner monitos”
+  ========================== -->
+  <section class="cta-section section-odd" id="cta">
     <div class="container cta-container">
-      <h2 class="section-title">¿Listo para simplificar tu almacén?</h2>
-      <p class="section-description cta-description">
-        Únete a FOCAL y transforma tu forma de gestionar inventario y ventas.
+      <h2 class="section-title" style="color:#fff">¿Listo para simplificar tu almacén?</h2>
+      <p class="cta-description" style="color:#fff">
+        Únete a nosotros y transforma tu forma de gestionar negocio y tu vida.
       </p>
-      <a href="{% url 'planes' %}" class="btn btn-cta">Regístrate Ahora</a>
+      <a href="/registro/" class="btn btn-cta">Regístrate Ahora</a>
+      <!-- espacio extra para ilustraciones/“monitos” -->
+      <div class="cta-illustrations" aria-hidden="true"></div>
     </div>
   </section>
 
-  <section id="contact" class="contact-section">
+  <!-- =========================
+       CONTACTO (SECCIÓN 4)
+       Form solo para prospectos con dudas
+  ========================== -->
+  <section class="contact-section section-even" id="contact">
     <div class="container">
-      <h2 class="section-title">Contáctanos</h2>
-      <p class="section-description">
-        ¿Tienes preguntas o quieres saber más? Envíanos un mensaje y te responderemos a la brevedad.
-      </p>
-      <form class="contact-form" method="POST" action="{% url 'contacto_submit' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-submit">Enviar Mensaje</button>
+      <h2 class="section-title" style="text-align:center">¿Tienes dudas?</h2>
+      <p class="section-description">Cuéntanos qué necesitas y uno de nuestros especialistas te contactará.</p>
+
+      <form class="contact-form" method="post" action="/contacto/">
+        <!-- {% csrf_token %} si usas Django -->
+        <div class="grid-2">
+          <div>
+            <label class="label">Nombre</label>
+            <input type="text" name="nombre" placeholder="Tu nombre" required>
+          </div>
+          <div>
+            <label class="label">Email</label>
+            <input type="email" name="email" placeholder="tu@correo.com" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="label">Teléfono</label>
+            <input type="text" name="telefono" placeholder="+56 9 1234 5678">
+          </div>
+          <div>
+            <label class="label">Empresa</label>
+            <input type="text" name="empresa" placeholder="Nombre de tu tienda/almacén">
+          </div>
+        </div>
+
+        <label class="label">Mensaje</label>
+        <textarea name="mensaje" placeholder="Cuéntanos tu caso o tus preguntas…"></textarea>
+
+        <div style="text-align:right">
+          <button class="btn btn-submit" type="submit">Enviar consulta</button>
+        </div>
       </form>
     </div>
   </section>
 
-  <!-- FOOTER (sin redes) -->
+  <!-- =========================
+       FOOTER
+  ========================== -->
   <footer class="main-footer">
     <div class="container">
-      <div class="footer-top">
-        <p class="footer-copy">&copy; 2025 FOCAL. Todos los derechos reservados.</p>
+      <div class="footer-grid">
+        <div class="footer-col">
+          <p class="footer-text">
+            Herramientas simples para un control inteligente de tu inventario.
+          </p>
+
+          <ul class="contact-list">
+            <li>
+              <a class="contact-chip" href="mailto:soporte@soyfocal.cl">
+                <span class="chip-ico">📧</span> soporte@soyfocal.cl
+              </a>
+            </li>
+            <li>
+              <a class="contact-chip" href="mailto:ventas@soyfocal.cl">
+                <span class="chip-ico">🛒</span> ventas@soyfocal.cl
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Producto</h4>
+          <nav class="footer-links">
+            <a href="#features">Características</a>
+          </nav>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Compañía</h4>
+          <nav class="footer-links">
+            <a href="#cta">Nosotros</a>
+            <a href="#contact">Contacto</a>
+            <a href="/registro/">Registro</a>
+          </nav>
+        </div>
       </div>
 
       <hr class="footer-divider" />
 
       <div class="footer-bottom">
-        <div class="footer-links" role="navigation" aria-label="Legales">
-          <a href="#">Términos de Servicio</a>
-          <a href="#">Política de Privacidad</a>
-        </div>
-      </div>
+        <p class="footer-copy">© <span id="year"></span> FOCAL. Todos los derechos reservados.</p>
+      </div>    
     </div>
   </footer>
 
-  <!-- BURBUJAS FLOTANTES (se mantienen) -->
-  <div class="floating-social" aria-label="Redes sociales">
-    <a class="float-btn ig"
-       href="https://www.instagram.com/focal_cl"
-       target="_blank" rel="noopener"
-       aria-label="Instagram">
-      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-        <rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
-        <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/>
-        <circle cx="17.5" cy="6.5" r="1.6" fill="currentColor"/>
-      </svg>
+  <!-- Flotantes (Instagram / WhatsApp) -->
+  <div class="floating-social" aria-hidden="true">
+    <a class="float-btn ig" href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
+      <i class="bi bi-instagram"></i>
     </a>
-
-    <a class="float-btn wa"
-       href="https://wa.me/56986308519?text=Hola%20Focal%2C%20tengo%20una%20consulta"
-       target="_blank" rel="noopener"
-       aria-label="WhatsApp">
-      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-        <path d="M20.5 12a8.5 8.5 0 0 1-12.38 7.43L4 20l.66-4.02A8.49 8.49 0 1 1 20.5 12z" fill="none" stroke="currentColor" stroke-width="2"/>
-        <path d="M8.7 9.6c.2-.5.4-.6.7-.6h.6c.2 0 .4 0 .5.4l.5 1c.1 .3.1 .4 0 .6-.2 .3-.3 .4-.5 .6 0 0 .5 1 1.3 1.7.8 .7 1.8 1.1 1.8 1.1.2 -.1 .4 -.3 .7 -.6 .2 -.2 .4 -.2 .6 -.1l1.1 .5c.4 .2 .4 .3 .4 .6v.6c0 .3 -.1 .5 -.5 .7-.9 .5 -2.1 .3 -3.7 -.6s-2.7 -2 -3.6 -3.6c-.9 -1.6 -1.1 -2.8 -.6 -3.7z" fill="currentColor"/>
-      </svg>
+    <a class="float-btn wa" href="https://wa.me/" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <i class="bi bi-whatsapp"></i>
     </a>
   </div>
 
-  <script src="{% static 'landing/js/index.js' %}" defer></script>
+  <!-- JS propio (menú móvil y autocierre de alertas) -->
+  <script src="static/landing/js/index.js"></script>
+  <script>
+    // Año dinámico en el footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

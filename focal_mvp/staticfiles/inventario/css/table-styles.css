@@ -1,273 +1,416 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos Maestra para Páginas con Tablas
+   FOCAL - Estilos unificados (tabla + hub de pestañas)
+   Archivo único: inventario/css/table-styles.css
    ========================================================================== */
 
-/* 1. Variables y Configuración Base
-   -------------------------------------------------------------------------- */
+/* 1) Variables y base ------------------------------------------------------ */
 :root {
   --primary-purple: #4A008B;
   --secondary-purple: #7B1FA2;
-  --light-purple: #f8f0ff;
+  --light-purple: #F3E8FF;
   --white: #FFFFFF;
   --dark-text: #212529;
   --muted-text: #6c757d;
   --border-color: #dee2e6;
-  --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
-  
-  --font-primary: 'InterTight', sans-serif;
-  --font-secondary: 'HankenGrotesk', sans-serif;
+  --shadow-light: 0 6px 20px rgba(0,0,0,.07);
+  --shadow-medium: 0 10px 28px rgba(0,0,0,.12);
+
+  --font-primary: 'InterTight', Arial, sans-serif;
+  --font-secondary: 'HankenGrotesk', Arial, sans-serif;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+/* (Opcional) Fuentes locales si existen en /static */
+@font-face { font-family: 'InterTight'; src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype'); font-weight: 700; }
+@font-face { font-family: 'HankenGrotesk'; src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype'); font-weight: 400; }
 
-/* ... (tus @font-face no cambian) ... */
-@font-face {
-  font-family: 'InterTight';
-  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight: 700;
-}
-@font-face {
-  font-family: 'HankenGrotesk';
-  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight: 400;
-}
+*,
+*::before,
+*::after { box-sizing: border-box; }
 
+html { scroll-behavior: smooth; }
 body {
-  font-family: var(--font-secondary);
-  background-color: var(--light-purple);
+  margin: 0;
   color: var(--dark-text);
+  background: var(--light-purple);
+  font-family: var(--font-secondary);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2) Header / navegación --------------------------------------------------- */
+.app-header{
+  background: var(--primary-purple);
+  color: var(--white);
+  padding: .9rem 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.app-header nav.container{
+  width: min(1280px, 92%);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+.app-header .logo{
+  font-family: var(--font-primary);
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -.02em;
+  text-decoration: none;
+  color: #fff;
+}
+.nav-links{
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem .75rem;
   margin: 0;
   padding: 0;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
 }
 
-/* 2. Componentes Comunes (Header y Footer)
-   -------------------------------------------------------------------------- */
-.app-header {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.app-header nav.container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-.app-header .logo {
-  color: var(--white);
-  font-family: var(--font-primary);
-  font-size: 1.5rem;
+/* Botones del header preexistentes */
+.btn-accion{
+  display: inline-block;
+  padding: .55rem .9rem;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,.25);
+  color: #fff;
   text-decoration: none;
   font-weight: 700;
-}
-.app-header .nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap; /* Para que se adapte en pantallas pequeñas */
-    gap: 0.5rem 1rem;
-}
-.app-header .nav-links a {
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-.app-header .nav-links a:hover {
-    background-color: rgba(255,255,255,0.1);
-}
-
-.app-footer {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  text-align: center;
-  padding: 1.5rem;
-  margin-top: auto;
-  font-size: 0.9rem;
-}
-
-/* 3. Contenedor Principal y Título
-   -------------------------------------------------------------------------- */
-main.container {
-  width: 100%;
-  max-width: 1400px;
-  margin: 2.5rem auto;
-  padding: 0 2rem;
-  flex-grow: 1; /* Permite que el main crezca para centrar contenido */
-  display: flex;
-  flex-direction: column;
-}
-
-main.container h1 {
   font-family: var(--font-primary);
-  font-size: 2.2rem;
+  letter-spacing: .02em;
+  transition: background .2s ease, transform .15s ease, border-color .2s ease;
+}
+.btn-accion:hover{
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.45);
+  transform: translateY(-1px);
+}
+
+/* 3) Contenedor principal -------------------------------------------------- */
+main.container{
+  width: min(1280px, 92%);
+  margin: 1.6rem auto 2.2rem;
+  background: transparent;
+  flex: 1;
+}
+main.container h1{
+  font-family: var(--font-primary);
   color: var(--primary-purple);
-  margin-top: 0;
-  margin-bottom: 1.5rem;
+  font-size: clamp(1.4rem, 2.2vw, 2.1rem);
+  margin: .2rem 0 1rem;
 }
 
-/* 4. Barra de Búsqueda Rediseñada
-   -------------------------------------------------------------------------- */
-.search-section {
-    margin-bottom: 2rem;
-}
-.search-form {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    max-width: 500px;
-}
-.search-input {
-    flex-grow: 1;
-    padding: 0.8rem 1rem;
-    font-size: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.search-input:focus {
-    outline: none;
-    border-color: var(--primary-purple);
-    box-shadow: 0 0 0 3px rgba(74, 0, 139, 0.2);
-}
-.search-button, .clear-search-button {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--font-primary);
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s;
-}
-.search-button {
-    background-color: var(--primary-purple);
-    color: var(--white);
-}
-.search-button:hover {
-    background-color: var(--hover-dark-purple);
-}
-.clear-search-button {
-    background-color: #f8f9fa;
-    color: var(--muted-text);
-    border: 1px solid var(--border-color);
-}
-.clear-search-button:hover {
-    background-color: #e9ecef;
-}
+/* 4) Hub de pestañas (unificado desde hub.css) ----------------------------- */
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+.tab-btn{border:1px solid #e5e7eb;padding:.6rem .9rem;border-radius:.75rem;background:#fff;cursor:pointer}
+.tab-btn.active{background:var(--light-purple);border-color:var(--secondary-purple)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
+.card{background:#fff;border:1px solid var(--border-color);border-radius:1rem;padding:1rem}
+.toolbar,.sku-inline{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.pill{font-size:.85rem;background:#eef2ff;padding:.2rem .5rem;border-radius:.5rem}
+.muted{color:#6b7280}
 
-/* 5. Estilos de la Tabla Responsiva
-   -------------------------------------------------------------------------- */
-.table-container {
-  width: 100%;
-  overflow-x: auto; 
-  -webkit-overflow-scrolling: touch;
+.grid{display:grid;gap:1rem}
+.grid-2{grid-template-columns:1fr}
+@media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
+
+/* Botones genéricos para tabs/paneles */
+.btn{padding:.55rem .85rem;border-radius:.6rem;border:1px solid #e5e7eb;background:#fff;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-primary{background:var(--secondary-purple);border-color:transparent;color:#fff}
+.btn-secondary{background:#fff;border-color:#e5e7eb;color:var(--dark-text)}
+.btn-sm{padding:.4rem .6rem;font-size:.9rem}
+.empty-hint{color:#6b7280;margin:.5rem 0}
+.acciones a{margin-right:.35rem}
+
+/* 5) Buscador -------------------------------------------------------------- */
+.search-section{ margin: 0 0 1.2rem; }
+.search-form{
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 720px;
+}
+.search-input{
+  flex: 1;
+  padding: .8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.search-input:focus{
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(74,0,139,.18);
+}
+.search-button, .clear-search-button{
+  padding: .75rem 1.1rem;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  text-decoration: none;
+  font-family: var(--font-primary);
+  font-weight: 800;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .15s ease;
+}
+.search-button{
+  background: var(--primary-purple);
+  color: #fff;
+  border-color: var(--primary-purple);
+}
+.search-button:hover{ background: #38006B; border-color: #38006B; transform: translateY(-1px); }
+.clear-search-button{
+  background: #fff; color: var(--muted-text);
+  border-color: var(--border-color);
+}
+.clear-search-button:hover{ background: #f3f4f6; }
+
+/* 6) Tabla (Desktop) ------------------------------------------------------- */
+.table-container{
+  background: #fff;
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  box-shadow: var(--box-shadow);
-  background-color: var(--white);
+  box-shadow: var(--shadow-light);
+
+  /* Importante para 100+ filas: scroll interno con header sticky */
+  max-height: 72vh;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
-/* ... (el resto de los estilos de la tabla no cambian) ... */
-table {
+.tabla-inventario{
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px; 
+  min-width: 980px;            /* deja espacio a todas las columnas */
+  font-size: .96rem;           /* densidad un poco más compacta */
 }
-table thead {
-  background-color: #f8f9fa;
+/* Header sticky */
+.tabla-inventario thead{
+  background: #f8f9fa;
   border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
-table th {
-  padding: 1rem 1.2rem;
+.tabla-inventario th,
+.tabla-inventario td{
+  padding: .9rem 1rem;
   text-align: left;
+  vertical-align: top;
+}
+.tabla-inventario th{
   font-family: var(--font-primary);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--dark-text);
   text-transform: uppercase;
-  font-size: 0.8rem;
-  letter-spacing: 0.5px;
+  letter-spacing: .4px;
+  font-size: .8rem;
 }
-table td {
-  padding: 1rem 1.2rem;
-  border-bottom: 1px solid #f1f3f5;
-  color: var(--muted-text);
-}
-table tbody tr:last-child td {
-  border-bottom: none;
-}
-table tbody tr:hover {
-  background-color: var(--light-purple);
-}
-.acciones { display: flex; gap: 0.5rem; }
-.btn-accion-tabla {
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-decoration: none;
-    color: white;
-    background-color: var(--secondary-purple);
-    transition: opacity 0.2s;
-}
-.btn-accion-tabla:hover { opacity: 0.8; }
-.btn-peligro { background-color: #c62828; }
 
+/* Zebra + hover */
+.tabla-inventario tbody tr:nth-child(even){ background:#fcfcfd; }
+.tabla-inventario tbody tr:hover{ background:#faf6ff; }
+.tabla-inventario tbody tr{ border-bottom:1px solid #f1f3f5; }
+.tabla-inventario tbody tr:last-child{ border-bottom:0; }
 
-/* 6. Estilos para el Estado Vacío (Rediseñado)
-   -------------------------------------------------------------------------- */
-.empty-state-wrapper {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* SKU largos + números monoespaciados */
+.tabla-inventario td:nth-child(2){ word-break: break-word; font-feature-settings: "tnum"; }
+
+/* Primera columna sticky (Producto) */
+.tabla-inventario th:first-child,
+.tabla-inventario td:first-child{
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 3;
+  box-shadow: 2px 0 0 #eee;
 }
-.empty-state {
-    max-width: 500px;
-    text-align: center;
-    padding: 2rem;
+
+/* Estados (señales por fila) */
+.tabla-inventario tr.vencido{ box-shadow: inset 4px 0 0 #c62828; background: #fff5f5; }
+.tabla-inventario tr.proximo-vencer{ box-shadow: inset 4px 0 0 #f57c00; background: #fff8e1; }
+.tabla-inventario tr.stock-bajo{ box-shadow: inset 4px 0 0 #1565c0; background: #eef6ff; }
+
+/* Acciones en fila */
+.acciones{ display:flex; gap:.5rem; flex-wrap:wrap; }
+.btn-accion-tabla{
+  display:inline-block; padding:.4rem .7rem; border-radius:8px;
+  background:var(--secondary-purple); color:#fff; text-decoration:none; font-size:.82rem; font-weight:700;
 }
-.empty-state-icon svg {
-    stroke: var(--primary-purple);
-    opacity: 0.2;
-    margin-bottom: 1.5rem;
+.btn-accion-tabla:hover{ filter:brightness(.95); }
+.btn-peligro{ background:#c62828; }
+
+/* 7) Empty state ----------------------------------------------------------- */
+.empty-state-wrapper{ min-height: 58vh; display: grid; place-items: center; }
+.empty-state{ text-align: center; max-width: 520px; background: transparent; padding: 1.5rem; }
+.empty-state-icon svg{ stroke: var(--primary-purple); opacity: .25; margin-bottom: 1rem; }
+.empty-state-title{
+  font-family: var(--font-primary);
+  font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+  color: var(--dark-text);
+  margin: 0 0 .6rem;
 }
-.empty-state-title {
-    font-family: var(--font-primary);
-    font-size: 1.8rem;
-    color: var(--dark-text);
-    margin: 0 0 0.75rem 0;
+.empty-state-message{ color: var(--muted-text); margin-bottom: 1.4rem; }
+.btn-accion-principal{
+  display: inline-block; padding: .9rem 1.4rem; border-radius: 10px;
+  background: var(--primary-purple); color: #fff; text-decoration: none;
+  font-family: var(--font-primary); font-weight: 800; border: 2px solid var(--primary-purple);
 }
-.empty-state-message {
-    color: var(--muted-text);
-    margin-bottom: 2.5rem;
-    line-height: 1.7;
+.btn-accion-principal:hover{ background: #38006B; border-color: #38006B; transform: translateY(-1px); }
+
+/* 8) Footer --------------------------------------------------------------- */
+.app-footer{
+  background: var(--primary-purple);
+  color: #fff;
+  text-align: center;
+  padding: 1.2rem 0;
+  margin-top: auto;
+  font-size: .95rem;
 }
-.btn-accion-principal {
-    display: inline-block;
-    padding: 0.9rem 2rem;
-    background-color: var(--primary-purple);
-    color: var(--white);
-    text-decoration: none;
-    font-family: var(--font-primary);
-    font-weight: 700;
+
+/* --- Ventana modal descontar --- */
+.modal{ position: fixed; inset:0; display:none; }
+.modal.is-open{ display:block; }
+.modal__backdrop{
+  position:absolute; inset:0; background: rgba(0,0,0,.45);
+}
+.modal__content{
+  position: relative;
+  max-width: 520px; width: calc(100% - 2rem);
+  margin: 8vh auto; background:#fff; border-radius: 14px;
+  border: 1px solid var(--border-color); box-shadow: var(--shadow-medium);
+  overflow: hidden;
+}
+.modal__header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: .9rem 1.1rem; background:#faf7ff; border-bottom:1px solid #eee;
+}
+.modal__header h3{ margin:0; font-family: var(--font-primary); }
+.modal__close{
+  border:0; background:transparent; font-size:1.6rem; line-height:1; cursor:pointer;
+}
+.modal__body{ padding: 1rem 1.1rem; }
+.modal__row{ display:grid; gap:.35rem; margin-bottom: .9rem; }
+.modal__footer{
+  display:flex; gap:.5rem; justify-content:flex-end; padding: .9rem 1.1rem;
+  border-top:1px solid #eee; background:#fff;
+}
+
+/* --- Stepper (+/−) --- */
+.stepper{ display:flex; align-items:center; gap:.4rem; max-width: 180px; }
+.stepper-btn{
+  flex:0 0 38px; height:38px; border-radius:8px;
+  border:1px solid var(--border-color); background:#fff; font-size:1.4rem; line-height:1;
+  cursor:pointer;
+}
+.stepper-btn:hover{ background: var(--light-purple); border-color: var(--secondary-purple); }
+.stepper input{
+  flex:1; text-align:center; font-size:1rem; padding:.4rem;
+  border-radius:6px; border:1px solid var(--border-color);
+}
+
+/* 9) RESPONSIVE ----------------------------------------------------------- */
+/* Tablet */
+@media (max-width: 1024px){
+  .nav-links{ gap: .4rem; }
+  .btn-accion{ padding: .5rem .72rem; }
+  .tabla-inventario{ min-width: 820px; }
+  .tabla-inventario th, .tabla-inventario td{ padding: .8rem .75rem; }
+  .search-form{ max-width: 100%; }
+}
+
+/* Móvil: tabla como tarjetas */
+@media (max-width: 768px){
+  main.container{ width: min(1100px, 94%); }
+
+  /* buscador full width */
+  .search-form{ flex-wrap: wrap; gap: .5rem; }
+  .search-input{ width: 100%; }
+  .search-button, .clear-search-button{ flex: 1; text-align: center; }
+
+  .table-container{
+    border-radius: 12px;
+    overflow: hidden;         /* sin scroll horizontal: tarjetas */
+    max-height: none;         /* deja que el documento scrollee */
+  }
+  .tabla-inventario{
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    min-width: 0;
+    width: 100%;
     font-size: 1rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
+  }
+
+  /* Escondemos thead y recreamos rótulos */
+  .tabla-inventario thead{
+    position: absolute; clip: rect(1px,1px,1px,1px);
+    width: 1px; height: 1px; overflow: hidden;
+  }
+
+  .tabla-inventario tr{
+    display: block;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-light);
+    padding: .6rem .75rem;
+    margin: 0 0 12px 0;
+    contain: content;
+  }
+  .tabla-inventario td{
+    display: grid;
+    grid-template-columns: 44% 56%; /* etiqueta / contenido */
+    align-items: start;
+    gap: .4rem;
+    padding: .55rem .25rem;
+    border: 0;
+    border-bottom: 1px dashed #eee;
+    word-break: break-word;
+  }
+  .tabla-inventario td:last-child{ border-bottom: 0; }
+
+  .tabla-inventario td::before{
+    content: attr(data-label);
+    font-family: var(--font-primary);
+    font-weight: 800;
+    color: var(--dark-text);
+    letter-spacing: .2px;
+    font-size: .92rem;
+  }
+
+  /* Mapeo por nth-child (por si no añades data-label) */
+  .tabla-inventario td:nth-child(1)::before{ content: "Producto"; }
+  .tabla-inventario td:nth-child(2)::before{ content: "SKU"; }
+  .tabla-inventario td:nth-child(3)::before{ content: "Marca"; }
+  .tabla-inventario td:nth-child(4)::before{ content: "Categoría"; }
+  .tabla-inventario td:nth-child(5)::before{ content: "Dramaje"; }
+  .tabla-inventario td:nth-child(6)::before{ content: "Unidad Medida"; }
+  .tabla-inventario td:nth-child(7)::before{ content: "Próximo Vencimiento"; }
+  .tabla-inventario td:nth-child(8)::before{ content: "Stock Total"; }
+  .tabla-inventario td:nth-child(9)::before{ content: "Cantidad Lotes"; }
+  .tabla-inventario td:nth-child(10)::before{ content: "Acciones"; }
+
+  /* Estados: banda superior en tarjeta */
+  .tabla-inventario tr.vencido{ box-shadow: 0 2px 0 #c62828 inset, var(--shadow-light); }
+  .tabla-inventario tr.proximo-vencer{ box-shadow: 0 2px 0 #f57c00 inset, var(--shadow-light); }
+  .tabla-inventario tr.stock-bajo{ box-shadow: 0 2px 0 #1565c0 inset, var(--shadow-light); }
 }
-.btn-accion-principal:hover {
-    background-color: var(--hover-dark-purple);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(74, 0, 139, 0.2);
+
+/* Móviles pequeños: aún más compacto */
+@media (max-width: 420px){
+  .btn-accion{ padding: .45rem .6rem; font-size: .92rem; }
+  .tabla-inventario td{
+    grid-template-columns: 48% 52%;
+    padding: .5rem .2rem;
+  }
 }

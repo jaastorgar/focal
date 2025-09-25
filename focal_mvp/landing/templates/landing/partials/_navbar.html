@@ -1,0 +1,40 @@
+{% load static %}
+<header class="main-header" id="site-header">
+  <div class="container header-inner">
+    <!-- Logo a la izquierda -->
+    <a class="logo" href="{% url 'landing:landing' %}" aria-label="Inicio">
+      <img
+        src="{% static 'landing/img/Focal_imagotipo.svg' %}"
+        alt="FOCAL"
+        class="logo-img"
+        width="120"
+        height="auto">
+      <span class="sr-only">FOCAL</span>
+    </a>
+
+    <!-- Botón hamburguesa (solo móvil/tablet, se controla por CSS) -->
+    <button class="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button>
+
+    <!-- Navegación principal -->
+    <nav class="main-nav" aria-label="Navegación principal">
+      <ul>
+        <li><a class="nav-link" href="{% url 'landing:landing' %}"><span>Inicio</span></a></li>
+        <li><a class="nav-link" href="{% url 'landing:landing' %}#features"><span>Qué ofrecemos</span></a></li>
+        <li><a class="nav-link" href="{% url 'landing:quienes_somos' %}"><span>Nosotros</span></a></li>
+        <li><a class="nav-link" href="{% url 'landing:landing' %}#contact"><span>Contacto</span></a></li>
+
+        <!-- Acciones (mismo estilo de botones del landing) -->
+        <li>
+          <a class="btn btn-primary nav-cta" href="{% url 'landing:login' %}">
+            Iniciar sesión
+          </a>
+        </li>
+        <li>
+          <a class="btn btn-outline nav-cta" href="{% url 'landing:registro' %}">
+            Regístrate
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

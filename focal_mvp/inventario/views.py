@@ -68,58 +68,98 @@ def home(request):
 def inventario_view(request):
     """
     Muestra la lista de productos del inventario de la empresa actual.
+    Además, si viene ?sku=, precarga el producto y sus lotes para el panel "Gestionar".
     """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
-        return render(request, 'inventario/inventario.html', {'productos': Producto.objects.none()})
+        return render(request, 'inventario/inventario.html', {
+            'productos': Producto.objects.none(),
+            # Para que el template no falle si espera estas claves:
+            'sku': '',
+            'producto_sel': None,
+            'lotes_sel': LoteProducto.objects.none(),
+            'query': '',
+            'today': date.today(),
+            'hoy_mas_15dias': int(time.mktime((date.today() + timedelta(days=15)).timetuple())),
+        })
 
+    # ===== Base de productos de la empresa =====
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
 
+    # Subconsultas (stock total, próximo vencimiento, cantidad de lotes) a nivel de empresa
     lotes_empresa = LoteProducto.objects.filter(
         producto__producto=OuterRef('pk'),
         producto__empresa=empresa_usuario
     )
 
     subquery_stock = Subquery(
-        lotes_empresa.values('producto__producto').annotate(total=Sum('cantidad')).values('total')
+        lotes_empresa.values('producto__producto')
+        .annotate(total=Sum('cantidad'))
+        .values('total')
     )
 
     subquery_vencimiento = Subquery(
-        lotes_empresa.values('producto__producto').annotate(proximo=Min('fecha_vencimiento')).values('proximo')
+        lotes_empresa.values('producto__producto')
+        .annotate(proximo=Min('fecha_vencimiento'))
+        .values('proximo')
     )
 
     subquery_cantidad_lotes = Subquery(
         LoteProducto.objects.filter(
-            producto__producto=OuterRef('pk'),  
+            producto__producto=OuterRef('pk'),
             producto__empresa=empresa_usuario
-        ).values('producto__producto') 
-         .annotate(count=Count('id'))  
-         .values('count')  
+        ).values('producto__producto')
+         .annotate(count=Count('id'))
+         .values('count')
     )
-    # =============================================================
-
-    # Subconsultas para precios - AHORA USANDO PROPIEDADES DINÁMICAS
-    ofertas_empresa = OfertaProducto.objects.filter(producto=OuterRef('pk'), empresa=empresa_usuario)
 
     productos = productos_base.annotate(
         stock_total=subquery_stock,
         proximo_vencimiento=subquery_vencimiento,
-        cantidad_lotes=subquery_cantidad_lotes 
+        cantidad_lotes=subquery_cantidad_lotes
     )
 
-    query = request.GET.get('q')
+    # ===== Filtro de búsqueda libre =====
+    query = (request.GET.get('q') or '').strip()
     if query:
         productos = productos.filter(
-            Q(nombre__icontains=query) | Q(sku__icontains=query) |
-            Q(marca__icontains=query) | Q(categoria__icontains=query)
+            Q(nombre__icontains=query) |
+            Q(sku__icontains=query) |
+            Q(marca__icontains=query) |
+            Q(categoria__icontains=query)
         ).distinct()
 
+    # ===== Panel "Gestionar" por SKU (reutiliza el flujo de gestionar_proveedores_precios) =====
+    sku = (request.GET.get('sku') or '').strip()
+    producto_sel = None
+    lotes_sel = LoteProducto.objects.none()
+
+    if sku:
+        try:
+            # Producto debe pertenecer al inventario (asociado a la empresa)
+            producto_sel = get_object_or_404(Producto, sku=sku, empresas=empresa_usuario)
+            oferta_producto = get_object_or_404(OfertaProducto, producto=producto_sel, empresa=empresa_usuario)
+            # Lotes de esa oferta (empresa) más recientes primero
+            lotes_sel = (LoteProducto.objects
+                         .filter(producto=oferta_producto)
+                         .select_related('proveedor')
+                         .order_by('-fecha_vencimiento'))
+        except Exception:
+            messages.error(request, "Producto no encontrado o no autorizado.")
+            producto_sel = None
+            lotes_sel = LoteProducto.objects.none()
+
+    # ===== Contexto =====
     context = {
         'productos': productos,
         'query': query,
         'today': date.today(),
         'hoy_mas_15dias': int(time.mktime((date.today() + timedelta(days=15)).timetuple())),
+        # Para el hub dentro del mismo template:
+        'sku': sku,
+        'producto_sel': producto_sel,
+        'lotes_sel': lotes_sel,
     }
     return render(request, 'inventario/inventario.html', context)
 
@@ -251,39 +291,64 @@ def detalle_producto(request, producto_id):
     return render(request, 'inventario/detalle_producto.html', context)
 
 @login_required
+@transaction.atomic
 def agregar_lote_producto(request):
-    """
-    Vista para agregar un nuevo lote de producto.
-    """
-    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    from django.urls import reverse
     
-    if not empresa_usuario:
+    """
+    Alta de Lote con preselección por ?sku=…
+    - Si viene ?sku=, busca el Producto de la empresa y lo setea como initial en el form.
+    - Tras guardar, redirige al hub de inventario con ?sku=…#tab-gestionar
+    """
+    empresa = obtener_empresa_del_usuario(request.user)
+    if not empresa:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
         return redirect('inventario')
 
-    if request.method == 'POST':
-        # === PASAR empresa_usuario AL FORMULARIO ===
-        form = LoteProductoForm(request.POST, empresa_usuario=empresa_usuario)
-        # =========================================
+    sku = (request.GET.get('sku') or '').strip()
+    oferta_seleccionada = None
 
+    if sku:
+        # Comprueba que ese producto exista y esté ofrecido por la empresa
+        producto = Producto.objects.filter(sku=sku, empresas=empresa).first()
+        if producto:
+            oferta_seleccionada = OfertaProducto.objects.filter(empresa=empresa, producto=producto).first()
+
+    if request.method == 'POST':
+        form = LoteProductoForm(request.POST, empresa_usuario=empresa)
         if form.is_valid():
             lote = form.save()
-            messages.success(request, f"Lote para '{lote.producto.producto.nombre}' agregado.")
-            return redirect('inventario')
+            messages.success(request, f"Lote para '{lote.producto.producto.nombre}' agregado correctamente.")
+            # Redirige al hub de gestionar con el SKU
+            try:
+                sku_ok = lote.producto.producto.sku
+            except Exception:
+                sku_ok = sku
+            inv = reverse('inventario')
+            return redirect(f"{inv}?sku={sku_ok}#tab-gestionar" if sku_ok else inv)
         else:
-            # Para debugging - puedes remover después
-            print("Form errors:", form.errors)
-            print("Form data:", request.POST)
+            messages.error(request, "Revisa los errores del formulario.")
     else:
-        # === PASAR empresa_usuario AL FORMULARIO PARA GET ===
-        form = LoteProductoForm(empresa_usuario=empresa_usuario)
-        # ==================================================
+        initial = {}
+        if oferta_seleccionada:
+            initial['producto'] = oferta_seleccionada
+        form = LoteProductoForm(empresa_usuario=empresa, initial=initial)
+        # Si hay oferta seleccionada, podrías restringir el queryset del campo 'producto' a esa oferta:
+        if oferta_seleccionada and 'producto' in form.fields:
+            form.fields['producto'].queryset = OfertaProducto.objects.filter(pk=oferta_seleccionada.pk)
 
-    context = {'form': form}
-    return render(request, 'inventario/agregar_lote.html', context)
+    return render(request, 'inventario/agregar_lote.html', {
+        'form': form,
+        'sku_prefill': sku,
+        'oferta_seleccionada': oferta_seleccionada,
+    })
 
 @login_required
 def editar_lote(request, lote_id):
+    """
+    Edita un lote y, al guardar o cancelar, redirige al hub de inventario con el SKU
+    del producto seleccionado en la pestaña 'Gestionar'.
+    """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     lote = get_object_or_404(
         LoteProducto.objects.select_related('producto__producto', 'proveedor'),
@@ -296,8 +361,20 @@ def editar_lote(request, lote_id):
         if form.is_valid():
             lote_actualizado = form.save()
             messages.success(request, "Lote actualizado correctamente.")
-            return redirect('inventario', producto_id=lote_actualizado.producto.producto.id)
+
+            # Redirección Plan B: volver al inventario con el SKU y abrir 'Gestionar'
+            from django.urls import reverse
+            try:
+                sku = lote_actualizado.producto.producto.sku
+            except Exception:
+                # fallback por si cambia la relación
+                sku = getattr(getattr(lote, 'producto', None), 'producto', None)
+                sku = getattr(sku, 'sku', '') if sku else ''
+
+            inventario_url = reverse('inventario')
+            return redirect(f"{inventario_url}?sku={sku}#tab-gestionar" if sku else inventario_url)
         else:
+            # Logs de ayuda + mensaje al usuario
             print("Form errors (editar_lote):", form.errors)
             print("Form non-field errors:", form.non_field_errors())
             print("Form data:", request.POST)
@@ -344,36 +421,18 @@ def eliminar_lote(request, lote_id):
 
 @login_required
 def gestionar_proveedores_precios(request):
-    from django.http import Http404
+    from django.urls import reverse
     
-    """
-    Muestra la página para gestionar proveedores y precios.
-    Puede funcionar sin un producto seleccionado inicialmente.
-    """
+    # Mantén validación de empresa si quieres:
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
         return redirect('inventario')
 
-    # Obtener el SKU de la solicitud GET
-    sku = request.GET.get('sku')
-    producto = None
-    lotes = LoteProducto.objects.none()
-
+    sku = (request.GET.get('sku') or '').strip()
     if sku:
-        try:
-            # Buscar el producto por SKU
-            producto = get_object_or_404(Producto, sku=sku, empresas=empresa_usuario)
-            oferta_producto = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa_usuario)
-            lotes = LoteProducto.objects.filter(producto=oferta_producto).order_by('-fecha_vencimiento')
-        except Http404:
-            messages.error(request, "Producto no encontrado o no autorizado.")
-
-    context = {
-        'producto': producto,
-        'lotes': lotes,
-    }
-    return render(request, 'inventario/gestionar_proveedores_precios.html', context)
+        return redirect(f"{reverse('inventario')}?sku={sku}#tab-gestionar")
+    return redirect(f"{reverse('inventario')}#tab-gestionar")
 
 @login_required
 def agregar_proveedor(request):
