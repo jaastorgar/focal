@@ -1,439 +1,211 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos para el Dashboard Principal
+   FOCAL – Dashboard (home.css)
+   Tarjetas estilo "Nosotros" + descripción que aparece al hover/focus
    ========================================================================== */
 
-/* 1. Variables y Configuración Base
-   -------------------------------------------------------------------------- */
-:root {
-  /* --- Colores de la Empresa --- */
-  --primary-purple: #4A008B; /* Morado Oscuro / Principal */
-  --secondary-purple: #7B1FA2; /* Morado Intermedio / Degradado */
-  --light-purple: #F3E8FF; /* Morado Claro / Accent (usado para fondos sutiles o texto sobre oscuro) */
-  --dark-text: #343A40; /* Gris Oscuro para texto principal */
-  --muted-text: #555555; /* Gris para texto secundario */
-  --white: #FFFFFF; /* Blanco */
-  --header-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer (nombre unificado) */
-  --hover-dark-purple: #38006B; /* Tono más oscuro para hover de botones */
-  --hover-light-purple: #E0B3FF; /* Morado claro para hover de enlaces */
-  
-  --border-color: #dee2e6;
-  --shadow-light: rgba(0, 0, 0, 0.08);
-  --shadow-medium: rgba(0, 0, 0, 0.15);
-  --shadow-dark: rgba(0, 0, 0, 0.3);
-  --danger-color: #dc3545; /* Rojo para mensajes de error/peligro */
-  --success-color: #28a745; /* Verde para mensajes de éxito */
-  --info-color: #17a2b8; /* Azul para mensajes de información */
-  --warning-color: #ffc107; /* Amarillo para mensajes de advertencia */
+/* 1) Variables y Fuentes
+-------------------------------------------------------------------------- */
+:root{
+  --primary-purple:#4A008B;
+  --secondary-purple:#7B1FA2;
+  --light-purple:#F3E8FF;
+  --header-footer-bg:#2C0140;
+  --dark-text:#343A40;
+  --muted-text:#555555;
+  --white:#FFFFFF;
+  --turquoise:#0AE8C6;
 
-  /* --- Colores de estado para las filas de la tabla --- */
-  --danger-bg: #ffebee;   /* Rojo muy claro para 'vencido' */
-  --warning-bg: #fffde7;  /* Amarillo muy claro para 'proximo-vencer' */
-  --info-bg: #e3f2fd;     /* Azul muy claro para 'stock-bajo' */
-  
-  /* --- Definiciones de fuentes personalizadas --- */
-  --font-primary: 'InterTight', Arial, sans-serif; /* Para títulos y botones */
-  --font-secondary: 'HankenGrotesk', Arial, sans-serif; /* Para párrafos y contenido */
+  --border-color:#e9e9ef;
+  --shadow-1:0 6px 20px rgba(15,15,30,.06);
+  --shadow-2:0 14px 34px rgba(15,15,30,.10);
+  --shadow-focus:0 0 0 3px rgba(10,232,198,.25);
+
+  --font-primary:'InterTight', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --font-secondary:'HankenGrotesk', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* Animación de la descripción */
+  --card-desc-max:110px;
 }
 
-/* --- Definiciones de fuentes personalizadas --- */
-/* InterTight – títulos y botones */
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight:800;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
 }
 
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+/* 2) Reset y layout base
+-------------------------------------------------------------------------- */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  min-height:100vh;display:flex;flex-direction:column;
+  background:#f7f8fb;color:var(--dark-text);line-height:1.6;
+  font-family:var(--font-secondary);
+}
+.container{width:90%;max-width:1200px;margin:0 auto}
+
+/* 3) Header / Footer mínimos (opcional)
+-------------------------------------------------------------------------- */
+.app-header{
+  position:sticky;top:0;z-index:1000;
+  background:var(--header-footer-bg);color:var(--white);
+  box-shadow:0 2px 10px rgba(0,0,0,.12);
+}
+.app-header .navbar{
+  max-width:1280px;margin:0 auto;padding:14px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.app-header .navbar-brand{
+  font-family:var(--font-primary);font-weight:800;font-size:1.4rem;letter-spacing:.3px
+}
+.app-header .navbar-menu{list-style:none}
+.app-header .dropdown{position:relative}
+.app-header .dropdown > a{
+  color:var(--white);text-decoration:none;font-weight:600;
+  padding:.5rem 1rem;border-radius:10px;display:inline-block;
+  transition:background .2s ease;
+}
+.app-header .dropdown > a:hover{background:rgba(255,255,255,.08)}
+.app-header .dropdown-menu{
+  position:absolute;right:0;top:calc(100% + 6px);
+  background:var(--header-footer-bg);border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  list-style:none;min-width:180px;padding:.4rem 0;display:none;
+}
+.app-header .dropdown:hover .dropdown-menu{display:block}
+.app-header .dropdown-menu a{
+  color:#fff;text-decoration:none;display:block;padding:.65rem 1rem;
+  border-bottom:1px solid rgba(255,255,255,.08);font-weight:400;
+}
+.app-header .dropdown-menu li:last-child a{border-bottom:none}
+
+.app-footer{
+  margin-top:auto;background:var(--header-footer-bg);color:#fff;
+  text-align:center;padding:1.2rem;font-size:.92rem;
 }
 
-/* HankenGrotesk – párrafos y contenido */
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
+/* 4) Sección de bienvenida
+-------------------------------------------------------------------------- */
+.dashboard-container{width:90%;max-width:1200px;margin:0 auto;padding:42px 0 48px}
+.welcome-header{text-align:center;margin-bottom:34px}
+.welcome-header h1{
+  font-family:var(--font-primary);font-size:2.6rem;font-weight:800;
+}
+.welcome-header .welcome-name{color:var(--primary-purple)}
+.welcome-header p{color:var(--muted-text);margin-top:.5rem;font-size:1.08rem}
+
+/* 5) Tarjetas estilo "Nosotros" + descripción al hover
+-------------------------------------------------------------------------- */
+.main-navigation{margin-top:10px}
+.card-grid{
+  display:grid;gap:24px;
+  grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
 }
 
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+/* Contenedor de la tarjeta */
+.card{
+  position:relative;isolation:isolate; /* para pseudo-elemento */
+  background:var(--white);
+  border:1px solid var(--border-color);
+  border-radius:22px;
+  box-shadow:var(--shadow-1);
+  text-decoration:none;color:inherit;
+  padding:28px 22px; text-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  min-height:230px; /* igualamos alturas */
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, background-color .25s ease;
+  overflow:hidden; /* oculta la animación del párrafo */
 }
 
-/* --- Estilos Generales del Documento --- */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* Halo/edge degradado en hover como en “Nosotros” */
+.card::after{
+  content:"";position:absolute;inset:-1px;z-index:-1;border-radius:24px;
+  background:linear-gradient(145deg, rgba(122,31,162,.18), rgba(10,232,198,.18));
+  opacity:0;transition:opacity .25s ease;
+}
+.card:hover::after{opacity:1}
+
+/* Interacciones */
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-2);
+  border-color:rgba(74,0,139,.25);
+  background:linear-gradient(180deg, #ffffff 0%, #fdfbff 100%);
+}
+.card:focus-visible{outline:none;box-shadow:var(--shadow-2), var(--shadow-focus)}
+
+/* Icono & Título */
+.card-icon{
+  font-size:48px;color:var(--primary-purple);
+  margin-bottom:14px;line-height:1
+}
+.card-title{
+  font-family:var(--font-primary);font-weight:800;
+  font-size:1.45rem;color:var(--primary-purple);
 }
 
-body {
-    font-family: var(--font-secondary);
-    background-color: #f8f9fa; /* Fondo suave */
-    color: var(--dark-text);
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+/* Descripción: oculta por defecto y aparece al hover/focus */
+.card-description{
+  color:var(--muted-text);
+  font-size:1rem;margin-top:.4rem;
+
+  max-height:0;opacity:0;visibility:hidden;
+  transform:translateY(-6px);pointer-events:none;
+  transition:
+    max-height .35s ease,
+    opacity .25s ease,
+    transform .25s ease,
+    visibility 0s linear .25s;
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
+/* Mostrar descripción en hover o focus-within (accesible con TAB) */
+.card:hover .card-description,
+.card:focus-within .card-description{
+  max-height:var(--card-desc-max);
+  opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;
+  transition:
+    max-height .45s ease,
+    opacity .25s ease,
+    transform .25s ease,
+    visibility 0s;
 }
 
-/* --- Encabezado (Actualizado con tus estilos) --- */
-.app-header {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+/* 6) Preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce){
+  .card, .card-description, .card::after{transition:none}
 }
 
-.app-header .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1400px; 
-    margin: 0 auto;
+/* 7) Responsivo
+-------------------------------------------------------------------------- */
+@media (max-width: 992px){
+  .welcome-header h1{font-size:2.35rem}
+  .card{min-height:220px}
 }
-
-.app-header .navbar-brand {
-    color: var(--white);
-    font-family: var(--font-primary);
-    font-size: 1.5rem;
-    font-weight: 700;
+@media (max-width: 768px){
+  .dashboard-container{width:94%}
+  .welcome-header h1{font-size:2.05rem}
+  .welcome-header p{font-size:1rem}
+  .card{padding:24px 18px;border-radius:20px}
+  .card-title{font-size:1.3rem}
 }
-
-.app-header .navbar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown a {
-    color: var(--white);
-    text-decoration: none;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-    display: block;
-}
-
-.dropdown a:hover {
-    background-color: rgba(255,255,255,0.1);
-}
-
-.dropdown-toggle::after {
-    font-size: 0.7rem;
-    margin-left: 5px;
-}
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: var(--primary-purple);
-    box-shadow: 0 4px 8px var(--shadow-medium);
-    padding: 0.5rem 0;
-    border-radius: 4px;
-    list-style: none;
-    min-width: 150px;
-    z-index: 1001;
-}
-
-.dropdown:hover .dropdown-menu {
-    display: block;
-}
-
-.dropdown-menu a {
-    padding: 10px 15px;
-    font-family: var(--font-secondary);
-    font-weight: 300;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.dropdown-menu a:last-child {
-    border-bottom: none;
-}
-
-/* --- Pie de Página --- */
-.app-footer {
-    background-color: var(--primary-purple);
-    color: var(--white);
-    text-align: center;
-    padding: 1.5rem;
-    margin-top: auto;
-    font-size: 0.9rem;
-}
-
-/* --- Contenido Principal --- */
-.dashboard-container {
-    flex: 1;
-    padding: 2.5rem 0 4rem 0;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 90%;
-}
-
-.welcome-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.welcome-header h1 {
-    font-family: var(--font-primary);
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: var(--dark-text);
-    margin: 0;
-}
-
-.welcome-name {
-    color: var(--primary-purple);
-}
-
-.welcome-header p {
-    font-size: 1.2rem;
-    color: var(--muted-text);
-    margin-top: 0.5rem;
-}
-
-/* === Estilos de las Tarjetas (Cards) === */
-.main-navigation {
-    margin-bottom: 3rem;
-}
-
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.card {
-    background-color: var(--white);
-    border-radius: 16px;
-    box-shadow: 0 8px 25px var(--shadow-light);
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: var(--dark-text);
-    padding: 1.5rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    cursor: pointer;
-    position: relative;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px var(--shadow-medium);
-    border-color: var(--primary-purple);
-    background-color: var(--light-purple);
-}
-
-.card-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--primary-purple);
-}
-
-.card-title {
-    font-family: var(--font-primary);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-purple);
-    margin-bottom: 0.5rem;
-}
-
-.card-description {
-    color: var(--muted-text);
-    font-size: 1rem;
-    margin: 0;
-}
-
-/* === Media Queries para Responsividad === */
-
-/* Para tablets */
-@media (max-width: 768px) {
-    .container, .dashboard-container {
-        width: 95%;
-    }
-
-    .app-header {
-        padding: 1rem; /* Reducir padding en tablets */
-    }
-
-    .app-header nav.container {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 0;
-    }
-
-    .navbar-brand {
-        font-size: 1.6rem;
-    }
-
-    .navbar-menu {
-        margin-top: 0.5rem;
-    }
-
-    .navbar-menu li {
-        margin: 0 10px;
-    }
-
-    .welcome-header h1 {
-        font-size: 2.2rem;
-    }
-
-    .welcome-header p {
-        font-size: 1.1rem;
-    }
-
-    .card-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .card {
-        padding: 1.2rem;
-    }
-
-    .card-title {
-        font-size: 1.3rem;
-    }
-
-    .card-description {
-        font-size: 0.95rem;
-    }
-
-    .app-footer {
-        font-size: 0.85rem;
-        padding: 1.2rem 0;
-    }
-}
-
-/* Para móviles medianos */
-@media (max-width: 576px) {
-    .dashboard-container {
-        padding: 1.5rem 0 2rem 0;
-    }
-
-    .welcome-header h1 {
-        font-size: 1.8rem;
-    }
-
-    .welcome-header p {
-        font-size: 1rem;
-    }
-
-    .card-grid {
-        gap: 1.2rem;
-    }
-
-    .card {
-        padding: 1rem;
-    }
-
-    .card-title {
-        font-size: 1.2rem;
-    }
-
-    .card-description {
-        font-size: 0.9rem;
-    }
-
-    .navbar-menu {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .navbar-menu li {
-        margin: 5px;
-    }
-
-    .app-footer {
-        font-size: 0.8rem;
-        padding: 1rem 0;
-    }
-}
-
-/* Para móviles pequeños */
-@media (max-width: 400px) {
-    .container, .dashboard-container {
-        width: 98%;
-        padding: 0 10px;
-    }
-
-    .app-header {
-        padding: 0.8rem; /* Reducir aún más en móviles pequeños */
-    }
-
-    .navbar {
-        padding: 0.8rem 0;
-    }
-
-    .navbar-brand {
-        font-size: 1.4rem;
-    }
-
-    .navbar-menu li {
-        margin: 3px;
-    }
-
-    .navbar-menu a {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.6rem;
-    }
-
-    .welcome-header h1 {
-        font-size: 1.6rem;
-    }
-
-    .welcome-header p {
-        font-size: 0.9rem;
-    }
-
-    .card-grid {
-        gap: 1rem;
-    }
-
-    .card {
-        padding: 0.8rem;
-    }
-
-    .card-title {
-        font-size: 1.1rem;
-    }
-
-    .card-description {
-        font-size: 0.85rem;
-    }
-
-    .app-footer {
-        font-size: 0.75rem;
-        padding: 0.8rem 0;
-    }
+@media (max-width: 520px){
+  .card{min-height:210px}
+  .card-icon{font-size:42px}
+  .card-title{font-size:1.18rem}
+  .card-description{font-size:.95rem}
 }

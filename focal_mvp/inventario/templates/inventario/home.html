@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
+    
+    <!-- Bootstrap Icons (para íconos de las tarjetas) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
     <header class="app-header">
@@ -40,30 +43,32 @@
             <p>Selecciona una opción para comenzar a gestionar tu negocio.</p>
         </section>
 
-        <!-- === NUEVO: Menú de Navegación Principal (Tarjetas) === -->
+        <!-- === Menú de Navegación Principal (Tarjetas) === -->
         <section class="main-navigation">
             <div class="card-grid">
                 <a href="{% url 'inventario' %}" class="card">
-                    <div class="card-icon">📦</div>
+                    <div class="card-icon"><i class="bi bi-box-seam"></i></div>
                     <h3 class="card-title">Mi Bodega</h3>
                     <p class="card-description">Revisa tu stock, descuenta y agrega productos en un solo lugar.</p>
                 </a>
                 
                 <a href="{% url 'lista_recordatorios' %}" class="card"> 
-                    <div class="card-icon">🔔</div>
-                    <h3 class="card-title">Recordatorios</h3>
-                    <p class="card-description">Alertas y obligaciones pendientes.</p>
+                    <div class="card-icon"><i class="bi bi-bell"></i></div>
+                    <h3 class="card-title">Obligaciones</h3>
+                    <p class="card-description">Registra tus Obligaciones trubitarias y comerciales.</p>
                 </a>
-                
-                <a href="{% url 'metrics' %}" class="card"> 
-                    <div class="card-icon">📊</div>
-                    <h3 class="card-title">Métricas</h3>
-                    <p class="card-description">Analiza el rendimiento de tu inventario.</p>
+
+                <a href="{% url 'finanza:finanzas' %}" class="card">
+                    <div class="card-icon"><i class="bi bi-cash-coin"></i></div>
+                    <h3 class="card-title">Finanzas</h3>
+                    <p class="card-description">Controla ingresos, gastos y proyecciones.</p>
                 </a>
+
+                <a hhref="{% url 'focalito' %}" class="card">
+                    <div class="card-icon"></div>
             </div>
         </section>
         <!-- ========================================= -->
-
     </main>
 
     <footer class="app-footer">

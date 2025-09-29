@@ -1,60 +1,52 @@
 /* ==========================================================================
-   Login – estilos específicos de la página
-   (styles.css ya define la escala de colores y fuentes corporativas)
+   LOGIN – Estilos específicos de página
+   (Se apoya en variables y fuentes declaradas en styles.css)
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   Tokens locales (sin pisar los de styles.css)
-   -------------------------------------------------------------------------- */
+/* --------------------------- Tokens locales ------------------------------ */
 :root{
-  /* Altura aproximada del header fijo (navbar) en cada breakpoint */
-  --header-h: clamp(64px, 8vw, 96px);
-  /* Altura mínima del footer (para reservar espacio visual) */
+  /* Alto aproximado del header fijo (navbar). Ajusta si cambias el navbar */
+  --header-h: clamp(72px, 9vw, 104px);
+
+  /* Reserva visual del footer para evitar solapes en pantallas cortas */
   --footer-min: clamp(220px, 28vh, 320px);
-  /* Ancho máximo de la tarjeta de login */
+
+  /* Ancho máximo de la tarjeta */
   --login-card-max: 520px;
 }
 
-/* --------------------------------------------------------------------------
-   Normalización mínima
-   -------------------------------------------------------------------------- */
+/* ----------------------------- Base mínima -------------------------------- */
 html, body { height: 100%; background: #fff; }
 
-/* --------------------------------------------------------------------------
-   Lienzo de la página de login
-   - Añadimos padding-top para que NO quede escondido bajo el navbar.
-   - Garantizamos “alto útil” para que la tarjeta quepa antes del footer.
-   -------------------------------------------------------------------------- */
+/* Lienzo de la página de login
+   - Deja respiro superior para no pegarse al navbar
+   - Reserva altura útil para que la tarjeta aparezca completa */
 .login-page{
   background: #fff;
-  /* Deja espacio debajo del header fijo + respiro superior/inferior */
-  padding: calc(var(--header-h) + 24px) 0 clamp(32px, 4vw, 48px);
-  /* Hace que el contenido principal intente ocupar la pantalla útil */
+  padding: calc(var(--header-h) + 40px) 0 clamp(40px, 5vw, 56px);
   min-height: calc(100svh - var(--footer-min));
 }
 
-/* Contenedor centrado (usa .container del sistema si existe; aquí un fallback) */
+/* Contenedor centrado (usa tu .container global si existe; aquí un fallback) */
 .container{
   width: min(1100px, 92%);
   margin-inline: auto;
 }
 
-/* Centro la tarjeta en el eje vertical y horizontal del área útil */
+/* Centrado vertical/horizontal del bloque de login dentro del área útil */
 .login-wrap{
   min-height: calc(100svh - var(--header-h) - var(--footer-min));
   display: grid;
   place-items: center;
 }
 
-/* --------------------------------------------------------------------------
-   Tarjeta del formulario
-   -------------------------------------------------------------------------- */
+/* ------------------------- Tarjeta del formulario ------------------------- */
 .login-card{
   width: min(var(--login-card-max), 100%);
   background: var(--white, #fff);
   border: 1px solid var(--border-color, #e6e6e6);
   border-radius: 18px;
-  padding: clamp(20px, 3.2vw, 32px);
+  padding: clamp(22px, 3.2vw, 32px);
   box-shadow: 0 18px 44px rgba(0,0,0,.16);
 }
 
@@ -69,11 +61,8 @@ html, body { height: 100%; background: #fff; }
   font-size: clamp(1.6rem, 2.4vw, 2rem);
 }
 
-/* --------------------------------------------------------------------------
-   Mensajes (Django messages + errores no asociados a un campo)
-   -------------------------------------------------------------------------- */
+/* Mensajes (Django) */
 .login-messages{ margin-bottom: 10px; }
-
 .alert{
   border-radius: 12px;
   padding: .75rem 1rem;
@@ -89,13 +78,11 @@ html, body { height: 100%; background: #fff; }
   border-color: #ffd1d6;
 }
 
-/* --------------------------------------------------------------------------
-   Campos
-   -------------------------------------------------------------------------- */
+/* ------------------------------ Campos ----------------------------------- */
 .form-group{ margin: 10px 0; }
 
 .form-group label{
-  display:block;
+  display: block;
   margin-bottom: 6px;
   font-weight: 700;
   font-size: .95rem;
@@ -126,14 +113,13 @@ html, body { height: 100%; background: #fff; }
   font-size: .9rem;
 }
 
-/* --------------------------------------------------------------------------
-   Botón principal (match con CTA sólido del landing)
-   -------------------------------------------------------------------------- */
+/* ----------------------------- Botones ----------------------------------- */
+/* Botón principal del formulario – consistente con CTA sólido del landing */
 .btn-primary-solid{
   display: inline-block;
   width: auto;
   padding: 0.95rem 1.4rem;
-  border-radius: 12px;                               /* “cuadrado” suave */
+  border-radius: 12px;                        /* “cuadrado” suave */
   border: 2px solid var(--primary-purple, #4A008B);
   background: var(--primary-purple, #4A008B);
   color: var(--white, #fff);
@@ -150,11 +136,9 @@ html, body { height: 100%; background: #fff; }
   transform: translateY(-1px);
   box-shadow: 0 14px 28px rgba(74,0,139,.34);
 }
-.btn-block{ width:100%; }
+.btn-block{ width: 100%; }
 
-/* --------------------------------------------------------------------------
-   Enlaces secundarios (olvido/registro)
-   -------------------------------------------------------------------------- */
+/* Enlaces secundarios (olvido/registro) */
 .login-links{
   margin-top: 14px;
   display: grid;
@@ -182,21 +166,38 @@ html, body { height: 100%; background: #fff; }
   text-decoration: underline;
 }
 
-/* --------------------------------------------------------------------------
-   Responsivo
-   -------------------------------------------------------------------------- */
+/* ------------------- Refuerzo estilo del NAV (login) --------------------- */
+/* Para que en esta página se vean idénticos a los del landing */
+.main-header .btn-primary{
+  background: var(--primary-purple);
+  color: #fff;
+  border-color: var(--primary-purple);
+}
+.main-header .btn-primary:hover{
+  background: var(--hover-dark-purple);
+  border-color: var(--hover-dark-purple);
+}
+.main-header .btn-secondary{
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+}
+.main-header .btn-secondary:hover{
+  color: var(--turquoise);
+  border-color: var(--turquoise);
+  background: rgba(255,255,255,.08);
+}
+
+/* ------------------------------ Responsive -------------------------------- */
 @media (max-width: 992px){
-  /* Un poco más de espacio bajo el header en tablets */
-  .login-page{ padding-top: calc(var(--header-h) + 16px); }
+  /* Un poco más de respiro en tablets */
+  .login-page{ padding-top: calc(var(--header-h) + 28px); }
 }
 
 @media (max-width: 640px){
   .login-card{ border-radius: 16px; padding: 20px; }
-  .login-page{ padding-top: calc(var(--header-h) + 12px); }
+  .login-page{ padding-top: calc(var(--header-h) + 20px); }
 }
 
-/* --------------------------------------------------------------------------
-   Accesibilidad: cuando navegas por anclas, evita que el header tape el scroll
-   (si usas id="main-content" u otros anclajes).
-   -------------------------------------------------------------------------- */
+/* Accesibilidad: si hay anclas, que el header no las tape */
 :target{ scroll-margin-top: calc(var(--header-h) + 16px); }

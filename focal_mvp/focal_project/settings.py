@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'inventario',
     'rest_framework',
     'widget_tweaks',
+    'finanza',
 ]
 
 AUTH_USER_MODEL = 'inventario.Almacenero'

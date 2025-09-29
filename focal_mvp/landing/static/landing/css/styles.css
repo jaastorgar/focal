@@ -186,7 +186,7 @@ img,svg,video{max-width:100%;height:auto;display:block}
 /* -------------------------- HERO ------------------------- */
 .hero-section{
   padding:126px 0 84px;   /* espacio por el header fijo + logo grande */
-  min-height:92vh; display:flex; align-items:center;
+  min-height:100vh; display:flex; align-items:center;
 }
 .hero-section .container{
   display:flex; align-items:center; justify-content:space-between; gap:min(6vw,40px);

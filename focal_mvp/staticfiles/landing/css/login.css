@@ -1,252 +1,203 @@
 /* ==========================================================================
-   FOCAL - Hoja de Estilos para la Página de Login
+   LOGIN – Estilos específicos de página
+   (Se apoya en variables y fuentes declaradas en styles.css)
    ========================================================================== */
 
-/* 1. Variables y Configuración Base
-   -------------------------------------------------------------------------- */
-:root {
-  --primary-purple: #4A008B;
-  --hover-dark-purple: #38006B;
-  --light-background: #f8f9fa;
-  --white: #FFFFFF;
-  --dark-text: #212529;
-  --muted-text: #6c757d;
-  --border-color: #ced4da;
-  --focus-shadow: rgba(74, 0, 139, 0.25);
-  --error-text: #d32f2f;
-  --error-bg: #ffebee;
-  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  
-  --font-primary: 'InterTight', sans-serif;
-  --font-secondary: 'HankenGrotesk', sans-serif;
+/* --------------------------- Tokens locales ------------------------------ */
+:root{
+  /* Alto aproximado del header fijo (navbar). Ajusta si cambias el navbar */
+  --header-h: clamp(72px, 9vw, 104px);
+
+  /* Reserva visual del footer para evitar solapes en pantallas cortas */
+  --footer-min: clamp(220px, 28vh, 320px);
+
+  /* Ancho máximo de la tarjeta */
+  --login-card-max: 520px;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+/* ----------------------------- Base mínima -------------------------------- */
+html, body { height: 100%; background: #fff; }
+
+/* Lienzo de la página de login
+   - Deja respiro superior para no pegarse al navbar
+   - Reserva altura útil para que la tarjeta aparezca completa */
+.login-page{
+  background: #fff;
+  padding: calc(var(--header-h) + 40px) 0 clamp(40px, 5vw, 56px);
+  min-height: calc(100svh - var(--footer-min));
 }
 
-/* Las declaraciones @font-face se mantienen igual. */
-@font-face {
-  font-family: 'InterTight';
-  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight: 700;
-}
-@font-face {
-  font-family: 'HankenGrotesk';
-  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight: 400;
-}
-@font-face {
-  font-family: 'HankenGrotesk';
-  src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-  font-weight: 300;
+/* Contenedor centrado (usa tu .container global si existe; aquí un fallback) */
+.container{
+  width: min(1100px, 92%);
+  margin-inline: auto;
 }
 
-body {
-  font-family: var(--font-secondary);
-  background-color: var(--light-background);
-  color: var(--dark-text);
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  align-items: center;
+/* Centrado vertical/horizontal del bloque de login dentro del área útil */
+.login-wrap{
+  min-height: calc(100svh - var(--header-h) - var(--footer-min));
+  display: grid;
+  place-items: center;
 }
 
-/* 2. Componentes Comunes (Header y Footer)
-   -------------------------------------------------------------------------- */
-.app-header-minimal {
-  width: 100%;
-  padding: 1.5rem 2rem;
+/* ------------------------- Tarjeta del formulario ------------------------- */
+.login-card{
+  width: min(var(--login-card-max), 100%);
+  background: var(--white, #fff);
+  border: 1px solid var(--border-color, #e6e6e6);
+  border-radius: 18px;
+  padding: clamp(22px, 3.2vw, 32px);
+  box-shadow: 0 18px 44px rgba(0,0,0,.16);
+}
+
+/* Título */
+.login-title{
+  margin: 0 0 12px;
+  font-family: var(--font-primary, 'InterTight', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif);
+  font-weight: 900;
+  letter-spacing: .01em;
+  color: #1f2937;
   text-align: center;
-}
-.app-header-minimal .logo {
-  color: var(--primary-purple);
-  font-family: var(--font-primary);
-  font-size: 2rem;
-  text-decoration: none;
-  font-weight: 700;
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
 }
 
-.app-footer {
-  width: 100%;
-  background-color: transparent;
-  color: var(--muted-text);
-  text-align: center;
-  padding: 1.5rem;
-  margin-top: auto;
-  font-size: 0.9rem;
-}
-
-/* 3. Contenedor Principal del Login
-   -------------------------------------------------------------------------- */
-main.login-container {
-  width: 100%;
-  max-width: 420px;
-  margin: 2rem auto;
-  padding: 3rem;
-  background-color: var(--white);
-  border-radius: 16px;
-  box-shadow: var(--box-shadow);
-  text-align: center;
-}
-
-main.login-container h2 {
-  font-family: var(--font-primary);
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--dark-text);
-  margin-top: 0;
-  margin-bottom: 2rem;
-}
-
-/* 4. Estilos del Formulario
-   -------------------------------------------------------------------------- */
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.form-group {
-  text-align: left;
-}
-
-.form-group label {
+/* Mensajes (Django) */
+.login-messages{ margin-bottom: 10px; }
+.alert{
+  border-radius: 12px;
+  padding: .75rem 1rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  margin: .5rem 0;
+  background: #f5f5f7;
+  color: #333;
+  border: 1px solid #eee;
+}
+.alert-error{
+  background: #fff5f5;
+  color: #7a061a;
+  border-color: #ffd1d6;
+}
+
+/* ------------------------------ Campos ----------------------------------- */
+.form-group{ margin: 10px 0; }
+
+.form-group label{
   display: block;
-  margin-bottom: 0.5rem;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  font-size: 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: var(--primary-purple);
-  box-shadow: 0 0 0 4px var(--focus-shadow);
-}
-
-/* 5. Mensajes de Error
-   -------------------------------------------------------------------------- */
-.error-message {
-  color: var(--error-text);
-  font-size: 0.875rem;
-  margin-top: 0.4rem;
-}
-
-.non-field-errors {
-  background-color: var(--error-bg);
-  border: 1px solid var(--error-text);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-.non-field-errors span {
-    display: block;
-}
-
-/* 6. Botón de Envío y Enlaces
-   -------------------------------------------------------------------------- */
-.btn-submit {
-  background-color: var(--primary-purple);
-  color: var(--white);
-  border: none;
-  padding: 0.9rem;
-  border-radius: 8px;
-  font-family: var(--font-primary);
+  margin-bottom: 6px;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: .95rem;
+  color: #222;
+  font-family: var(--font-secondary, 'HankenGrotesk', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif);
+}
+
+.form-group input{
+  width: 100%;
+  padding: 14px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e6e6e6);
+  background: #fff;
+  color: #111;
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+  font: inherit;
+}
+.form-group input:focus{
+  outline: none;
+  border-color: var(--primary-purple, #4A008B);
+  box-shadow: 0 0 0 3px rgba(74,0,139,.18);
+}
+
+/* Errores por campo */
+.field-error{
+  margin-top: 6px;
+  color: #b42318;
+  font-size: .9rem;
+}
+
+/* ----------------------------- Botones ----------------------------------- */
+/* Botón principal del formulario – consistente con CTA sólido del landing */
+.btn-primary-solid{
+  display: inline-block;
+  width: auto;
+  padding: 0.95rem 1.4rem;
+  border-radius: 12px;                        /* “cuadrado” suave */
+  border: 2px solid var(--primary-purple, #4A008B);
+  background: var(--primary-purple, #4A008B);
+  color: var(--white, #fff);
+  font-family: var(--font-primary, 'InterTight', system-ui);
+  font-weight: 800;
+  letter-spacing: .02em;
+  box-shadow: 0 10px 24px rgba(74,0,139,.28);
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 1rem;
 }
-
-.btn-submit:hover {
-  background-color: var(--hover-dark-purple);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+.btn-primary-solid:hover{
+  background: var(--hover-dark-purple, #38006B);
+  border-color: var(--hover-dark-purple, #38006B);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(74,0,139,.34);
 }
+.btn-block{ width: 100%; }
 
-.login-links {
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: var(--muted-text);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+/* Enlaces secundarios (olvido/registro) */
+.login-links{
+  margin-top: 14px;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+  font-size: .95rem;
 }
-
-.login-links a {
-  color: var(--primary-purple);
+.link-muted{
+  color: var(--muted-text, #6b7280);
   text-decoration: none;
-  font-weight: 600;
+  font-family: var(--font-secondary, 'HankenGrotesk', system-ui);
 }
+.link-muted[aria-disabled="true"]{ opacity:.6; cursor:not-allowed; }
+.link-muted:hover{ text-decoration: underline; }
 
-.login-links a:hover {
+.link-strong{
+  color: var(--primary-purple, #4A008B);
+  font-weight: 800;
+  text-decoration: none;
+  font-family: var(--font-primary, 'InterTight', system-ui);
+}
+.link-strong:hover{
+  color: var(--hover-dark-purple, #38006B);
   text-decoration: underline;
 }
 
-/* 7. Responsividad
-   -------------------------------------------------------------------------- */
-@media (max-width: 576px) {
-  body {
-    padding: 1rem;
-  }
-  main.login-container {
-    padding: 2rem;
-  }
+/* ------------------- Refuerzo estilo del NAV (login) --------------------- */
+/* Para que en esta página se vean idénticos a los del landing */
+.main-header .btn-primary{
+  background: var(--primary-purple);
+  color: #fff;
+  border-color: var(--primary-purple);
+}
+.main-header .btn-primary:hover{
+  background: var(--hover-dark-purple);
+  border-color: var(--hover-dark-purple);
+}
+.main-header .btn-secondary{
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+}
+.main-header .btn-secondary:hover{
+  color: var(--turquoise);
+  border-color: var(--turquoise);
+  background: rgba(255,255,255,.08);
 }
 
-.disabled-link {
-    pointer-events: none;
-    color: gray;
-    text-decoration: none;
-    cursor: not-allowed;
+/* ------------------------------ Responsive -------------------------------- */
+@media (max-width: 992px){
+  /* Un poco más de respiro en tablets */
+  .login-page{ padding-top: calc(var(--header-h) + 28px); }
 }
 
-/* 8. Estilos para Mensajes de Alerta
-   -------------------------------------------------------------------------- */
-.messages-container {
-    margin-bottom: 1.5rem;
+@media (max-width: 640px){
+  .login-card{ border-radius: 16px; padding: 20px; }
+  .login-page{ padding-top: calc(var(--header-h) + 20px); }
 }
 
-.alert {
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    border: 1px solid transparent;
-    text-align: center;
-    transition: opacity 0.5s ease-out;
-}
-
-.alert.fade-out {
-    opacity: 0;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-    color: #155724;
-}
-
-.alert-error, .non-field-errors {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    color: #721c24;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
-    color: #0c5460;
-}
+/* Accesibilidad: si hay anclas, que el header no las tape */
+:target{ scroll-margin-top: calc(var(--header-h) + 16px); }

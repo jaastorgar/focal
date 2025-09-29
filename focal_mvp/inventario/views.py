@@ -493,7 +493,7 @@ def perfil(request):
 def logout_view(request):
     logout(request)
     messages.info(request, "Has cerrado sesión correctamente.")
-    return redirect('landing')
+    return redirect('landing:landing')
 
 # --- Vistas de API ---
 

@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(('landing.urls', 'landing'), namespace='landing')),
     path('', include('inventario.urls')),
+    path('', include(('finanza.urls', 'finanza'), namespace='finanza')),
 ]
