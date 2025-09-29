@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOCAL - Dashboard Financiero</title>
+    <link rel="stylesheet" href="static/css/finanza.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">FOCAL</h1>
+                <div class="header-actions">
+                    <button id="btnAddTransaction" class="btn-primary">
+                        <span class="icon">+</span>
+                        Añadir Transacción
+                    </button>
+                    <div class="user-info">
+                        <span class="bell-icon">🔔</span>
+                        <div class="user-details">
+                            <p class="user-name">Gabriel Ignacio</p>
+                            <p class="user-label">Mi Cuenta</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navigation">
+        <div class="container">
+            <div class="nav-items">
+                <a href="{% url 'home' %}" class="nav-item nav-link">
+                    <span>← Volver al Inicio</span>
+                </a>
+                <button class="nav-item active" data-section="dashboard">Dashboard</button>
+                <button class="nav-item" data-section="ingresos">Ingresos</button>
+                <button class="nav-item" data-section="gastos">Gastos</button>
+                <button class="nav-item" data-section="proyecciones">Proyecciones</button>
+                <button class="nav-item" data-section="reportes">Reportes</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modal Añadir Transacción -->
+    <div id="modalTransaction" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nueva Transacción</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="formTransaction" class="modal-form">
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="transactionType" required>
+                        <option value="income">Ingreso</option>
+                        <option value="expense">Gasto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" id="transactionDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <input type="text" id="transactionDescription" placeholder="Ej: Venta de servicio..." required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="transactionCategory" required>
+                        <option value="Ventas">Ventas</option>
+                        <option value="Consultoría">Consultoría</option>
+                        <option value="Servicios">Servicios</option>
+                        <option value="Sueldos">Sueldos</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Oficina">Oficina</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Monto (CLP)</label>
+                    <input type="number" id="transactionAmount" placeholder="0" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- DASHBOARD SECTION -->
+            <div id="section-dashboard" class="section active">
+                <!-- KPIs -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-content">
+                            <p class="kpi-label">Saldo Actual</p>
+                            <p class="kpi-value" id="saldoActual">$8,500,000</p>
+                        </div>
+                        <div class="kpi-icon bg-purple">💰</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-content">
+                            <p class="kpi-label">Ingresos del Mes</p>
+                            <p class="kpi-value text-green" id="ingresosDelMes">$6,200,000</p>
+                        </div>
+                        <div class="kpi-icon bg-green">📈</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-content">
+                            <p class="kpi-label">Gastos del Mes</p>
+                            <p class="kpi-value text-red" id="gastosDelMes">$4,300,000</p>
+                        </div>
+                        <div class="kpi-icon bg-red">📉</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-content">
+                            <p class="kpi-label">Resultado</p>
+                            <p class="kpi-value text-green" id="resultado">$1,900,000</p>
+                        </div>
+                        <div class="kpi-icon bg-green">✓</div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Flujo de Caja 2025</h3>
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Ingresos por Categoría</h3>
+                        <canvas id="incomePieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Alertas y Meta -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-header">
+                            <span>🔔</span>
+                            <h3>Alertas y Notificaciones</h3>
+                        </div>
+                        <div class="alerts-container" id="alertsContainer"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-header">
+                            <span>🎯</span>
+                            <h3>Meta Mensual</h3>
+                        </div>
+                        <div class="goal-container">
+                            <div class="goal-row">
+                                <span>Objetivo:</span>
+                                <span class="goal-value">$7,000,000</span>
+                            </div>
+                            <div class="goal-row">
+                                <span>Actual:</span>
+                                <span class="goal-value text-purple">$6,200,000</span>
+                            </div>
+                            <div class="goal-progress">
+                                <div class="progress-label">
+                                    <span>Progreso</span>
+                                    <span id="goalProgress">88.6%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill" style="width: 88.6%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INGRESOS SECTION -->
+            <div id="section-ingresos" class="section">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Historial de Ingresos</h3>
+                        <div class="table-actions">
+                            <input type="text" id="searchIngresos" placeholder="🔍 Buscar..." class="search-input">
+                            <button class="btn-filter">🔽 Filtrar</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Categoría</th>
+                                    <th class="text-right">Monto</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ingresosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GASTOS SECTION -->
+            <div id="section-gastos" class="section">
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3>Historial de Gastos</h3>
+                        <div class="table-actions">
+                            <input type="text" id="searchGastos" placeholder="🔍 Buscar..." class="search-input">
+                            <button class="btn-filter">🔽 Filtrar</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Categoría</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-right">Monto</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gastosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>Gastos por Categoría</h3>
+                    <canvas id="expensesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- PROYECCIONES SECTION -->
+            <div id="section-proyecciones" class="section">
+                <div class="chart-card">
+                    <h3>Proyección Anual 2025</h3>
+                    <canvas id="projectionChart"></canvas>
+                </div>
+                <div class="projection-grid">
+                    <div class="projection-card">
+                        <h3>Configurar Meta Anual</h3>
+                        <form class="projection-form">
+                            <div class="form-group">
+                                <label>Objetivo de Ingresos Anuales</label>
+                                <input type="text" value="$75,000,000">
+                            </div>
+                            <div class="form-group">
+                                <label>Plazo</label>
+                                <select>
+                                    <option>Diciembre 2025</option>
+                                    <option>Junio 2026</option>
+                                    <option>Diciembre 2026</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary full-width">Guardar Meta</button>
+                        </form>
+                    </div>
+                    <div class="projection-card">
+                        <h3>Resumen de Proyección</h3>
+                        <div class="summary-container">
+                            <div class="summary-row">
+                                <span>Ingresos Real (Ene-Sep)</span>
+                                <span class="summary-value">$36,200,000</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Proyección (Oct-Dic)</span>
+                                <span class="summary-value text-purple">$21,700,000</span>
+                            </div>
+                            <div class="summary-row highlight">
+                                <span>Total Esperado 2025</span>
+                                <span class="summary-value">$57,900,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTES SECTION -->
+            <div id="section-reportes" class="section">
+                <div class="report-card">
+                    <h3>Generador de Reportes</h3>
+                    <form class="report-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Tipo de Reporte</label>
+                                <select>
+                                    <option>Estado de Resultados (P&G)</option>
+                                    <option>Flujo de Caja</option>
+                                    <option>Resumen de Gastos por Categoría</option>
+                                    <option>Ingresos por Categoría</option>
+                                    <option>Reporte Completo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Rango de Fechas</label>
+                                <select>
+                                    <option>Este mes</option>
+                                    <option>Últimos 3 meses</option>
+                                    <option>Últimos 6 meses</option>
+                                    <option>Este año</option>
+                                    <option>Personalizado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button type="button" class="btn-primary">📄 Exportar a PDF</button>
+                            <button type="button" class="btn-success">📊 Descargar CSV</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="preview-card">
+                    <h3>Vista Previa: Estado de Resultados</h3>
+                    <div class="report-preview">
+                        <div class="report-header">
+                            <h4>FOCAL</h4>
+                            <p>Estado de Resultados</p>
+                            <p>Septiembre 2025</p>
+                        </div>
+                        <div class="report-section">
+                            <div class="report-line header-line text-green">
+                                <span>INGRESOS</span>
+                                <span>$6,200,000</span>
+                            </div>
+                            <div class="report-line indent">
+                                <span>Ventas</span>
+                                <span>$3,500,000</span>
+                            </div>
+                            <div class="report-line indent">
+                                <span>Consultoría</span>
+                                <span>$2,000,000</span>
+                            </div>
+                            <div class="report-line indent">
+                                <span>Otros</span>
+                                <span>$700,000</span>
+                            </div>
+                        </div>
+                        <div class="report-section">
+                            <div class="report-line header-line text-red">
+                                <span>GASTOS</span>
+                                <span>$4,300,000</span>
+                            </div>
+                            <div class="report-line indent">
+                                <span>Sueldos</span>
+                                <span>$3,200,000</span>
+                            </div>
+                            <div class="report-line indent">
+                                <span>Marketing</span>
+                                <span>$450,000</span>
+                            </div>
+                            <div class="report-line indent">
+                                <span>Otros</span>
+                                <span>$650,000</span>
+                            </div>
+                        </div>
+                        <div class="report-section">
+                            <div class="report-line total-line text-green">
+                                <span>RESULTADO NETO</span>
+                                <span>$1,900,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2025 FOCAL. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="static/js/finanza.js"></script>
+</body>
+</html>
