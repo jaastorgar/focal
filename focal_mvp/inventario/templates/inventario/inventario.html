@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario | FOCAL</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-
     {# ÚNICO CSS #}
     <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}">
-
     {# (opción B) Endpoint para autocompletar por SKU en "Agregar" #}
     <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}">
 </head>
@@ -58,9 +56,8 @@
                             <th>SKU</th>
                             <th>Marca</th>
                             <th>Categoría</th>
-                            <th>Dramaje</th>
+                            <th>Gramaje</th>
                             <th>Unidad Medida</th>
-                            <th>Próximo Vencimiento</th>
                             <th>Stock Total</th>
                             <th>Cantidad Lotes</th>
                             <th>Acciones</th>
@@ -78,9 +75,8 @@
                                 <td>{{ producto.sku }}</td>
                                 <td>{{ producto.marca|default:"N/A" }}</td>
                                 <td>{{ producto.get_categoria_display }}</td>
-                                <td>{{ producto.dramage }}</td>
+                                <td>{{ producto.gramage }}</td>
                                 <td>{{ producto.unidad_medida }}</td>
-                                <td>{{ producto.proximo_vencimiento|date:"d-m-Y"|default:"N/A" }}</td>
                                 <td>{{ producto.stock_total|default:"0" }}</td>
                                 <td>{{ producto.cantidad_lotes|default:"0" }}</td>
                                 <td class="acciones">

@@ -1,10 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FOCAL - Dashboard Financiero</title>
-    <link rel="stylesheet" href="static/css/finanza.css">
+    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'finanza/css/finanza.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -378,6 +380,6 @@
         <p>© 2025 FOCAL. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="static/js/finanza.js"></script>
+    <script src="{% static 'finanza/js/finanza.js' %}"></script>
 </body>
 </html>
