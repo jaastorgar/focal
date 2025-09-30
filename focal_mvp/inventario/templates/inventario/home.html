@@ -7,43 +7,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'inventario/css/home.css' %}">
-    
     <!-- Bootstrap Icons (para íconos de las tarjetas) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
+    <!-- ================= NAVBAR ================= -->
     <header class="app-header">
         <nav class="navbar">
-            <div class="navbar-brand">FOCAL</div>
-            <ul class="navbar-menu">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">Mi Cuenta</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="{% url 'perfil' %}">Perfil</a></li>
-                        <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            <div class="navbar-left">
+                <div class="navbar-brand">FOCAL</div>
+            </div>
+
+            <div class="navbar-right">
+                <!-- Nombre + Mi Cuenta con dropdown -->
+                <div class="user-dropdown">
+                    <button class="user-pill" type="button">
+                        <span class="user-name">
+                            {% if almacenero and almacenero.nombres %}
+                                {{ almacenero.nombres }}
+                            {% elif request.user.first_name %}
+                                {{ request.user.first_name }}
+                            {% else %}
+                                {{ request.user.username }}
+                            {% endif %}
+                        </span>
+                        <span class="user-sub">Mi Cuenta</span>
+                        <i class="bi bi-chevron-down chevron"></i>
+                    </button>
+                    <ul class="user-menu">
+                        <li><a href="{% url 'perfil' %}"><i class="bi bi-person"></i> Perfil</a></li>
+                        <li><a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
                     </ul>
-                </li>
-            </ul>
+                </div>
+            </div>
         </nav>
     </header>
 
+    <!-- ================ CONTENIDO ================ -->
     <main class="dashboard-container">
-        <!-- Mensaje de Bienvenida -->
         <section class="welcome-header">
             <h1>
-                Bienvenido, 
+                Bienvenido,
                 <span class="welcome-name">
-                    {% if almacenero %}
+                    {% if almacenero and almacenero.nombres %}
                         {{ almacenero.nombres }}
+                    {% elif request.user.first_name %}
+                        {{ request.user.first_name }}
                     {% else %}
                         {{ request.user.username }}
                     {% endif %}
                 </span>
             </h1>
-            <p>Selecciona una opción para comenzar a gestionar tu negocio.</p>
         </section>
 
-        <!-- === Menú de Navegación Principal (Tarjetas) === -->
         <section class="main-navigation">
             <div class="card-grid">
                 <a href="{% url 'inventario' %}" class="card">
@@ -51,8 +67,8 @@
                     <h3 class="card-title">Mi Bodega</h3>
                     <p class="card-description">Revisa tu stock, descuenta y agrega productos en un solo lugar.</p>
                 </a>
-                
-                <a href="{% url 'lista_recordatorios' %}" class="card"> 
+
+                <a href="{% url 'lista_recordatorios' %}" class="card">
                     <div class="card-icon"><i class="bi bi-bell"></i></div>
                     <h3 class="card-title">Obligaciones</h3>
                     <p class="card-description">Registra tus Obligaciones trubitarias y comerciales.</p>
@@ -65,7 +81,6 @@
                 </a>
             </div>
         </section>
-        <!-- ========================================= -->
     </main>
 
     <footer class="app-footer">
