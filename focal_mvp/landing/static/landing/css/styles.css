@@ -138,9 +138,10 @@ img,svg,video{max-width:100%;height:auto;display:block}
 
 /* ► Logo grande (desktop) y legible */
 .logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:#fff}
-.logo img{
-  width:110px; height:auto;              /* tamaño aumentado */
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,.25));
+.logo img {
+    width: 80px;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .25));
 }
 .logo-text{font-family:var(--font-primary);font-weight:900;letter-spacing:-.04em}
 
@@ -161,14 +162,23 @@ img,svg,video{max-width:100%;height:auto;display:block}
   border-radius:12px;
   padding:.85rem 1.5rem;
 }
-.main-header .btn-primary{
-  background:var(--primary-purple); color:#fff; border-color:var(--primary-purple);
+.main-header .btn-primary {
+  background: var(--primary-purple);
+  color: #fff;
+  padding: 12px;
+  border-color: var(--primary-purple); 
+  font-size: 10pt;
 }
 .main-header .btn-primary:hover{
-  background:var(--hover-dark-purple); border-color:var(--hover-dark-purple);
+  background:var(--hover-dark-purple); 
+  border-color:var(--hover-dark-purple);
 }
-.main-header .btn-secondary{
-  background:transparent; color:#fff; border-color:#fff;
+.main-header .btn-secondary {
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+  padding: 12px;
+  font-size: 10pt;
 }
 .main-header .btn-secondary:hover{
   color:var(--turquoise); border-color:var(--turquoise);
@@ -270,7 +280,13 @@ img,svg,video{max-width:100%;height:auto;display:block}
 
 /* -------------------------- CTA ------------------------- */
 .cta-section{padding:72px 0; text-align:center}
-.cta-container{display:flex; flex-direction:column; align-items:center; gap:14px; max-width:880px}
+.cta-container {
+  display: flex;
+  align-items: center;
+  gap: 33px;
+  max-width: 880px;
+  justify-content: space-around;
+}
 .cta-description{max-width:760px; margin:0 auto 6px}
 .cta-illustrations{height:120px}
 
