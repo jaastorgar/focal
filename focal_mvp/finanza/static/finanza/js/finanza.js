@@ -1,19 +1,16 @@
-// ===== DATOS DE EJEMPLO =====
-let transactions = [
-    { id: 1, date: '2025-09-15', description: 'Venta Servicio Premium', category: 'Ventas', amount: 2500000, type: 'income' },
-    { id: 2, date: '2025-09-14', description: 'Consultoría Empresarial', category: 'Consultoría', amount: 1800000, type: 'income' },
-    { id: 3, date: '2025-09-13', description: 'Pago Sueldos', category: 'Sueldos', amount: 3200000, type: 'expense', status: 'Pagado' },
-    { id: 4, date: '2025-09-12', description: 'Campaña Facebook Ads', category: 'Marketing', amount: 450000, type: 'expense', status: 'Pagado' },
-    { id: 5, date: '2025-09-10', description: 'Venta Curso Online', category: 'Ventas', amount: 980000, type: 'income' },
-    { id: 6, date: '2025-09-08', description: 'Consultoría Digital', category: 'Consultoría', amount: 1200000, type: 'income' },
-    { id: 7, date: '2025-09-05', description: 'Arriendo Oficina', category: 'Oficina', amount: 650000, type: 'expense', status: 'Pagado' }
-];
+// ===== DATOS CON LOCALSTORAGE =====
+let transactions = JSON.parse(localStorage.getItem('focal_transactions')) || [];
 
 const alerts = [
     { id: 1, message: 'Próximo pago de sueldos en 5 días', type: 'warning' },
     { id: 2, message: 'Factura #1234 vencida', type: 'danger' },
     { id: 3, message: 'Meta mensual alcanzada al 87%', type: 'info' }
 ];
+
+// Función para guardar en localStorage
+function saveTransactions() {
+    localStorage.setItem('focal_transactions', JSON.stringify(transactions));
+}
 
 // ===== UTILIDADES =====
 const formatCurrency = (value) => {
@@ -55,11 +52,9 @@ function initNavigation() {
         item.addEventListener('click', function() {
             const sectionId = this.getAttribute('data-section');
             
-            // Actualizar botones activos
             navItems.forEach(nav => nav.classList.remove('active'));
             this.classList.add('active');
             
-            // Mostrar sección correspondiente
             sections.forEach(section => section.classList.remove('active'));
             document.getElementById(`section-${sectionId}`).classList.add('active');
         });
@@ -74,14 +69,11 @@ function initModal() {
     const btnCancel = document.getElementById('cancelModal');
     const form = document.getElementById('formTransaction');
 
-    // Abrir modal
     btnAdd.addEventListener('click', () => {
         modal.classList.add('active');
-        // Establecer fecha actual por defecto
         document.getElementById('transactionDate').valueAsDate = new Date();
     });
 
-    // Cerrar modal
     const closeModal = () => {
         modal.classList.remove('active');
         form.reset();
@@ -90,19 +82,17 @@ function initModal() {
     btnClose.addEventListener('click', closeModal);
     btnCancel.addEventListener('click', closeModal);
 
-    // Cerrar al hacer clic fuera del modal
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             closeModal();
         }
     });
 
-    // Enviar formulario
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         
         const newTransaction = {
-            id: transactions.length + 1,
+            id: Date.now(), // Usar timestamp como ID único
             date: document.getElementById('transactionDate').value,
             description: document.getElementById('transactionDescription').value,
             category: document.getElementById('transactionCategory').value,
@@ -112,15 +102,13 @@ function initModal() {
         };
 
         transactions.unshift(newTransaction);
+        saveTransactions(); // Guardar en localStorage
         
-        // Actualizar dashboard y tablas
         updateDashboard();
         initTables();
         initCharts();
         
         closeModal();
-        
-        // Mostrar mensaje de éxito (opcional)
         alert('Transacción agregada exitosamente');
     });
 }
@@ -133,26 +121,34 @@ function initDashboard() {
 
 function updateDashboard() {
     const totals = calculateTotals();
-    const saldoActual = 8500000; // Esto podría ser calculado
+    const saldoActual = totals.resultado;
     
     document.getElementById('saldoActual').textContent = formatCurrency(saldoActual);
     document.getElementById('ingresosDelMes').textContent = formatCurrency(totals.ingresos);
     document.getElementById('gastosDelMes').textContent = formatCurrency(totals.gastos);
     document.getElementById('resultado').textContent = formatCurrency(totals.resultado);
     
-    // Actualizar clase de color para resultado
     const resultadoEl = document.getElementById('resultado');
     resultadoEl.className = totals.resultado >= 0 ? 'kpi-value text-green' : 'kpi-value text-red';
     
-    // Actualizar meta
     const metaMensual = 7000000;
-    const progreso = (totals.ingresos / metaMensual) * 100;
+    const progreso = totals.ingresos > 0 ? (totals.ingresos / metaMensual) * 100 : 0;
     document.getElementById('goalProgress').textContent = `${progreso.toFixed(1)}%`;
     document.getElementById('progressFill').style.width = `${Math.min(progreso, 100)}%`;
 }
 
 function renderAlerts() {
     const container = document.getElementById('alertsContainer');
+    
+    if (transactions.length === 0) {
+        container.innerHTML = `
+            <div class="alert info">
+                No hay transacciones registradas. Haz clic en "Añadir Transacción" para comenzar.
+            </div>
+        `;
+        return;
+    }
+    
     container.innerHTML = alerts.map(alert => `
         <div class="alert ${alert.type}">
             ${alert.message}
@@ -170,6 +166,17 @@ function initTables() {
 function renderIngresosTable() {
     const tbody = document.getElementById('ingresosTable');
     const ingresos = transactions.filter(t => t.type === 'income');
+    
+    if (ingresos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted-text);">
+                    No hay ingresos registrados. Añade una nueva transacción de tipo "Ingreso".
+                </td>
+            </tr>
+        `;
+        return;
+    }
     
     tbody.innerHTML = ingresos.map(transaction => `
         <tr>
@@ -192,6 +199,17 @@ function renderIngresosTable() {
 function renderGastosTable() {
     const tbody = document.getElementById('gastosTable');
     const gastos = transactions.filter(t => t.type === 'expense');
+    
+    if (gastos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--muted-text);">
+                    No hay gastos registrados. Añade una nueva transacción de tipo "Gasto".
+                </td>
+            </tr>
+        `;
+        return;
+    }
     
     tbody.innerHTML = gastos.map(transaction => `
         <tr>
@@ -241,6 +259,16 @@ function filterTable(searchTerm, type) {
     
     if (type === 'income') {
         const tbody = document.getElementById('ingresosTable');
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 2rem; color: var(--muted-text);">
+                        No se encontraron resultados para "${searchTerm}"
+                    </td>
+                </tr>
+            `;
+            return;
+        }
         tbody.innerHTML = filtered.map(transaction => `
             <tr>
                 <td>${transaction.date}</td>
@@ -257,6 +285,16 @@ function filterTable(searchTerm, type) {
         `).join('');
     } else {
         const tbody = document.getElementById('gastosTable');
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--muted-text);">
+                        No se encontraron resultados para "${searchTerm}"
+                    </td>
+                </tr>
+            `;
+            return;
+        }
         tbody.innerHTML = filtered.map(transaction => `
             <tr>
                 <td>${transaction.date}</td>
@@ -284,6 +322,7 @@ function editTransaction(id) {
 function deleteTransaction(id) {
     if (confirm('¿Estás seguro de eliminar esta transacción?')) {
         transactions = transactions.filter(t => t.id !== id);
+        saveTransactions(); // Guardar cambios
         updateDashboard();
         initTables();
         initCharts();
@@ -306,7 +345,6 @@ function createCashFlowChart() {
     const ctx = document.getElementById('cashFlowChart');
     if (!ctx) return;
     
-    // Destruir gráfico anterior si existe
     if (window.cashFlowChartInstance) {
         window.cashFlowChartInstance.destroy();
     }
@@ -363,19 +401,45 @@ function createCashFlowChart() {
 function createIncomePieChart() {
     const ctx = document.getElementById('incomePieChart');
     if (!ctx) return;
-    
+
     if (window.incomePieChartInstance) {
         window.incomePieChartInstance.destroy();
     }
-    
+
+    const incomeByCategory = transactions
+        .filter(t => t.type === 'income')
+        .reduce((acc, transaction) => {
+            const { category, amount } = transaction;
+            if (!acc[category]) {
+                acc[category] = 0;
+            }
+            acc[category] += amount;
+            return acc;
+        }, {});
+
+    const sortedCategories = Object.entries(incomeByCategory)
+        .sort(([, a], [, b]) => b - a);
+
+    if (sortedCategories.length === 0) {
+        // Mostrar mensaje en canvas cuando no hay datos
+        ctx.getContext('2d').font = '16px Arial';
+        ctx.getContext('2d').fillStyle = '#666';
+        ctx.getContext('2d').textAlign = 'center';
+        ctx.getContext('2d').fillText('No hay datos de ingresos', ctx.width / 2, ctx.height / 2);
+        return;
+    }
+
+    const chartLabels = sortedCategories.map(item => item[0]);
+    const chartData = sortedCategories.map(item => item[1]);
+
     const data = {
-        labels: ['Ventas', 'Consultoría', 'Servicios', 'Otros'],
+        labels: chartLabels,
         datasets: [{
-            data: [15000000, 8000000, 5000000, 2000000],
-            backgroundColor: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe']
+            data: chartData,
+            backgroundColor: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#e4e2f7']
         }]
     };
-    
+
     window.incomePieChartInstance = new Chart(ctx, {
         type: 'pie',
         data: data,
@@ -394,7 +458,7 @@ function createIncomePieChart() {
                             const value = formatCurrency(context.parsed);
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return label + ': ' + value + ' (' + percentage + '%)';
+                            return `${label}: ${value} (${percentage}%)`;
                         }
                     }
                 }
@@ -406,20 +470,45 @@ function createIncomePieChart() {
 function createExpensesChart() {
     const ctx = document.getElementById('expensesChart');
     if (!ctx) return;
-    
+
     if (window.expensesChartInstance) {
         window.expensesChartInstance.destroy();
     }
-    
+
+    const expensesByCategory = transactions
+        .filter(t => t.type === 'expense')
+        .reduce((acc, transaction) => {
+            const { category, amount } = transaction;
+            if (!acc[category]) {
+                acc[category] = 0;
+            }
+            acc[category] += amount;
+            return acc;
+        }, {});
+
+    const sortedCategories = Object.entries(expensesByCategory)
+        .sort(([, a], [, b]) => b - a);
+
+    if (sortedCategories.length === 0) {
+        ctx.getContext('2d').font = '16px Arial';
+        ctx.getContext('2d').fillStyle = '#666';
+        ctx.getContext('2d').textAlign = 'center';
+        ctx.getContext('2d').fillText('No hay datos de gastos', ctx.width / 2, ctx.height / 2);
+        return;
+    }
+
+    const chartLabels = sortedCategories.map(item => item[0]);
+    const chartData = sortedCategories.map(item => item[1]);
+
     const data = {
-        labels: ['Sueldos', 'Marketing', 'Oficina', 'Proveedores', 'Otros'],
+        labels: chartLabels,
         datasets: [{
             label: 'Monto',
-            data: [8000000, 4500000, 2800000, 6200000, 1500000],
+            data: chartData,
             backgroundColor: '#ef4444'
         }]
     };
-    
+
     window.expensesChartInstance = new Chart(ctx, {
         type: 'bar',
         data: data,
