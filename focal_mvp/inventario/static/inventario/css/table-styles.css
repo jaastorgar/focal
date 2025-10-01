@@ -414,3 +414,59 @@ main.container h1{
     padding: .5rem .2rem;
   }
 }
+
+/* ===== BOTÓN FLOTANTE DE ASISTENTE ===== */
+.floating-assistant {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-2);
+    transition: all 0.3s ease;
+    border: 3px solid var(--white);
+}
+
+.floating-assistant:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: var(--shadow-3);
+}
+
+.floating-assistant svg {
+    width: 36px;
+    height: 36px;
+    fill: var(--white);
+}
+
+/* Contenedor para posicionar el botón */
+.assistant-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding-right: 30px;
+    padding-bottom: 20px;
+    padding-top: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .assistant-container {
+        padding-right: 20px;
+        padding-bottom: 15px;
+        padding-top: 30px;
+    }
+    
+    .floating-assistant {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .floating-assistant svg {
+        width: 24px;
+        height: 24px;
+    }
+}
