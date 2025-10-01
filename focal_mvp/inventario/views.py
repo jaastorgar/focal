@@ -69,13 +69,22 @@ def inventario_view(request):
     """
     Muestra la lista de productos del inventario de la empresa actual.
     Además, si viene ?sku=, precarga el producto y sus lotes para el panel "Gestionar".
+
+    También consume flags de la URL para disparar toasts (Django messages) al
+    volver desde acciones como crear/editar/eliminar/descontar:
+      - ?created=1&created_sku=XXXXXXXX
+      - ?updated=1&sku=XXXXXXXX
+      - ?deleted=1&sku=XXXXXXXX
+      - ?discounted=1&sku=XXXXXXXX
     """
+    # ---------------------------------------------------------------------
+    # 0) Empresa del usuario
+    # ---------------------------------------------------------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
         return render(request, 'inventario/inventario.html', {
             'productos': Producto.objects.none(),
-            # Para que el template no falle si espera estas claves:
             'sku': '',
             'producto_sel': None,
             'lotes_sel': LoteProducto.objects.none(),
@@ -84,34 +93,74 @@ def inventario_view(request):
             'hoy_mas_15dias': int(time.mktime((date.today() + timedelta(days=15)).timetuple())),
         })
 
-    # ===== Base de productos de la empresa =====
+    # ---------------------------------------------------------------------
+    # 1) Flags de retorno para mostrar alertas/toasts
+    #    (los verás con el sistema de "messages" en el template)
+    # ---------------------------------------------------------------------
+    created = request.GET.get('created') == '1'
+    created_sku = (request.GET.get('created_sku') or '').strip()
+
+    updated = request.GET.get('updated') == '1'
+    deleted = request.GET.get('deleted') == '1'
+    discounted = request.GET.get('discounted') == '1'
+    sku_flag = (request.GET.get('sku') or '').strip()  # para updated/deleted/discounted
+
+    if created:
+        # Buscar nombre por SKU si viene
+        nombre_txt = None
+        if created_sku:
+            try:
+                p = Producto.objects.get(sku=created_sku, empresas=empresa_usuario)
+                nombre_txt = p.nombre
+            except Producto.DoesNotExist:
+                pass
+        if nombre_txt:
+            messages.success(request, f"¡Producto «{nombre_txt}» ingresado correctamente!")
+        elif created_sku:
+            messages.success(request, f"¡Producto con SKU {created_sku} ingresado correctamente!")
+        else:
+            messages.success(request, "¡Producto ingresado correctamente!")
+
+    if updated and sku_flag:
+        messages.info(request, f"Producto (SKU {sku_flag}) actualizado.")
+    if deleted and sku_flag:
+        messages.warning(request, f"Producto (SKU {sku_flag}) eliminado del inventario.")
+    if discounted and sku_flag:
+        messages.success(request, f"Se descontó stock del producto (SKU {sku_flag}).")
+
+    # ---------------------------------------------------------------------
+    # 2) Base de productos de la empresa + subconsultas (stock/vencimientos/lotes)
+    # ---------------------------------------------------------------------
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
 
-    # Subconsultas (stock total, próximo vencimiento, cantidad de lotes) a nivel de empresa
+    # Lotes asociados a cada producto PARA ESA EMPRESA
     lotes_empresa = LoteProducto.objects.filter(
         producto__producto=OuterRef('pk'),
         producto__empresa=empresa_usuario
     )
 
     subquery_stock = Subquery(
-        lotes_empresa.values('producto__producto')
+        lotes_empresa
+        .values('producto__producto')
         .annotate(total=Sum('cantidad'))
-        .values('total')
+        .values('total')[:1]
     )
 
     subquery_vencimiento = Subquery(
-        lotes_empresa.values('producto__producto')
+        lotes_empresa
+        .values('producto__producto')
         .annotate(proximo=Min('fecha_vencimiento'))
-        .values('proximo')
+        .values('proximo')[:1]
     )
 
     subquery_cantidad_lotes = Subquery(
         LoteProducto.objects.filter(
             producto__producto=OuterRef('pk'),
             producto__empresa=empresa_usuario
-        ).values('producto__producto')
-         .annotate(count=Count('id'))
-         .values('count')
+        )
+        .values('producto__producto')
+        .annotate(count=Count('id'))
+        .values('count')[:1]
     )
 
     productos = productos_base.annotate(
@@ -120,7 +169,9 @@ def inventario_view(request):
         cantidad_lotes=subquery_cantidad_lotes
     )
 
-    # ===== Filtro de búsqueda libre =====
+    # ---------------------------------------------------------------------
+    # 3) Buscador libre
+    # ---------------------------------------------------------------------
     query = (request.GET.get('q') or '').strip()
     if query:
         productos = productos.filter(
@@ -130,33 +181,43 @@ def inventario_view(request):
             Q(categoria__icontains=query)
         ).distinct()
 
-    # ===== Panel "Gestionar" por SKU (reutiliza el flujo de gestionar_proveedores_precios) =====
+        # Pequeño feedback si no hay resultados (aparece como toast info)
+        if not productos.exists():
+            messages.info(request, f"No se encontraron resultados para «{query}».")
+
+    # ---------------------------------------------------------------------
+    # 4) Panel "Gestionar" por SKU (reutiliza flujo de empresa-oferta-lotes)
+    # ---------------------------------------------------------------------
     sku = (request.GET.get('sku') or '').strip()
     producto_sel = None
     lotes_sel = LoteProducto.objects.none()
 
     if sku:
         try:
-            # Producto debe pertenecer al inventario (asociado a la empresa)
+            # Producto de la empresa
             producto_sel = get_object_or_404(Producto, sku=sku, empresas=empresa_usuario)
+            # Oferta de esa empresa para ese producto
             oferta_producto = get_object_or_404(OfertaProducto, producto=producto_sel, empresa=empresa_usuario)
-            # Lotes de esa oferta (empresa) más recientes primero
-            lotes_sel = (LoteProducto.objects
-                         .filter(producto=oferta_producto)
-                         .select_related('proveedor')
-                         .order_by('-fecha_vencimiento'))
+            # Lotes más recientes primero
+            lotes_sel = (
+                LoteProducto.objects
+                .filter(producto=oferta_producto)
+                .select_related('proveedor')
+                .order_by('-fecha_vencimiento')
+            )
         except Exception:
             messages.error(request, "Producto no encontrado o no autorizado.")
             producto_sel = None
             lotes_sel = LoteProducto.objects.none()
 
-    # ===== Contexto =====
+    # ---------------------------------------------------------------------
+    # 5) Contexto a template
+    # ---------------------------------------------------------------------
     context = {
         'productos': productos,
         'query': query,
         'today': date.today(),
         'hoy_mas_15dias': int(time.mktime((date.today() + timedelta(days=15)).timetuple())),
-        # Para el hub dentro del mismo template:
         'sku': sku,
         'producto_sel': producto_sel,
         'lotes_sel': lotes_sel,
@@ -204,7 +265,7 @@ def agregar_producto(request):
                     'nombre': form_prod.cleaned_data.get('nombre'),
                     'marca': form_prod.cleaned_data.get('marca'),
                     'categoria': form_prod.cleaned_data.get('categoria'),
-                    'dramage': form_prod.cleaned_data.get('dramage'),
+                    'gramage': form_prod.cleaned_data.get('gramage'),
                     'unidad_medida': form_prod.cleaned_data.get('unidad_medida'),
                 }
             )
