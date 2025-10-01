@@ -20,12 +20,22 @@
                         <span class="icon">+</span>
                         Añadir Transacción
                     </button>
-                    <div class="user-info">
+                         <div class="user-info">
                         <span class="bell-icon">🔔</span>
-                        <div class="user-details">
-                            <p class="user-name">Gabriel Ignacio</p>
-                            <p class="user-label">Mi Cuenta</p>
-                        </div>
+                        <div class="user-info">
+    
+    <div class="user-details">
+        <p class="user-name">
+            {% if user.is_authenticated %}
+                {{ user.nombres }} {{ user.apellidos }}
+            {% else %}
+                Invitado
+            {% endif %}
+        </p>
+        <p class="user-label">Mi Cuenta</p>
+    </div>
+</div>
+                    </div>
                     </div>
                 </div>
             </div>
