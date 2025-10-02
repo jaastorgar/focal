@@ -2,14 +2,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inventario | FOCAL</title>
-  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon"/>
+
   <!-- ÚNICO CSS -->
-  <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}">
-  <!-- Endpoint para autocompletar por SKU en "Agregar" -->
-  <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}">
+  <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}"/>
+
+  <!-- Endpoint para autocompletar por SKU -->
+  <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}"/>
+
+  <!-- SKU a resaltar: ?hl=SKU o variable de contexto highlight_sku -->
+  <meta name="highlight-sku" content="{{ request.GET.hl|default:highlight_sku|default:'' }}"/>
 </head>
 <body>
 
@@ -17,20 +22,18 @@
   <nav class="container">
     <a href="{% url 'home' %}" class="logo">FOCAL</a>
     <ul class="nav-links">
+      <li><a href="{% url 'metrics' %}" class="btn-accion">Metricas</a></li>
       <li><a href="{% url 'agregar-producto' %}" class="btn-accion">Agregar Producto</a></li>
       <li><a href="{% url 'home' %}" class="btn-accion">Volver al Home</a></li>
     </ul>
   </nav>
 </header>
 
-{# ===================== TOAST / ALERTAS (Django messages) ===================== #}
 {% if messages %}
   <div class="toast-stack" aria-live="polite" aria-atomic="true">
     {% for message in messages %}
       {% with level=message.tags %}
-      <section
-        class="toast {% if 'success' in level %}toast--success{% elif 'error' in level %}toast--error{% elif 'warning' in level %}toast--warning{% else %}toast--info{% endif %}"
-        role="status">
+      <section class="toast {% if 'success' in level %}toast--success{% elif 'error' in level %}toast--error{% elif 'warning' in level %}toast--warning{% else %}toast--info{% endif %}" role="status">
         <div class="toast__icon" aria-hidden="true">
           {% if 'success' in level %}
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="m20 6-11 11-5-5"/></svg>
@@ -49,238 +52,94 @@
     {% endfor %}
   </div>
 {% endif %}
-{# ============================================================================ #}
 
 <main class="container">
   <h1>Inventario</h1>
 
-  <!-- TAB 1: Inventario -->
-  <section id="tab-inv" class="tab-panel active" role="tabpanel">
-    {% if productos %}
-      <h2>Inventario de productos</h2>
+  <!-- Sección: Inventario -->
+  {% if productos %}
 
-      <div class="search-section">
-        <form method="GET" action="{% url 'inventario' %}" class="search-form">
-          <input class="search-input" type="search" placeholder="Buscar por nombre, sku, marca..." aria-label="Buscar" name="q" value="{{ query|default:'' }}">
-          <button class="search-button" type="submit">Buscar</button>
-          {% if query %}
-            <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a>
-          {% endif %}
-        </form>
-      </div>
-
-      <div class="table-container">
-        <table class="tabla-inventario">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>SKU</th>
-              <th>Marca</th>
-              <th>Categoría</th>
-              <th>Gramaje</th>
-              <th>Unidad Medida</th>
-              <th>Stock Total</th>
-              <th>Cantidad Lotes</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for producto in productos %}
-              <tr
-                {% if producto.proximo_vencimiento and producto.proximo_vencimiento < today %} class="vencido"
-                {% elif producto.proximo_vencimiento and producto.proximo_vencimiento|date:"U" <= hoy_mas_15dias %} class="proximo-vencer"
-                {% elif producto.stock_total and producto.stock_total <= 5 %} class="stock-bajo"
-                {% endif %}>
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.sku }}</td>
-                <td>{{ producto.marca|default:"N/A" }}</td>
-                <td>{{ producto.get_categoria_display }}</td>
-                <td>{{ producto.gramage }}</td>
-                <td>{{ producto.unidad_medida }}</td>
-                <td>{{ producto.stock_total|default:"0" }}</td>
-                <td>{{ producto.cantidad_lotes|default:"0" }}</td>
-                <td class="acciones">
-                  <a href="?sku={{ producto.sku }}#tab-gestionar" class="btn btn-secondary btn-sm">Gestionar</a>
-                  <a href="#modal-descontar" class="btn btn-secondary btn-sm js-open-descontar" data-sku="{{ producto.sku }}">Descontar</a>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <div class="empty-state-wrapper">
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4A2 2 0 0 0 12 20a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-              <polyline points="5.5 11 18.5 11"></polyline>
-              <line x1="13" y1="11" x2="13" y2="16"></line>
-              <line x1="8" y1="11" x2="8" y2="16"></line>
-            </svg>
-          </div>
-          <h2 class="empty-state-title">
-            {% if query %}
-              Sin resultados para "{{ query }}"
-            {% else %}
-              Tu inventario está vacío
-            {% endif %}
-          </h2>
-          <p class="empty-state-message">
-            {% if query %}
-              Intenta con otros términos de búsqueda o limpia el filtro para ver todos tus productos.
-            {% else %}
-              Añade tu primer producto para empezar a gestionar tu stock.
-            {% endif %}
-          </p>
-          <div class="empty-state-actions">
-            <a href="{% url 'agregar-producto' %}" class="btn-accion-principal">+ Agregar Nuevo Producto</a>
-          </div>
-        </div>
-      </div>
-    {% endif %}
-  </section>
-
-  <!-- TAB 2: Gestionar -->
-  <section id="tab-gestionar" class="tab-panel" role="tabpanel" aria-labelledby="Gestionar">
-    <div class="card">
-      <div class="section-head">
-        <h2>Gestionar por SKU</h2>
-        <p class="muted">Escanea o ingresa un SKU para ver lotes y precios por proveedor.</p>
-      </div>
-
-      <form method="GET" action="" class="sku-inline">
-        <input type="text" name="sku" id="id_sku" placeholder="Ej: 7801234567890" value="{{ sku|default:'' }}">
-        <button class="btn btn-primary" type="submit">Buscar</button>
-        {% if sku %}<a class="btn btn-secondary" href="{% url 'inventario' %}#tab-gestionar">Limpiar</a>{% endif %}
-      </form>
-
-      {% if producto_sel %}
-        <hr>
-        <div class="section-head">
-          <div>
-            <h3>{{ producto_sel.nombre }}</h3>
-            <span class="pill">SKU: {{ producto_sel.sku }}</span>
-          </div>
-          <div class="toolbar">
-            <a href="{% url 'agregar_proveedor' %}" class="btn btn-primary">Agregar Proveedor</a>
-            <a href="{% url 'agregar_lote' %}" class="btn btn-primary">Agregar Lote</a>
-          </div>
-        </div>
-
-        {% if lotes_sel %}
-          <div class="table-container">
-            <table class="tabla-inventario">
-              <thead>
-                <tr>
-                  <th>ID Lote</th>
-                  <th>Vencimiento</th>
-                  <th>Cantidad</th>
-                  <th>Proveedor</th>
-                  <th>Precio Compra</th>
-                  <th>Precio Venta</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for lote in lotes_sel %}
-                <tr>
-                  <td>{{ lote.id }}</td>
-                  <td>{{ lote.fecha_vencimiento|date:"d-m-Y" }}</td>
-                  <td>{{ lote.cantidad }}</td>
-                  <td>{{ lote.proveedor.nombre|default:"No especificado" }}</td>
-                  <td>${{ lote.precio_compra|floatformat:0 }}</td>
-                  <td>${{ lote.precio_venta|floatformat:0 }}</td>
-                  <td class="acciones">
-                    <a href="{% url 'editar_lote' lote.id %}" class="btn btn-secondary btn-sm">Editar</a>
-                    <a href="{% url 'eliminar_lote' lote.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <p class="empty-hint">No hay lotes registrados para este producto.</p>
+    <div class="search-section">
+      <form method="GET" action="{% url 'inventario' %}" class="search-form">
+        <input class="search-input" type="search" name="q" placeholder="Buscar por nombre, sku, marca..." aria-label="Buscar" value="{{ query|default:'' }}">
+        <button class="search-button" type="submit">Buscar</button>
+        {% if query %}
+          <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a>
         {% endif %}
-      {% else %}
-        <p class="empty-hint">Ingresa un SKU para comenzar.</p>
-      {% endif %}
-    </div>
-  </section>
-
-  <!-- TAB 3: Descontar -->
-  <section id="tab-descontar" class="tab-panel" role="tabpanel" aria-labelledby="Descontar">
-    <div class="card">
-      <div class="section-head">
-        <h2>Descontar producto</h2>
-        <p class="muted">Funciona con lector de código de barras o ingreso manual.</p>
-      </div>
-      <form method="POST" action="{% url 'descontar_producto' %}" class="grid grid-2">
-        {% csrf_token %}
-        <div>
-          <label for="id_sku_desc">SKU</label>
-          <input type="text" name="sku" id="id_sku_desc" placeholder="Escanea o escribe el SKU" value="{{ sku|default:'' }}">
-        </div>
-        <div>
-          <label for="id_cant_desc">Cantidad</label>
-          <div class="stepper">
-            <button type="button" class="stepper-btn" data-step="-1">−</button>
-            <input type="number" name="cantidad" id="id_cant_desc" min="1" step="1" value="1" placeholder="Ej: 1">
-            <button type="button" class="stepper-btn" data-step="1">+</button>
-          </div>
-        </div>
-        <div style="grid-column:1/-1">
-          <button class="btn btn-primary" type="submit">Descontar</button>
-          <span class="muted">Aplica FIFO y elimina lote agotado automáticamente.</span>
-        </div>
       </form>
     </div>
-  </section>
-</main>
 
-<!-- MODAL: Descontar Rápido -->
-<div id="modal-descontar" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-desc-title">
-  <div class="modal__backdrop js-close-descontar" data-close="true"></div>
-  <div class="modal__content" role="document">
-    <header class="modal__header">
-      <h3 id="modal-desc-title">Descontar producto</h3>
-      <button type="button" class="modal__close js-close-descontar" aria-label="Cerrar">×</button>
-    </header>
-    <form method="POST" action="{% url 'descontar_producto' %}" class="modal__body">
-      {% csrf_token %}
-      <div class="modal__row">
-        <label for="md_sku">SKU</label>
-        <input type="text" id="md_sku" name="sku" placeholder="Escanea o escribe el SKU">
-      </div>
-      <div class="modal__row">
-        <label for="md_qty">Cantidad</label>
-        <div class="stepper">
-          <button type="button" class="stepper-btn" data-step="-1">−</button>
-          <input type="number" id="md_qty" name="cantidad" min="1" step="1" value="1">
-          <button type="button" class="stepper-btn" data-step="1">+</button>
+    <div class="table-container">
+      <table class="tabla-inventario" id="tablaInventario">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>SKU</th>
+            <th>Marca</th>
+            <th>Categoría</th>
+            <th>Gramaje</th>
+            <th>Unidad Medida</th>
+            <th>Stock Total</th>
+            <th>Cantidad Lotes</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for producto in productos %}
+          <tr
+            data-sku="{{ producto.sku }}"
+            {% if producto.proximo_vencimiento and producto.proximo_vencimiento < today %} class="vencido"
+            {% elif producto.proximo_vencimiento and producto.proximo_vencimiento|date:"U" <= hoy_mas_15dias %} class="proximo-vencer"
+            {% elif producto.stock_total and producto.stock_total <= 5 %} class="stock-bajo"
+            {% endif %}>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.sku }}</td>
+            <td>{{ producto.marca|default:"N/A" }}</td>
+            <td>{{ producto.get_categoria_display }}</td>
+            <td>{{ producto.gramage }}</td>
+            <td>{{ producto.unidad_medida }}</td>
+            <td>{{ producto.stock_total|default:"0" }}</td>
+            <td>{{ producto.cantidad_lotes|default:"0" }}</td>
+            <td class="acciones">
+              <a href="?sku={{ producto.sku }}#gestionar" class="btn btn-secondary btn-sm">Gestionar</a>
+              <a href="#modal-descontar" class="btn btn-secondary btn-sm js-open-descontar" data-sku="{{ producto.sku }}">Descontar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state-wrapper">
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4A2 2 0 0 0 12 20a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="5.5 11 18.5 11"></polyline>
+            <line x1="13" y1="11" x2="13" y2="16"></line>
+            <line x1="8" y1="11" x2="8" y2="16"></line>
+          </svg>
+        </div>
+        <h2 class="empty-state-title">
+          {% if query %}Sin resultados para "{{ query }}"{% else %}Tu inventario está vacío{% endif %}
+        </h2>
+        <p class="empty-state-message">
+          {% if query %}Intenta con otros términos o limpia el filtro.{% else %}Añade tu primer producto para empezar a gestionar tu stock.{% endif %}
+        </p>
+        <div class="empty-state-actions">
+          <a href="{% url 'agregar-producto' %}" class="btn-accion-principal">+ Agregar Nuevo Producto</a>
         </div>
       </div>
-      <footer class="modal__footer">
-        <button type="button" class="btn btn-secondary js-close-descontar">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Confirmar descuento</button>
-      </footer>
-    </form>
-  </div>
-</div>
+    </div>
+  {% endif %}
 
 <!-- Asistente FOCAL -->
 <div class="assistant-container">
-  <button id="assistantBtn"
-          class="floating-assistant"
-          type="button"
-          aria-haspopup="dialog"
-          aria-label="Abrir asistente FOCAL"
+  <button id="assistantBtn" class="floating-assistant" type="button"
+          aria-haspopup="dialog" aria-label="Abrir asistente FOCAL"
           data-idle-src="{% static 'inventario/img/servicioalcliente_focal.png' %}"
           data-gif-src="{% static 'inventario/img/servicioalcliente-focal.gif' %}">
-    <img id="assistantImg"
-         src="{% static 'inventario/img/servicioalcliente_focal.png' %}"
-         alt="Asistente FOCAL">
+    <img id="assistantImg" src="{% static 'inventario/img/servicioalcliente_focal.png' %}" alt="Asistente FOCAL">
     <span id="assistantBubble" class="assistant-bubble" role="status" aria-live="polite"></span>
   </button>
 </div>

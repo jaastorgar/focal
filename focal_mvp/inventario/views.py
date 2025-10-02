@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db import transaction
 from django.db.models import Q, Min, Sum, Subquery, OuterRef, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import date, timedelta
+from django.db import transaction, IntegrityError
 import time
 import logging
 import json
@@ -67,19 +67,20 @@ def home(request):
 @login_required
 def inventario_view(request):
     """
-    Muestra la lista de productos del inventario de la empresa actual.
-    Además, si viene ?sku=, precarga el producto y sus lotes para el panel "Gestionar".
+    Lista de productos del inventario de la empresa actual.
+    Si viene ?sku=, precarga el panel "Gestionar" con ese SKU.
 
-    También consume flags de la URL para disparar toasts (Django messages) al
-    volver desde acciones como crear/editar/eliminar/descontar:
+    Flags soportadas (Django messages + highlight de fila):
       - ?created=1&created_sku=XXXXXXXX
       - ?updated=1&sku=XXXXXXXX
       - ?deleted=1&sku=XXXXXXXX
       - ?discounted=1&sku=XXXXXXXX
+    Además, si viene ?hl=SKU (o si created_sku está presente), se pasa ese SKU
+    al template para que el JS resalte la fila.
     """
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # 0) Empresa del usuario
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
@@ -91,12 +92,12 @@ def inventario_view(request):
             'query': '',
             'today': date.today(),
             'hoy_mas_15dias': int(time.mktime((date.today() + timedelta(days=15)).timetuple())),
+            'highlight_sku': '',
         })
 
-    # ---------------------------------------------------------------------
-    # 1) Flags de retorno para mostrar alertas/toasts
-    #    (los verás con el sistema de "messages" en el template)
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # 1) Flags de retorno (toasts) + highlight
+    # ------------------------------------------------------------------
     created = request.GET.get('created') == '1'
     created_sku = (request.GET.get('created_sku') or '').strip()
 
@@ -105,8 +106,8 @@ def inventario_view(request):
     discounted = request.GET.get('discounted') == '1'
     sku_flag = (request.GET.get('sku') or '').strip()  # para updated/deleted/discounted
 
+    # Mensajes
     if created:
-        # Buscar nombre por SKU si viene
         nombre_txt = None
         if created_sku:
             try:
@@ -128,50 +129,47 @@ def inventario_view(request):
     if discounted and sku_flag:
         messages.success(request, f"Se descontó stock del producto (SKU {sku_flag}).")
 
-    # ---------------------------------------------------------------------
-    # 2) Base de productos de la empresa + subconsultas (stock/vencimientos/lotes)
-    # ---------------------------------------------------------------------
+    # SKU a resaltar: ?hl=... o, si no viene, usa created_sku
+    highlight_sku = (request.GET.get('hl') or '').strip() or created_sku
+
+    # ------------------------------------------------------------------
+    # 2) Base de productos + subconsultas (stock, vencimiento, #lotes)
+    # ------------------------------------------------------------------
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
 
-    # Lotes asociados a cada producto PARA ESA EMPRESA
     lotes_empresa = LoteProducto.objects.filter(
         producto__producto=OuterRef('pk'),
-        producto__empresa=empresa_usuario
+        producto__empresa=empresa_usuario,
     )
 
     subquery_stock = Subquery(
-        lotes_empresa
-        .values('producto__producto')
+        lotes_empresa.values('producto__producto')
         .annotate(total=Sum('cantidad'))
         .values('total')[:1]
     )
-
     subquery_vencimiento = Subquery(
-        lotes_empresa
-        .values('producto__producto')
+        lotes_empresa.values('producto__producto')
         .annotate(proximo=Min('fecha_vencimiento'))
         .values('proximo')[:1]
     )
-
     subquery_cantidad_lotes = Subquery(
         LoteProducto.objects.filter(
             producto__producto=OuterRef('pk'),
-            producto__empresa=empresa_usuario
-        )
-        .values('producto__producto')
-        .annotate(count=Count('id'))
-        .values('count')[:1]
+            producto__empresa=empresa_usuario,
+        ).values('producto__producto')
+         .annotate(count=Count('id'))
+         .values('count')[:1]
     )
 
     productos = productos_base.annotate(
         stock_total=subquery_stock,
         proximo_vencimiento=subquery_vencimiento,
-        cantidad_lotes=subquery_cantidad_lotes
+        cantidad_lotes=subquery_cantidad_lotes,
     )
 
-    # ---------------------------------------------------------------------
-    # 3) Buscador libre
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # 3) Buscador
+    # ------------------------------------------------------------------
     query = (request.GET.get('q') or '').strip()
     if query:
         productos = productos.filter(
@@ -180,25 +178,20 @@ def inventario_view(request):
             Q(marca__icontains=query) |
             Q(categoria__icontains=query)
         ).distinct()
-
-        # Pequeño feedback si no hay resultados (aparece como toast info)
         if not productos.exists():
             messages.info(request, f"No se encontraron resultados para «{query}».")
 
-    # ---------------------------------------------------------------------
-    # 4) Panel "Gestionar" por SKU (reutiliza flujo de empresa-oferta-lotes)
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # 4) Panel "Gestionar" por SKU
+    # ------------------------------------------------------------------
     sku = (request.GET.get('sku') or '').strip()
     producto_sel = None
     lotes_sel = LoteProducto.objects.none()
 
     if sku:
         try:
-            # Producto de la empresa
             producto_sel = get_object_or_404(Producto, sku=sku, empresas=empresa_usuario)
-            # Oferta de esa empresa para ese producto
             oferta_producto = get_object_or_404(OfertaProducto, producto=producto_sel, empresa=empresa_usuario)
-            # Lotes más recientes primero
             lotes_sel = (
                 LoteProducto.objects
                 .filter(producto=oferta_producto)
@@ -210,9 +203,9 @@ def inventario_view(request):
             producto_sel = None
             lotes_sel = LoteProducto.objects.none()
 
-    # ---------------------------------------------------------------------
-    # 5) Contexto a template
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # 5) Render
+    # ------------------------------------------------------------------
     context = {
         'productos': productos,
         'query': query,
@@ -221,6 +214,7 @@ def inventario_view(request):
         'sku': sku,
         'producto_sel': producto_sel,
         'lotes_sel': lotes_sel,
+        'highlight_sku': highlight_sku,  
     }
     return render(request, 'inventario/inventario.html', context)
 
@@ -232,10 +226,15 @@ logger = logging.getLogger(__name__)
 @login_required
 @transaction.atomic
 def agregar_producto(request):
+    from django.urls import reverse
+    
     """
-    Vista para agregar un nuevo producto al inventario de la empresa del usuario.
+    Agrega un nuevo producto (o asocia uno existente) al inventario de la
+    empresa del usuario. Tras guardar, redirige al inventario con:
+      ?created=1&created_sku=<SKU>&hl=<SKU>
+    para mostrar el toast y destacar la fila del producto.
     """
-    # --- Esta parte inicial de validaciones de empresa y suscripción es correcta y se mantiene ---
+    # --- Validaciones iniciales: empresa y suscripción --------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Debes estar asociado a una empresa para agregar productos.")
@@ -244,51 +243,68 @@ def agregar_producto(request):
     try:
         suscripcion = SuscripcionUsuario.objects.get(empresa=empresa_usuario, activa=True)
         productos_actuales = Producto.objects.filter(empresas=empresa_usuario).count()
+        # Si el plan limita el número de productos (max_productos != 0)
         if suscripcion.plan.max_productos != 0 and productos_actuales >= suscripcion.plan.max_productos:
-            messages.error(request, f"Has alcanzado el límite de productos para tu plan ({suscripcion.plan.max_productos}).")
+            messages.error(
+                request,
+                f"Has alcanzado el límite de productos para tu plan ({suscripcion.plan.max_productos})."
+            )
             return redirect('inventario')
     except SuscripcionUsuario.DoesNotExist:
         messages.error(request, "No tienes una suscripción activa.")
         return redirect('home')
-    # --- Fin de las validaciones iniciales ---
+    # ---------------------------------------------------------------------
 
     if request.method == 'POST':
         form_prod = ProductoForm(request.POST, empresa_usuario=empresa_usuario)
-        
+
         if form_prod.is_valid():
-            
             sku = form_prod.cleaned_data.get('sku')
-            
-            producto, creado = Producto.objects.get_or_create(
-                sku=sku,
-                defaults={
-                    'nombre': form_prod.cleaned_data.get('nombre'),
-                    'marca': form_prod.cleaned_data.get('marca'),
-                    'categoria': form_prod.cleaned_data.get('categoria'),
-                    'gramage': form_prod.cleaned_data.get('gramage'),
-                    'unidad_medida': form_prod.cleaned_data.get('unidad_medida'),
-                }
-            )
-            
-            # Finalmente, creamos la relación entre el producto (nuevo o existente) y la empresa.
-            OfertaProducto.objects.create(
-                producto=producto,
-                empresa=empresa_usuario
-            )
 
-            accion = "agregado" if creado else "asociado"
-            messages.success(request, f"Producto '{producto.nombre}' {accion} a tu inventario.")
-            return redirect('inventario')
-        else:
-            # Mostrar errores en los mensajes de Django
-            for field, errors in form_prod.errors.items():
-                for error in errors:
-                    messages.error(request, f"Error en {field}: {error}")
-            
-            for error in form_prod.non_field_errors():
-                messages.error(request, f"Error general en producto: {error}")
+            try:
+                # 1) Crear o recuperar el Producto por SKU
+                producto, creado_producto = Producto.objects.get_or_create(
+                    sku=sku,
+                    defaults={
+                        'nombre': form_prod.cleaned_data.get('nombre'),
+                        'marca': form_prod.cleaned_data.get('marca'),
+                        'categoria': form_prod.cleaned_data.get('categoria'),
+                        'gramage': form_prod.cleaned_data.get('gramage'),
+                        'unidad_medida': form_prod.cleaned_data.get('unidad_medida'),
+                    }
+                )
 
-    else: # GET request
+                # 2) Asociar a la empresa vía OfertaProducto (evita duplicados)
+                oferta, creada_oferta = OfertaProducto.objects.get_or_create(
+                    producto=producto,
+                    empresa=empresa_usuario
+                )
+
+                # 3) Mensaje + redirect con highlight siempre que se haya agregado/asociado
+                if creada_oferta:
+                    accion = "agregado" if creado_producto else "asociado"
+                    messages.success(request, f"Producto «{producto.nombre}» {accion} a tu inventario.")
+                    url = reverse('inventario') + f"?created=1&created_sku={producto.sku}&hl={producto.sku}"
+                    return redirect(url)
+                else:
+                    # Ya estaba en el inventario de esta empresa
+                    messages.info(request, f"El producto «{producto.nombre}» ya estaba en tu inventario.")
+                    url = reverse('inventario') + f"?hl={producto.sku}"
+                    return redirect(url)
+
+            except IntegrityError:
+                messages.error(request, "Ocurrió un problema guardando el producto. Intenta nuevamente.")
+                return redirect('inventario')
+
+        # Form inválido: enviar errores a messages
+        for field, errors in form_prod.errors.items():
+            for error in errors:
+                messages.error(request, f"Error en {field}: {error}")
+        for error in form_prod.non_field_errors():
+            messages.error(request, f"Error general en producto: {error}")
+
+    else:
+        # GET
         form_prod = ProductoForm(empresa_usuario=empresa_usuario)
 
     context = {

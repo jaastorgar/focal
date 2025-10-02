@@ -1,36 +1,38 @@
-/*! FOCAL - inventario_app.js (único)
-   Tabs + modal descontar + stepper + fade alerts
-   + Asistente (GIF + globito de ayuda)
+/*! FOCAL - inventario.js (sin HUB/TABS)
+   - Highlight de fila recién agregada
+   - Modal descontar
+   - Stepper cantidad
+   - Fade de alerts (toasts siguen en CSS)
+   - Asistente flotante
 */
 (function () {
   'use strict';
 
-  // ---------- Helpers ----------
-  const $ = (s, r = document) => r.querySelector(s);
+  // Helpers
+  const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => r.querySelectorAll(s);
   const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
 
-  /* ================== TABS ================== */
-  const tabs = $$('.tab-btn');
-  const panels = $$('.tab-panel');
+  // ========= HIGHLIGHT fila recién agregada =========
+  (function highlightNewRow() {
+    const params  = new URLSearchParams(location.search);
+    const metaHL  = document.querySelector('meta[name="highlight-sku"]');
+    const fromQS  = (params.get('hl') || '').trim();
+    const fromMeta = metaHL ? (metaHL.getAttribute('content') || '').trim() : '';
+    const skuToHL = fromMeta || fromQS;
+    if (!skuToHL) return;
 
-  function setActive(id) {
-    if (!id) return;
-    tabs.forEach(b => b.classList.toggle('active', b.dataset.tab === id));
-    panels.forEach(p => p.classList.toggle('active', p.id === id));
-    if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
-    if (id === 'tab-descontar') { $('#id_sku_desc')?.focus(); }
-    if (id === 'tab-gestionar') { $('#id_sku')?.focus(); }
-  }
+    const tbody = $('#tablaInventario tbody');
+    if (!tbody) return;
+    const row = tbody.querySelector(`tr[data-sku="${CSS.escape(skuToHL)}"]`);
+    if (!row) return;
 
-  tabs.forEach(btn => on(btn, 'click', () => setActive(btn.dataset.tab)));
-  if (location.hash && $(location.hash)) setActive(location.hash.substring(1));
-  else setActive('tab-inv');
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.classList.add('row--highlight');
+    setTimeout(() => row.classList.remove('row--highlight'), 4500);
+  })();
 
-  const params = new URLSearchParams(location.search);
-  if (params.get('sku')) setActive('tab-gestionar');
-
-  /* ============ MODAL: Descontar ============ */
+  // ============= MODAL: Descontar =============
   const modal = $('#modal-descontar');
   const mdSku = $('#md_sku');
   const mdQty = $('#md_qty');
@@ -56,18 +58,16 @@
     });
   });
   $$('.js-close-descontar').forEach(b => on(b, 'click', closeModalDescontar));
-  on(document, 'keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('is-open')) closeModalDescontar();
-  });
+  on(document, 'keydown', (e) => { if (e.key === 'Escape' && modal?.classList.contains('is-open')) closeModalDescontar(); });
   on($('.modal__backdrop'), 'click', (e) => { if (e.target.dataset.close) closeModalDescontar(); });
 
-  /* =============== STEPPER +/- =============== */
+  // =============== STEPPER +/- ===============
   function hookSteppers(root = document) {
     root.querySelectorAll('.stepper-btn').forEach(btn => {
       on(btn, 'click', () => {
         const input = btn.parentElement.querySelector('input[type="number"]');
-        const step = parseInt(btn.dataset.step || '0', 10);
-        let val = parseInt(input?.value || '1', 10);
+        const step  = parseInt(btn.dataset.step || '0', 10);
+        let val     = parseInt(input?.value || '1', 10);
         val = (isNaN(val) ? 1 : val + step);
         if (val < 1) val = 1;
         if (input) input.value = val;
@@ -76,83 +76,59 @@
   }
   hookSteppers(document);
 
-  /* ====== Fade automático de .alert (si las hubiese) ====== */
-  on(document, 'DOMContentLoaded', () => {
-    $$('.alert').forEach(msg => {
-      setTimeout(() => {
-        msg.classList.add('fade-out');
-        on(msg, 'transitionend', () => msg.remove(), { once: true });
-      }, 5000);
-    });
+  // ====== Fade automático de .alert (si existieran) ======
+  $$('.alert').forEach(msg => {
+    setTimeout(() => {
+      msg.classList.add('fade-out');
+      on(msg, 'transitionend', () => msg.remove(), { once: true });
+    }, 5000);
   });
 
-  /* =================== ASISTENTE =================== */
-  const btn = $('#assistantBtn');
-  const img = $('#assistantImg');
+  // =================== ASISTENTE ===================
+  const btn    = $('#assistantBtn');
+  const img    = $('#assistantImg');
   const bubble = $('#assistantBubble');
   const idleSrc = btn?.dataset.idleSrc;
-  const gifSrc = btn?.dataset.gifSrc;
+  const gifSrc  = btn?.dataset.gifSrc;
 
   let bubbleTimer = null;
   let revertTimer = null;
 
-  function setImage(src) {
-    if (img && src) img.src = src;  // cambiar PNG <-> GIF
-  }
-
-  // Muestra mensaje en el globito
+  function setImage(src) { if (img && src) img.src = src; }
   function say(text, delay = 0) {
     if (!btn || !bubble) return;
-    window.clearTimeout(bubbleTimer);
-    bubbleTimer = window.setTimeout(() => {
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(() => {
       bubble.textContent = text;
       btn.classList.add('show-bubble');
     }, delay);
   }
-
   function hideBubble(delay = 0) {
-    window.clearTimeout(bubbleTimer);
-    bubbleTimer = window.setTimeout(() => {
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(() => {
       btn?.classList.remove('show-bubble');
       if (bubble) bubble.textContent = '';
     }, delay);
   }
 
-  // Al entrar (hover/focus/touch) -> reproducir GIF + frases
   function playAssistant() {
     setImage(gifSrc);
     say('¡Hola! ¿Te ayudo?', 0);
     say('¡Soy tu asistente!', 1800);
   }
-
-  // Al salir -> volver a PNG y ocultar burbuja
   function stopAssistant() {
     hideBubble(120);
-    window.clearTimeout(revertTimer);
-    revertTimer = window.setTimeout(() => setImage(idleSrc), 250);
+    clearTimeout(revertTimer);
+    revertTimer = setTimeout(() => setImage(idleSrc), 250);
   }
 
   if (btn) {
-    // Mouse/keyboard
     on(btn, 'mouseenter', playAssistant);
     on(btn, 'focus', playAssistant);
     on(btn, 'mouseleave', stopAssistant);
     on(btn, 'blur', stopAssistant);
 
-    // Touch (móviles): tocar -> anima y muestra; tocar fuera -> oculta
-    on(btn, 'touchstart', (e) => {
-      e.preventDefault();
-      playAssistant();
-    }, { passive: false });
-
-    on(document, 'touchstart', (e) => {
-      if (!btn.contains(e.target)) stopAssistant();
-    }, { passive: true });
-
-    // Click (si quieres abrir algo futuro)
-    on(btn, 'click', () => {
-      // Aquí podrías abrir tu panel/chat real del asistente
-      // Por ahora solo dejamos la animación.
-    });
+    on(btn, 'touchstart', (e) => { e.preventDefault(); playAssistant(); }, { passive: false });
+    on(document, 'touchstart', (e) => { if (!btn.contains(e.target)) stopAssistant(); }, { passive: true });
   }
 })();
