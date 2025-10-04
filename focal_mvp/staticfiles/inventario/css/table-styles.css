@@ -1,128 +1,111 @@
-/* ==========================================================================
-   FOCAL - Estilos unificados (tabla + hub + asistente)
-   Archivo único: inventario/css/table-styles.css
-   ========================================================================== */
+/* =======================================================================
+   FOCAL - Estilos inventario (footer fijo)
+   ======================================================================= */
 
-/* 1) Variables y base ------------------------------------------------------ */
+/* 1) Variables y base */
 :root{
   --primary-purple:#4A008B;
   --secondary-purple:#7B1FA2;
   --light-purple:#F3E8FF;
   --white:#FFFFFF;
   --dark-text:#212529;
-  --muted-text:#6c757d;
+  --muted-text:#6b7280;
   --border-color:#dee2e6;
-
-  /* sombras usadas por el asistente y tarjetas */
-  --shadow-2: 0 10px 24px rgba(0,0,0,.12);
-  --shadow-3: 0 14px 34px rgba(0,0,0,.18);
 
   --shadow-light:0 6px 20px rgba(0,0,0,.07);
   --shadow-medium:0 10px 28px rgba(0,0,0,.12);
+  --shadow-2:0 10px 24px rgba(0,0,0,.12);
+  --shadow-3:0 14px 34px rgba(0,0,0,.18);
 
   --font-primary:'InterTight', Arial, sans-serif;
   --font-secondary:'HankenGrotesk', Arial, sans-serif;
+
+  /* Altura del footer fijo */
+  --footer-height: 72px;
 }
-
-/* (opcional) fuentes locales */
-@font-face{font-family:'InterTight';src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');font-weight:700}
-@font-face{font-family:'HankenGrotesk';src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');font-weight:400}
-
-*,
-*::before,
-*::after{box-sizing:border-box}
 
 html{scroll-behavior:smooth}
+*{box-sizing:border-box}
 body{
-  margin:0;
-  color:var(--dark-text);
-  background:var(--light-purple);
-  font-family:var(--font-secondary);
-  line-height:1.6;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
+  margin:0; color:var(--dark-text); background:var(--light-purple);
+  font-family:var(--font-secondary); line-height:1.6; min-height:100vh;
+  display:flex; flex-direction:column;
+  /* espacio para que el footer fijo no tape contenido */
+  padding-bottom: var(--footer-height);
 }
 
-/* 2) Header / navegación --------------------------------------------------- */
+/* 2) Header */
 .app-header{
-  background:var(--primary-purple);
-  color:#fff;
-  padding:.9rem 0;
-  box-shadow:0 2px 10px rgba(0,0,0,.08);
-  position:sticky; top:0; z-index:50;
+  background:var(--primary-purple);color:#fff;padding:.9rem 0;
+  position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.08)
 }
 .app-header nav.container{
-  width:min(1280px,92%); margin:0 auto;
-  display:flex; align-items:center; justify-content:space-between; gap:.75rem;
+  width:min(1280px,92%);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem
 }
 .app-header .logo{
-  font-family:var(--font-primary);
-  font-weight:800; font-size:1.5rem; letter-spacing:-.02em;
-  text-decoration:none; color:#fff;
+  font-family:var(--font-primary);font-weight:800;font-size:1.5rem;
+  letter-spacing:-.02em;text-decoration:none;color:#fff
 }
 .nav-links{list-style:none;display:flex;gap:.5rem .75rem;margin:0;padding:0}
 .btn-accion{
-  display:inline-block; padding:.55rem .9rem; border-radius:10px;
-  border:2px solid rgba(255,255,255,.25); color:#fff; text-decoration:none;
-  font-weight:700; font-family:var(--font-primary); letter-spacing:.02em;
-  transition:background .2s, transform .15s, border-color .2s;
+  display:inline-block;padding:.55rem .9rem;border-radius:10px;
+  border:2px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;
+  font-weight:700;font-family:var(--font-primary);letter-spacing:.02em;
+  transition:background .2s, transform .15s, border-color .2s
 }
 .btn-accion:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.45);transform:translateY(-1px)}
 
-/* 3) Contenedor principal -------------------------------------------------- */
-main.container{width:min(1280px,92%);margin:1.6rem auto 2.2rem;background:transparent;flex:1}
+/* 3) Main */
+main.container{
+  width:min(1280px,92%);margin:1.6rem auto;
+  /* margen extra para que no choque con el footer fijo */
+  margin-bottom: calc(var(--footer-height) + 16px);
+  flex:1
+}
 main.container h1{
-  font-family:var(--font-primary); color:var(--primary-purple);
-  font-size:clamp(1.4rem,2.2vw,2.1rem); margin:.2rem 0 1rem;
+  font-family:var(--font-primary);color:var(--primary-purple);
+  font-size:clamp(1.4rem,2.2vw,2.1rem);margin:.2rem 0 1rem
 }
 
-/* 4) Hub simple (pestañas/controles mínimos) ------------------------------ */
-.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
-.tab-btn{border:1px solid #e5e7eb;padding:.6rem .9rem;border-radius:.75rem;background:#fff;cursor:pointer}
-.tab-btn.active{background:var(--light-purple);border-color:var(--secondary-purple)}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-
+/* Utilidades */
 .card{background:#fff;border:1px solid var(--border-color);border-radius:1rem;padding:1rem}
 .toolbar,.sku-inline{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
 .pill{font-size:.85rem;background:#eef2ff;padding:.2rem .5rem;border-radius:.5rem}
-.muted{color:#6b7280}
-
+.muted{color:var(--muted-text)}
 .grid{display:grid;gap:1rem}
 .grid-2{grid-template-columns:1fr}
 @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
-
 .btn{padding:.55rem .85rem;border-radius:.6rem;border:1px solid #e5e7eb;background:#fff;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-primary{background:var(--secondary-purple);border-color:transparent;color:#fff}
 .btn-secondary{background:#fff;border-color:#e5e7eb;color:var(--dark-text)}
 .btn-danger{background:#c62828;border-color:#c62828;color:#fff}
 .btn-sm{padding:.4rem .6rem;font-size:.9rem}
-.empty-hint{color:#6b7280;margin:.5rem 0}
+.empty-hint{color:var(--muted-text);margin:.5rem 0}
 .acciones a{margin-right:.35rem}
 
-/* 5) Buscador -------------------------------------------------------------- */
+/* 4) Buscador */
 .search-section{margin:0 0 1.2rem}
 .search-form{display:flex;align-items:center;gap:.5rem;max-width:720px}
 .search-input{
   flex:1;padding:.8rem 1rem;border:1px solid var(--border-color);border-radius:10px;background:#fff;font:inherit;
-  transition:border-color .2s, box-shadow .2s;
+  transition:border-color .2s, box-shadow .2s
 }
 .search-input:focus{outline:none;border-color:var(--primary-purple);box-shadow:0 0 0 3px rgba(74,0,139,.18)}
 .search-button,.clear-search-button{
   padding:.75rem 1.1rem;border-radius:10px;border:2px solid transparent;text-decoration:none;
   font-family:var(--font-primary);font-weight:800;letter-spacing:.02em;cursor:pointer;
-  transition:background .2s, border-color .2s, transform .15s;
+  transition:background .2s, border-color .2s, transform .15s
 }
 .search-button{background:var(--primary-purple);color:#fff;border-color:var(--primary-purple)}
 .search-button:hover{background:#38006B;border-color:#38006B;transform:translateY(-1px)}
-.clear-search-button{background:#fff;color:var(--muted-text);border-color:var(--border-color)}
+.clear-search-button{background:#fff;color:#6c757d;border-color:var(--border-color)}
 .clear-search-button:hover{background:#f3f4f6}
 
-/* 6) Tabla ----------------------------------------------------------------- */
+/* 5) Tabla */
 .table-container{
   background:#fff;border:1px solid var(--border-color);border-radius:12px;box-shadow:var(--shadow-light);
-  max-height:72vh;overflow:auto;-webkit-overflow-scrolling:touch;
+  max-height:72vh;overflow:auto;-webkit-overflow-scrolling:touch
 }
 .tabla-inventario{width:100%;border-collapse:collapse;min-width:980px;font-size:.96rem}
 .tabla-inventario thead{background:#f8f9fa;border-bottom:2px solid var(--border-color);position:sticky;top:0;z-index:2}
@@ -135,36 +118,56 @@ main.container h1{
 .tabla-inventario tbody tr{border-bottom:1px solid #f1f3f5}
 .tabla-inventario tbody tr:last-child{border-bottom:0}
 .tabla-inventario td:nth-child(2){word-break:break-word;font-feature-settings:"tnum"}
-
 .tabla-inventario th:first-child,.tabla-inventario td:first-child{
   position:sticky;left:0;background:#fff;z-index:3;box-shadow:2px 0 0 #eee
 }
 .tabla-inventario tr.vencido{box-shadow:inset 4px 0 0 #c62828;background:#fff5f5}
 .tabla-inventario tr.proximo-vencer{box-shadow:inset 4px 0 0 #f57c00;background:#fff8e1}
 .tabla-inventario tr.stock-bajo{box-shadow:inset 4px 0 0 #1565c0;background:#eef6ff}
-
 .acciones{display:flex;gap:.5rem;flex-wrap:wrap}
-.btn-accion-tabla{display:inline-block;padding:.4rem .7rem;border-radius:8px;background:var(--secondary-purple);color:#fff;text-decoration:none;font-size:.82rem;font-weight:700}
-.btn-accion-tabla:hover{filter:brightness(.95)}
-.btn-peligro{background:#c62828}
 
-/* 7) Empty state ----------------------------------------------------------- */
-.empty-state-wrapper{min-height:58vh;display:grid;place-items:center}
-.empty-state{text-align:center;max-width:520px;background:transparent;padding:1.5rem}
+/* Highlight “producto ingresado correcto” */
+@keyframes rowPulse{0%{box-shadow:0 0 0 0 rgba(74,0,139,.35)}40%{box-shadow:0 0 0 6px rgba(74,0,139,0)}100%{box-shadow:0 0 0 0 rgba(74,0,139,0)}}
+.row--highlight{
+  outline:2px solid rgba(74,0,139,.65);
+  background:linear-gradient(0deg, rgba(122,74,203,.08), rgba(122,74,203,.08));
+  position:relative;animation:rowPulse 1.2s ease-out 0s 3
+}
+.row--highlight td:first-child{
+  background:linear-gradient(0deg, rgba(122,74,203,.08), rgba(122,74,203,.08))
+}
+
+/* 6) Empty state */
+.empty-state-wrapper{min-height:40vh;display:grid;place-items:center}
+.empty-state{text-align:center;max-width:520px;padding:1.5rem}
 .empty-state-icon svg{stroke:var(--primary-purple);opacity:.25;margin-bottom:1rem}
 .empty-state-title{font-family:var(--font-primary);font-size:clamp(1.3rem,2.2vw,1.8rem);color:var(--dark-text);margin:0 0 .6rem}
-.empty-state-message{color:var(--muted-text);margin-bottom:1.4rem}
-.btn-accion-principal{display:inline-block;padding:.9rem 1.4rem;border-radius:10px;background:var(--primary-purple);color:#fff;text-decoration:none;font-family:var(--font-primary);font-weight:800;border:2px solid var(--primary-purple)}
+.empty-state-message{color:#6c757d;margin-bottom:1.4rem}
+.btn-accion-principal{
+  display:inline-block;padding:.9rem 1.4rem;border-radius:10px;background:var(--primary-purple);color:#fff;text-decoration:none;
+  font-family:var(--font-primary);font-weight:800;border:2px solid var(--primary-purple)
+}
 .btn-accion-principal:hover{background:#38006B;border-color:#38006B;transform:translateY(-1px)}
 
-/* 8) Footer --------------------------------------------------------------- */
-.app-footer{background:var(--primary-purple);color:#fff;text-align:center;padding:1.2rem 0;margin-top:auto;font-size:.95rem}
+/* 7) Footer (FIJO) */
+.app-footer{
+  position:fixed; left:0; right:0; bottom:0;
+  height: var(--footer-height);
+  background:var(--primary-purple); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:0 16px; z-index:40;  /* debajo de toasts (60) y modales */
+  box-shadow:0 -2px 10px rgba(0,0,0,.08);
+  font-size:.95rem;
+}
 
-/* --- Modal descontar --- */
-.modal{position:fixed;inset:0;display:none}
+/* 8) Modal descontar */
+.modal{position:fixed;inset:0;display:none;z-index:80}
 .modal.is-open{display:block}
 .modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45)}
-.modal__content{position:relative;max-width:520px;width:calc(100% - 2rem);margin:8vh auto;background:#fff;border-radius:14px;border:1px solid var(--border-color);box-shadow:var(--shadow-medium);overflow:hidden}
+.modal__content{
+  position:relative;max-width:520px;width:calc(100% - 2rem);margin:8vh auto;background:#fff;
+  border-radius:14px;border:1px solid var(--border-color);box-shadow:var(--shadow-medium);overflow:hidden
+}
 .modal__header{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.1rem;background:#faf7ff;border-bottom:1px solid #eee}
 .modal__header h3{margin:0;font-family:var(--font-primary)}
 .modal__close{border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer}
@@ -172,26 +175,29 @@ main.container h1{
 .modal__row{display:grid;gap:.35rem;margin-bottom:.9rem}
 .modal__footer{display:flex;gap:.5rem;justify-content:flex-end;padding:.9rem 1.1rem;border-top:1px solid #eee;background:#fff}
 
-/* --- Stepper --- */
+/* Stepper */
 .stepper{display:flex;align-items:center;gap:.4rem;max-width:180px}
 .stepper-btn{flex:0 0 38px;height:38px;border-radius:8px;border:1px solid var(--border-color);background:#fff;font-size:1.4rem;line-height:1;cursor:pointer}
 .stepper-btn:hover{background:var(--light-purple);border-color:var(--secondary-purple)}
 .stepper input{flex:1;text-align:center;font-size:1rem;padding:.4rem;border-radius:6px;border:1px solid var(--border-color)}
 
-/* =================== TOASTS =================== */
-.toast-stack{position:fixed;top:88px;right:18px;display:grid;gap:.6rem;z-index:60}
+/* 9) Toasts */
+.toast-stack{position:fixed;top:88px;right:18px;display:grid;gap:.6rem;z-index:90}
 .toast{
   --toast-bg:#fff;--toast-fg:#212529;--toast-border:#e9ecef;--toast-shadow:0 12px 28px rgba(0,0,0,.12);
   background:var(--toast-bg);color:var(--toast-fg);border:1px solid var(--toast-border);
   border-radius:12px;box-shadow:var(--toast-shadow);
   display:grid;grid-template-columns:24px 1fr;gap:.65rem .7rem;align-items:center;
   padding:.75rem .9rem .9rem .9rem;min-width:280px;max-width:380px;
-  animation:toast-enter .36s ease-out, toast-exit .4s ease-out 4.2s forwards;
+  animation:toast-enter .36s ease-out, toast-exit .4s ease-out 4.2s forwards
 }
 .toast__icon{color:var(--primary-purple);display:flex;align-items:center;justify-content:center}
 .toast__body{font-size:.95rem}
 .toast__timer{grid-column:1/-1;height:3px;background:rgba(0,0,0,.08);border-radius:99px;overflow:hidden;position:relative}
-.toast__timer::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--secondary-purple),var(--primary-purple));transform-origin:left;animation:toast-timer 4s linear forwards;border-radius:99px}
+.toast__timer::after{
+  content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--secondary-purple),var(--primary-purple));
+  transform-origin:left;animation:toast-timer 4s linear forwards;border-radius:99px
+}
 .toast--success{--toast-bg:#ECFDF5;--toast-fg:#065F46;--toast-border:#A7F3D0}
 .toast--error{--toast-bg:#FEF2F2;--toast-fg:#7F1D1D;--toast-border:#FECACA}
 .toast--warning{--toast-bg:#FFFBEB;--toast-fg:#7C2D12;--toast-border:#FDE68A}
@@ -200,13 +206,12 @@ main.container h1{
 @keyframes toast-exit{to{opacity:0;transform:translateY(-6px);pointer-events:none}}
 @keyframes toast-timer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 
-/* 9) Responsive tabla ------------------------------------------------------ */
+/* 10) Responsive tabla (stack cards) */
 @media (max-width:1024px){
   .nav-links{gap:.4rem}
   .btn-accion{padding:.5rem .72rem}
   .tabla-inventario{min-width:820px}
   .tabla-inventario th,.tabla-inventario td{padding:.8rem .75rem}
-  .search-form{max-width:100%}
 }
 @media (max-width:768px){
   main.container{width:min(1100px,94%)}
@@ -218,14 +223,14 @@ main.container h1{
   .tabla-inventario{border-collapse:separate;border-spacing:0 12px;min-width:0;width:100%;font-size:1rem}
   .tabla-inventario thead{position:absolute;clip:rect(1px,1px,1px,1px);width:1px;height:1px;overflow:hidden}
   .tabla-inventario tr{display:block;background:#fff;border:1px solid var(--border-color);border-radius:12px;box-shadow:var(--shadow-light);padding:.6rem .75rem;margin:0 0 12px 0;contain:content}
-  .tabla-inventario td{display:grid;grid-template-columns:44% 56%;align-items:start;gap:.4rem;padding:.55rem .25rem;border:0;border-bottom:1px dashed #eee;word-break:break-word}
+  .tabla-inventario td{display:grid;grid-template-columns:44% 56%;gap:.4rem;padding:.55rem .25rem;border:0;border-bottom:1px dashed #eee}
   .tabla-inventario td:last-child{border-bottom:0}
   .tabla-inventario td::before{content:attr(data-label);font-family:var(--font-primary);font-weight:800;color:var(--dark-text);letter-spacing:.2px;font-size:.92rem}
   .tabla-inventario td:nth-child(1)::before{content:"Producto"}
   .tabla-inventario td:nth-child(2)::before{content:"SKU"}
   .tabla-inventario td:nth-child(3)::before{content:"Marca"}
   .tabla-inventario td:nth-child(4)::before{content:"Categoría"}
-  .tabla-inventario td:nth-child(5)::before{content:"Dramaje"}
+  .tabla-inventario td:nth-child(5)::before{content:"Gramaje"}
   .tabla-inventario td:nth-child(6)::before{content:"Unidad Medida"}
   .tabla-inventario td:nth-child(7)::before{content:"Stock Total"}
   .tabla-inventario td:nth-child(8)::before{content:"Cantidad Lotes"}
@@ -239,36 +244,29 @@ main.container h1{
   .tabla-inventario td{grid-template-columns:48% 52%;padding:.5rem .2rem}
 }
 
-/* ===================== BOTÓN FLOTANTE – ASISTENTE ======================== */
-.assistant-container{position:fixed;inset:auto 24px 60px auto;z-index:900}
+/* 11) Asistente FOCAL (botón flotante) */
+/* Se eleva para no chocar con el footer fijo */
+.assistant-container{
+  position:fixed; inset:auto 24px calc(var(--footer-height) + 12px) auto; z-index:70
+}
 .floating-assistant{
-  width:74px;height:74px;border-radius:50%;
-  background:#fff;border:3px solid var(--primary-purple);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;box-shadow:var(--shadow-2);
-  transition:transform .2s ease, box-shadow .2s ease;
-  overflow:hidden;position:relative;
+  width:74px;height:74px;border-radius:50%;background:#fff;border:3px solid var(--primary-purple);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-2);
+  transition:transform .2s ease, box-shadow .2s ease;overflow:hidden;position:relative
 }
 .floating-assistant:hover{transform:translateY(-6px) scale(1.04);box-shadow:var(--shadow-3)}
 .floating-assistant img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-
-/* Globo */
 .assistant-bubble{
-  position:absolute;right:88px;bottom:10px;
-  background:#fff;color:#2a1840;border:1px solid var(--border-color);
-  border-radius:12px;padding:10px 12px;font-weight:700;
-  box-shadow:var(--shadow-2);white-space:nowrap;
-  opacity:0;transform:translateY(6px) scale(.98);pointer-events:none;
-  transition:opacity .22s ease, transform .22s ease;
+  position:absolute;right:88px;bottom:10px;background:#fff;color:#2a1840;border:1px solid var(--border-color);
+  border-radius:12px;padding:10px 12px;font-weight:700;box-shadow:var(--shadow-2);white-space:nowrap;
+  opacity:0;transform:translateY(6px) scale(.98);pointer-events:none;transition:opacity .22s ease, transform .22s ease
 }
 .assistant-bubble::after{
-  content:"";position:absolute;right:-8px;bottom:16px;
-  border:8px solid transparent;border-left-color:#fff;
-  filter:drop-shadow(1px 0 0 var(--border-color));
+  content:"";position:absolute;right:-8px;bottom:16px;border:8px solid transparent;border-left-color:#fff;
+  filter:drop-shadow(1px 0 0 var(--border-color))
 }
 .floating-assistant.show-bubble .assistant-bubble{opacity:1;transform:translateY(0) scale(1)}
-
 @media (max-width:768px){
-  .assistant-container{padding-right:20px;padding-bottom:15px;padding-top:30px}
+  .assistant-container{right:20px;bottom:calc(var(--footer-height) + 10px)}
   .floating-assistant{width:60px;height:60px}
 }

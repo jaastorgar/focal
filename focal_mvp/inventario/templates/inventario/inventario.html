@@ -7,13 +7,16 @@
   <title>Inventario | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon"/>
 
+  <!-- Íconos (lupa y +) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
   <!-- ÚNICO CSS -->
   <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}"/>
 
   <!-- Endpoint para autocompletar por SKU -->
   <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}"/>
 
-  <!-- SKU a resaltar: ?hl=SKU o variable de contexto highlight_sku -->
+  <!-- SKU a resaltar -->
   <meta name="highlight-sku" content="{{ request.GET.hl|default:highlight_sku|default:'' }}"/>
 </head>
 <body>
@@ -23,7 +26,6 @@
     <a href="{% url 'home' %}" class="logo">FOCAL</a>
     <ul class="nav-links">
       <li><a href="{% url 'metrics' %}" class="btn-accion">Metricas</a></li>
-      <li><a href="{% url 'agregar-producto' %}" class="btn-accion">Agregar Producto</a></li>
       <li><a href="{% url 'home' %}" class="btn-accion">Volver al Home</a></li>
     </ul>
   </nav>
@@ -36,13 +38,13 @@
       <section class="toast {% if 'success' in level %}toast--success{% elif 'error' in level %}toast--error{% elif 'warning' in level %}toast--warning{% else %}toast--info{% endif %}" role="status">
         <div class="toast__icon" aria-hidden="true">
           {% if 'success' in level %}
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="m20 6-11 11-5-5"/></svg>
+          <i class="bi bi-check-circle-fill"></i>
           {% elif 'error' in level %}
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <i class="bi bi-x-circle-fill"></i>
           {% elif 'warning' in level %}
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <i class="bi bi-exclamation-triangle-fill"></i>
           {% else %}
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <i class="bi bi-info-circle-fill"></i>
           {% endif %}
         </div>
         <div class="toast__body">{{ message }}</div>
@@ -56,13 +58,21 @@
 <main class="container">
   <h1>Inventario</h1>
 
-  <!-- Sección: Inventario -->
   {% if productos %}
-
     <div class="search-section">
       <form method="GET" action="{% url 'inventario' %}" class="search-form">
         <input class="search-input" type="search" name="q" placeholder="Buscar por nombre, sku, marca..." aria-label="Buscar" value="{{ query|default:'' }}">
-        <button class="search-button" type="submit">Buscar</button>
+        
+        <!-- Botón de búsqueda con ícono lupa -->
+        <button class="search-button" type="submit" aria-label="Buscar">
+          <i class="bi bi-search" aria-hidden="true"></i>
+        </button>
+
+        <!-- Botón + para agregar producto -->
+        <a href="{% url 'agregar-producto' %}" class="search-button" aria-label="Agregar producto">
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        </a>
+
         {% if query %}
           <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a>
         {% endif %}
@@ -112,14 +122,6 @@
   {% else %}
     <div class="empty-state-wrapper">
       <div class="empty-state">
-        <div class="empty-state-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4A2 2 0 0 0 12 20a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-            <polyline points="5.5 11 18.5 11"></polyline>
-            <line x1="13" y1="11" x2="13" y2="16"></line>
-            <line x1="8" y1="11" x2="8" y2="16"></line>
-          </svg>
-        </div>
         <h2 class="empty-state-title">
           {% if query %}Sin resultados para "{{ query }}"{% else %}Tu inventario está vacío{% endif %}
         </h2>

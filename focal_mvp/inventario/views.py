@@ -6,9 +6,9 @@ from django.contrib import messages
 from django.http import JsonResponse
 from datetime import date, timedelta
 from django.db import transaction, IntegrityError
+from django.utils.timezone import now
 import time
 import logging
-import json
 from .forms import (
     ProductoForm, 
     LoteProductoForm, 
@@ -77,6 +77,12 @@ def inventario_view(request):
       - ?discounted=1&sku=XXXXXXXX
     Además, si viene ?hl=SKU (o si created_sku está presente), se pasa ese SKU
     al template para que el JS resalte la fila.
+
+    También realiza housekeeping de vencimientos:
+      - Elimina lotes con fecha < hoy (vencidos) y muestra alerta.
+      - En el template, si el próximo vencimiento es dentro de 15 días,
+        se pinta en amarillo; si fuera hoy o anterior, sería rojo, pero
+        como los lotes vencidos se eliminan aquí, ya no aparecerán.
     """
     # ------------------------------------------------------------------
     # 0) Empresa del usuario
@@ -96,7 +102,47 @@ def inventario_view(request):
         })
 
     # ------------------------------------------------------------------
-    # 1) Flags de retorno (toasts) + highlight
+    # 1) Housekeeping de vencidos (rojo): eliminar y alertar
+    # ------------------------------------------------------------------
+    hoy = now().date()
+    lotes_vencidos_qs = (
+        LoteProducto.objects
+        .select_related('producto', 'producto__producto')
+        .filter(producto__empresa=empresa_usuario, fecha_vencimiento__lt=hoy)
+    )
+
+    if lotes_vencidos_qs.exists():
+        # Guardamos datos para el mensaje ANTES de borrar
+        info_lotes = list(
+            lotes_vencidos_qs.values(
+                'id',
+                'fecha_vencimiento',
+                'producto__producto__sku',
+                'producto__producto__nombre',
+            )
+        )
+
+        # Borrado en base de datos
+        deleted_count, _ = lotes_vencidos_qs.delete()
+
+        # Armamos un mensaje compacto
+        # Mostramos hasta 5 ítems y luego "y N más..."
+        detalle = []
+        for item in info_lotes[:5]:
+            detalle.append(
+                f"SKU {item['producto__producto__sku']} · «{item['producto__producto__nombre']}» (lote #{item['id']}, {item['fecha_vencimiento']:%d-%m-%Y})"
+            )
+        extras = max(0, len(info_lotes) - 5)
+        detalle_txt = " | ".join(detalle) + (f" … y {extras} más." if extras else "")
+
+        messages.warning(
+            request,
+            "Se eliminaron lotes vencidos. Retira los productos vencidos de la vitrina. "
+            f"Detalle: {detalle_txt}"
+        )
+
+    # ------------------------------------------------------------------
+    # 2) Flags de retorno (toasts) + highlight
     # ------------------------------------------------------------------
     created = request.GET.get('created') == '1'
     created_sku = (request.GET.get('created_sku') or '').strip()
@@ -104,7 +150,7 @@ def inventario_view(request):
     updated = request.GET.get('updated') == '1'
     deleted = request.GET.get('deleted') == '1'
     discounted = request.GET.get('discounted') == '1'
-    sku_flag = (request.GET.get('sku') or '').strip()  # para updated/deleted/discounted
+    sku_flag = (request.GET.get('sku') or '').strip()
 
     # Mensajes
     if created:
@@ -133,7 +179,7 @@ def inventario_view(request):
     highlight_sku = (request.GET.get('hl') or '').strip() or created_sku
 
     # ------------------------------------------------------------------
-    # 2) Base de productos + subconsultas (stock, vencimiento, #lotes)
+    # 3) Base de productos + subconsultas (stock, vencimiento, #lotes)
     # ------------------------------------------------------------------
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
 
@@ -168,7 +214,7 @@ def inventario_view(request):
     )
 
     # ------------------------------------------------------------------
-    # 3) Buscador
+    # 4) Buscador
     # ------------------------------------------------------------------
     query = (request.GET.get('q') or '').strip()
     if query:
@@ -182,7 +228,7 @@ def inventario_view(request):
             messages.info(request, f"No se encontraron resultados para «{query}».")
 
     # ------------------------------------------------------------------
-    # 4) Panel "Gestionar" por SKU
+    # 5) Panel "Gestionar" por SKU
     # ------------------------------------------------------------------
     sku = (request.GET.get('sku') or '').strip()
     producto_sel = None
@@ -204,17 +250,17 @@ def inventario_view(request):
             lotes_sel = LoteProducto.objects.none()
 
     # ------------------------------------------------------------------
-    # 5) Render
+    # 6) Render
     # ------------------------------------------------------------------
     context = {
         'productos': productos,
         'query': query,
-        'today': date.today(),
-        'hoy_mas_15dias': int(time.mktime((date.today() + timedelta(days=15)).timetuple())),
+        'today': hoy,
+        'hoy_mas_15dias': int(time.mktime((hoy + timedelta(days=15)).timetuple())),
         'sku': sku,
         'producto_sel': producto_sel,
         'lotes_sel': lotes_sel,
-        'highlight_sku': highlight_sku,  
+        'highlight_sku': highlight_sku,
     }
     return render(request, 'inventario/inventario.html', context)
 
