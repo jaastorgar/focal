@@ -253,7 +253,7 @@ def inventario_view(request):
     # 6) Render
     # ------------------------------------------------------------------
     context = {
-        'productos': productos,
+        'productos': productos, 
         'query': query,
         'today': hoy,
         'hoy_mas_15dias': int(time.mktime((hoy + timedelta(days=15)).timetuple())),

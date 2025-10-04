@@ -79,8 +79,6 @@
             <th>SKU</th>
             <th>Marca</th>
             <th>Categoría</th>
-            <th>Gramaje</th>
-            <th>Unidad Medida</th>
             <th>Stock Total</th>
             <th>Cantidad Lotes</th>
             <th>Acciones</th>
@@ -98,8 +96,6 @@
             <td>{{ producto.sku }}</td>
             <td>{{ producto.marca|default:"N/A" }}</td>
             <td>{{ producto.get_categoria_display }}</td>
-            <td>{{ producto.gramage }}</td>
-            <td>{{ producto.unidad_medida }}</td>
             <td>{{ producto.stock_total|default:"0" }}</td>
             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
 
