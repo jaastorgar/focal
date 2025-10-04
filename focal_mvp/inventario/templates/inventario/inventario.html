@@ -7,13 +7,13 @@
   <title>Inventario | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon"/>
 
-  <!-- Íconos (lupa y +) -->
+  <!-- Bootstrap Icons (lupa, +, -, basurero, tuerca, etc.) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-  <!-- ÚNICO CSS -->
+  <!-- CSS -->
   <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}"/>
 
-  <!-- Endpoint para autocompletar por SKU -->
+  <!-- Para autocompletar por SKU -->
   <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}"/>
 
   <!-- SKU a resaltar -->
@@ -37,15 +37,10 @@
       {% with level=message.tags %}
       <section class="toast {% if 'success' in level %}toast--success{% elif 'error' in level %}toast--error{% elif 'warning' in level %}toast--warning{% else %}toast--info{% endif %}" role="status">
         <div class="toast__icon" aria-hidden="true">
-          {% if 'success' in level %}
-          <i class="bi bi-check-circle-fill"></i>
-          {% elif 'error' in level %}
-          <i class="bi bi-x-circle-fill"></i>
-          {% elif 'warning' in level %}
-          <i class="bi bi-exclamation-triangle-fill"></i>
-          {% else %}
-          <i class="bi bi-info-circle-fill"></i>
-          {% endif %}
+          {% if 'success' in level %}<i class="bi bi-check-circle-fill"></i>
+          {% elif 'error' in level %}<i class="bi bi-x-circle-fill"></i>
+          {% elif 'warning' in level %}<i class="bi bi-exclamation-triangle-fill"></i>
+          {% else %}<i class="bi bi-info-circle-fill"></i>{% endif %}
         </div>
         <div class="toast__body">{{ message }}</div>
         <div class="toast__timer" aria-hidden="true"></div>
@@ -62,17 +57,14 @@
     <div class="search-section">
       <form method="GET" action="{% url 'inventario' %}" class="search-form">
         <input class="search-input" type="search" name="q" placeholder="Buscar por nombre, sku, marca..." aria-label="Buscar" value="{{ query|default:'' }}">
-        
-        <!-- Botón de búsqueda con ícono lupa -->
+        <!-- Lupa (submit) -->
         <button class="search-button" type="submit" aria-label="Buscar">
           <i class="bi bi-search" aria-hidden="true"></i>
         </button>
-
-        <!-- Botón + para agregar producto -->
+        <!-- + (agregar producto) -->
         <a href="{% url 'agregar-producto' %}" class="search-button" aria-label="Agregar producto">
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
         </a>
-
         {% if query %}
           <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a>
         {% endif %}
@@ -110,9 +102,37 @@
             <td>{{ producto.unidad_medida }}</td>
             <td>{{ producto.stock_total|default:"0" }}</td>
             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
+
             <td class="acciones">
-              <a href="?sku={{ producto.sku }}#gestionar" class="btn btn-secondary btn-sm">Gestionar</a>
-              <a href="#modal-descontar" class="btn btn-secondary btn-sm js-open-descontar" data-sku="{{ producto.sku }}">Descontar</a>
+              <!-- + Agregar lote (pasamos SKU por query) -->
+              <a href="{% url 'agregar_lote' %}?sku={{ producto.sku }}"
+                 class="btn icon-btn"
+                 title="Agregar lote" aria-label="Agregar lote">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+              </a>
+
+              <!-- − Descontar (abre modal con SKU) -->
+              <a href="#modal-descontar"
+                 class="btn icon-btn js-open-descontar"
+                 data-sku="{{ producto.sku }}"
+                 title="Descontar stock" aria-label="Descontar stock">
+                <i class="bi bi-dash-lg" aria-hidden="true"></i>
+              </a>
+
+              <!-- 🗑 Eliminar producto -> usa producto.id (según urls.py) -->
+              <a href="{% url 'eliminar_producto' producto.id %}"
+                 class="btn icon-btn icon-btn--danger"
+                 title="Eliminar producto" aria-label="Eliminar producto"
+                 onclick="return confirm('¿Eliminar el producto {{ producto.nombre }} (SKU {{ producto.sku }}) del inventario?');">
+                <i class="bi bi-trash3" aria-hidden="true"></i>
+              </a>
+
+              <!-- ⚙ Gestionar lotes y proveedores -> template dedicado -->
+              <a href="{% url 'gestionar_proveedores_precios' %}?sku={{ producto.sku }}"
+                 class="btn icon-btn icon-btn--primary"
+                 title="Gestionar lotes y proveedores" aria-label="Gestionar lotes y proveedores">
+                <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
+              </a>
             </td>
           </tr>
           {% endfor %}
@@ -150,7 +170,7 @@
   <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
 </footer>
 
-<!-- ÚNICO JS -->
+<!-- JS -->
 <script src="{% static 'inventario/js/inventario.js' %}" defer></script>
 </body>
 </html>

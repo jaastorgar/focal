@@ -124,7 +124,23 @@ main.container h1{
 .tabla-inventario tr.vencido{box-shadow:inset 4px 0 0 #c62828;background:#fff5f5}
 .tabla-inventario tr.proximo-vencer{box-shadow:inset 4px 0 0 #f57c00;background:#fff8e1}
 .tabla-inventario tr.stock-bajo{box-shadow:inset 4px 0 0 #1565c0;background:#eef6ff}
-.acciones{display:flex;gap:.5rem;flex-wrap:wrap}
+
+/* Acciones como íconos */
+.acciones{display:flex;gap:.45rem;flex-wrap:nowrap;align-items:center}
+.icon-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:10px;
+  border:1px solid #e5e7eb;background:#fff;color:#374151;
+  text-decoration:none;cursor:pointer;transition:transform .12s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+.icon-btn i{font-size:1rem;line-height:1}
+.icon-btn:hover{background:#f9fafb;border-color:#d1d5db;box-shadow:var(--shadow-light);transform:translateY(-1px)}
+.icon-btn:active{transform:translateY(0)}
+/* variantes de color (opcionales si quieres diferenciarlas) */
+.icon-btn--danger{color:#b91c1c;border-color:#fca5a5;background:#fff}
+.icon-btn--danger:hover{background:#fef2f2;border-color:#fca5a5}
+.icon-btn--primary{color:#4A008B;border-color:#e5e7eb}
+.icon-btn--primary:hover{background:#F3E8FF;border-color:#d1c4e9}
 
 /* Highlight “producto ingresado correcto” */
 @keyframes rowPulse{0%{box-shadow:0 0 0 0 rgba(74,0,139,.35)}40%{box-shadow:0 0 0 6px rgba(74,0,139,0)}100%{box-shadow:0 0 0 0 rgba(74,0,139,0)}}
