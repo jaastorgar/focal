@@ -6,20 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FOCAL | Tu socio digital</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <!-- Bootstrap Icons (para íconos de las tarjetas) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <!-- Estilos del landing -->
   <link rel="stylesheet" href="static/landing/css/styles.css">
 </head>
 <body>
 
-  <!-- =========================
-       HEADER / NAVBAR
-  ========================== -->
   <header class="main-header" id="home">
     <div class="container">
       <a class="logo" href="#home" aria-label="Inicio">
-        <!-- Reemplazo del texto por logo, tal como indicaste -->
         <img src="/static/landing/img/Focal_imagotipo.svg" alt="Bootstrap" width="30" height="24" style="vertical-align:middle;margin-right:.5rem">
         <span class="logo-text sr-only">SOY FOCAL</span>
       </a>
@@ -39,10 +33,6 @@
     </div>
   </header>
 
-  <!-- =========================
-       HERO (SECCIÓN 1)
-       *Quité el texto “FOCAL” grande y dejé tarjeta para tu animación*
-  ========================== -->
   <section class="hero-section section-odd">
     <div class="container">
       <div class="hero-content">
@@ -56,7 +46,6 @@
         </div>
       </div>
 
-      <!-- Tarjeta/espacio para la animación (de momento un placeholder) -->
       <div class="hero-image">
         <div class="anim-card" aria-hidden="true">
           <img src="{% static 'landing/img/comp-11.gif' %}" alt="" class="anim-gif">
@@ -65,11 +54,6 @@
     </div>
   </section>
 
-  <!-- =========================
-       FEATURES (SECCIÓN 2)
-       Título actualizado: “Lo que te ofrecemos”
-       Tarjetas son botones (enlaces) a páginas de detalle
-  ========================== -->
   <section class="features-section section-even" id="features">
     <div class="container">
       <h2 class="section-title" style="text-align:center">Servicios</h2>
@@ -111,41 +95,33 @@
     </div>
   </section>
 
-  <!-- =========================
-       CTA (SECCIÓN 3)
-       Texto actualizado y más alto para “poner monitos”
-  ========================== -->
   <section class="cta-section section-odd" id="cta">
     <div class="container cta-container">
       <h2 class="section-title" style="color:#fff">¡Maneja tu almacén!</h2>
       <a href="/registro/" class="btn btn-cta">Únete</a>
-      <!-- espacio extra para ilustraciones/“monitos” -->
       <div class="cta-illustrations" aria-hidden="true"></div>
     </div>
   </section>
 
-  <!-- =========================
-       CONTACTO (SECCIÓN 4)
-       Form solo para prospectos con dudas
-  ========================== -->
   <section class="contact-section section-even" id="contact">
     <div class="container">
       <h2 class="section-title" style="text-align:center">¿Tienes dudas?</h2>
       <p class="section-description">Cuéntanos qué necesitas y uno de nuestros especialistas te contactará.</p>
 
-      <form class="contact-form" method="post" action="/contacto/">
-        <!-- {% csrf_token %} si usas Django -->
+      <form class="contact-form" method="post" action="{% url 'landing:contacto_submit' %}">
+        {% csrf_token %} 
+        
         <div class="grid-2">
           <div>
             <label class="label">Nombre</label>
-            <input type="text" name="nombre" placeholder="Tu nombre" required>
+            <input type="text" name="nombre_completo" placeholder="Tu nombre" required>
           </div>
           <div>
             <label class="label">Email</label>
             <input type="email" name="email" placeholder="tu@correo.com" required>
           </div>
         </div>
-
+      
         <div class="grid-2">
           <div>
             <label class="label">Teléfono</label>
@@ -167,9 +143,6 @@
     </div>
   </section>
 
-  <!-- =========================
-       FOOTER
-  ========================== -->
   <footer class="main-footer">
     <div class="container">
       <div class="footer-grid">
@@ -217,7 +190,6 @@
     </div>
   </footer>
 
-  <!-- Flotantes (Instagram / WhatsApp) -->
   <div class="floating-social" aria-hidden="true">
     <a class="float-btn ig" href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
       <i class="bi bi-instagram"></i>
@@ -227,7 +199,6 @@
     </a>
   </div>
 
-  <!-- JS propio (menú móvil y autocierre de alertas) -->
   <script src="static/landing/js/index.js"></script>
   <script>
     // Año dinámico en el footer

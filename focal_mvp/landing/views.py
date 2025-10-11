@@ -27,7 +27,7 @@ def contacto_submit_view(request):
     else:
         messages.error(request, "Hubo un error al enviar tu mensaje. Por favor, revisa los datos e intenta nuevamente.")
         
-    return redirect('landing')
+    return redirect('landing:landing')
 
 def vista_registro(request):
     # 1) Elegir automáticamente el plan por defecto
