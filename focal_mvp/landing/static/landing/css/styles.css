@@ -84,7 +84,7 @@ img,svg,video{max-width:100%;height:auto;display:block}
 .btn{
   display:inline-block;
   padding:.85rem 1.5rem;
-  border-radius:12px;                 /* cuadros con esquinas suaves */
+  border-radius:12px;
   font-family:var(--font-primary);
   font-weight:800; letter-spacing:.02em;
   border:2px solid transparent;
@@ -132,7 +132,6 @@ img,svg,video{max-width:100%;height:auto;display:block}
   width:min(1380px, 99%);               /* más ancho que el container general */
   margin-inline:auto;
   display:flex; align-items:center; justify-content:space-between; gap:.75rem;
-  padding:1.05rem 0;                    /* alto del header */
   padding-left:clamp(4px, 1.2vw, 14px); /* empuja todo un poquito más a la izquierda */
 }
 

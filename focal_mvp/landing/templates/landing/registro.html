@@ -12,13 +12,9 @@
     <link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
 </head>
 <body>
-    <!-- =========================
-        HEADER / NAVBAR
-    ========================== -->
     <header class="main-header" id="home">
         <div class="container">
         <a class="logo" href="#home" aria-label="Inicio">
-            <!-- Reemplazo del texto por logo, tal como indicaste -->
             <img src="/static/landing/img/Focal_imagotipo.svg" alt="Bootstrap" width="30" height="24" style="vertical-align:middle;margin-right:.5rem">
             <span class="logo-text sr-only">SOY FOCAL</span>
         </a>
@@ -49,7 +45,6 @@
         <form method="post" class="registration-form" novalidate>
             {% csrf_token %}
 
-            <!-- === 1. DATOS DEL ADMINISTRADOR === -->
             <div class="form-section">
                 <h3 class="section-heading">1. Datos del Administrador</h3>
                 <div class="form-grid">
@@ -57,7 +52,6 @@
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
 
-                            <!-- Campo con atributos data para región y comuna -->
                             {% if field.name == 'region' %}
                                 {{ field|add_class:"form-select"|attr:"data-region-target:almacenero"|attr:"id:id_almacenero-region" }}
                             {% elif field.name == 'comuna' %}
@@ -66,7 +60,6 @@
                                 {{ field }}
                             {% endif %}
 
-                            <!-- Feedback de contraseña -->
                             {% if field.name == 'password1' %}
                                 <div id="password-feedback" class="password-requirements">
                                     <ul>
@@ -75,12 +68,19 @@
                                         <li id="req-lowercase">Al menos una minúscula (a-z)</li>
                                         <li id="req-number">Al menos un número (0-9)</li>
                                         <li id="req-special">Al menos un carácter especial (_!@#$...)</li>
+                                        {# Eliminado: <li id="req-match">Las contraseñas deben coincidir</li> #}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            {% if field.name == 'password2' %}
+                                <div id="password-match-feedback" class="password-requirements password-match-box">
+                                    <ul>
                                         <li id="req-match">Las contraseñas deben coincidir</li>
                                     </ul>
                                 </div>
                             {% endif %}
 
-                            <!-- Errores -->
                             {% if field.errors %}
                                 <div class="error-message">{{ field.errors|striptags }}</div>
                             {% endif %}
@@ -89,7 +89,6 @@
                 </div>
             </div>
 
-            <!-- === 2. DATOS DE LA EMPRESA === -->
             <div class="form-section">
                 <h3 class="section-heading">2. Datos de la Empresa</h3>
                 <div class="form-grid">
@@ -119,17 +118,10 @@
         </form>
     </main>
 
-    <!-- =========================
-        FOOTER
-    ========================== -->
     <footer class="main-footer">
         <div class="container">
         <div class="footer-grid">
             <div class="footer-col">
-            <a class="footer-logo" href="#home">
-                <img src="/static/landing/img/Focal_imagotipo.svg" alt="Bootstrap" width="30" height="24" style="vertical-align:middle;margin-right:.5rem">
-                <span class="sr-only">SOY FOCAL</span>
-            </a>
             <p class="footer-text">
                 Herramientas simples para un control inteligente de tu inventario.
             </p>
@@ -152,8 +144,6 @@
             <h4 class="footer-title">Producto</h4>
             <nav class="footer-links">
                 <a href="#features">Características</a>
-                <a href="/metrics/">Métricas</a>
-                <a href="/inventario/">Inventario</a>
             </nav>
             </div>
 
@@ -175,7 +165,6 @@
         </div>
     </footer>
 
-    <!-- Flotantes (Instagram / WhatsApp) -->
     <div class="floating-social" aria-hidden="true">
         <a class="float-btn ig" href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
         <i class="bi bi-instagram"></i>
@@ -189,7 +178,6 @@
         // Año dinámico en el footer
         document.getElementById('year').textContent = new Date().getFullYear();
     </script>
-    <!-- Registro JS -->
     <script src="{% static 'landing/js/registro.js' %}" defer></script>
 </body>
 </html>

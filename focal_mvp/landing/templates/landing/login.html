@@ -1,65 +1,137 @@
-{% extends "landing/base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iniciar sesión | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  {# Carga el CSS global y el CSS específico de login #}
+  <link rel="stylesheet" href="{% static 'landing/css/login.css' %}">
+</head>
+<body class="login-body">
 
-{% block title %}Iniciar sesión | FOCAL{% endblock %}
+  <header class="main-header" id="home">
+    <div class="container">
+      <a class="logo" href="{% url 'landing:landing' %}" aria-label="Inicio">
+        <img src="{% static 'landing/img/Focal_imagotipo.svg' %}" alt="SOY FOCAL Logo">
+        <span class="logo-text sr-only">SOY FOCAL</span>
+      </a>
 
-{# CSS específico de la página #}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'landing/css/login.css' %}">
-<link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
-{% endblock %}
+      <nav class="main-nav" aria-label="Navegación de acceso">
+        <ul>
+          <li><a href="{% url 'landing:landing' %}">Inicio</a></li>
+          <li><a href="{% url 'landing:landing' %}#features">Qué ofrecemos</a></li>
+          <li><a href="{% url 'landing:quienes_somos' %}">Nosotros</a></li>
+          <li><a href="{% url 'landing:landing' %}#contact">Contacto</a></li>
+          <li><a class="btn btn-primary" href="{% url 'landing:login' %}">Iniciar sesión</a></li>
+          <li><a class="btn btn-secondary" href="{% url 'landing:registro' %}">Regístrate</a></li>
+        </ul>
+      </nav>
+      <button class="menu-toggle sr-only" aria-label="Abrir menú">☰</button>
+    </div>
+  </header>
 
-{% block content %}
-<main class="login-page" id="main-content">
-  <section class="login-wrap container">
-    <div class="login-card" role="form" aria-labelledby="login-title">
-      <h1 id="login-title" class="login-title">Iniciar sesión</h1>
+  <main class="login-page" id="main-content">
+    <section class="login-wrap container">
+      <div class="login-card" role="form" aria-labelledby="login-title">
+        <h1 id="login-title" class="login-title">Iniciar sesión</h1>
 
-      {# Mensajes del framework #}
-      {% if messages %}
-        <div class="login-messages">
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <form method="post" novalidate>
-        {% csrf_token %}
-
-        {# Errores no asociados a un campo #}
-        {% if form.non_field_errors %}
-          <div class="alert alert-error">
-            {% for error in form.non_field_errors %}
-              <div>{{ error }}</div>
+        {# Mensajes del framework #}
+        {% if messages %}
+          <div class="login-messages">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
             {% endfor %}
           </div>
         {% endif %}
 
-        {% for field in form %}
-          <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-              <div class="field-error">{{ field.errors|striptags }}</div>
-            {% endif %}
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {# Errores no asociados a un campo #}
+          {% if form.non_field_errors %}
+            <div class="alert alert-error">
+              {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="field-error">{{ field.errors|striptags }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <button type="submit" class="btn-primary-solid btn-block">Ingresar</button>
+
+          <div class="login-links">
+            <a class="link-muted" href="#" aria-disabled="true">¿Has olvidado la contraseña?</a>
+            <span class="link-muted">¿No tienes cuenta?
+              <a class="link-strong" href="{% url 'landing:registro' %}">Regístrate aquí</a>
+            </span>
           </div>
-        {% endfor %}
+        </form>
+      </div>
+    </section>
+  </main>
 
-        <button type="submit" class="btn-primary-solid btn-block">Ingresar</button>
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <p class="footer-text">
+            Herramientas simples para un control inteligente de tu inventario.
+          </p>
 
-        <div class="login-links">
-          <a class="link-muted" href="#" aria-disabled="true">¿Has olvidado la contraseña?</a>
-          <span class="link-muted">¿No tienes cuenta?
-            <a class="link-strong" href="{% url 'landing:registro' %}">Regístrate aquí</a>
-          </span>
+          <ul class="contact-list">
+            <li>
+              <a class="contact-chip" href="mailto:soporte@soyfocal.cl">
+                <span class="chip-ico">📧</span> soporte@soyfocal.cl
+              </a>
+            </li>
+            <li>
+              <a class="contact-chip" href="mailto:ventas@soyfocal.cl">
+                <span class="chip-ico">🛒</span> ventas@soyfocal.cl
+              </a>
+            </li>
+          </ul>
         </div>
-      </form>
-    </div>
-  </section>
-</main>
-{% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'landing/js/login.js' %}"></script>
-{% endblock %}
+        <div class="footer-col">
+          <h4 class="footer-title">Producto</h4>
+          <nav class="footer-links">
+            <a href="{% url 'landing:landing' %}#features">Características</a>
+          </nav>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Compañía</h4>
+          <nav class="footer-links">
+            <a href="{% url 'landing:quienes_somos' %}">Nosotros</a>
+            <a href="{% url 'landing:landing' %}#contact">Contacto</a>
+            <a href="{% url 'landing:registro' %}">Registro</a>
+          </nav>
+        </div>
+      </div>
+
+      <hr class="footer-divider" />
+
+      <div class="footer-bottom">
+        <p class="footer-copy">© <span id="year"></span> FOCAL. Todos los derechos reservados.</p>
+      </div>    
+    </div>
+  </footer>
+
+  <script src="{% static 'landing/js/login.js' %}"></script>
+  <script>
+    // Año dinámico en el footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
