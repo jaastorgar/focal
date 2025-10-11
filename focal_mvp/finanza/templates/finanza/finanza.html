@@ -7,6 +7,8 @@
     <title>FOCAL - Dashboard Financiero</title>
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'finanza/css/finanza.css' %}">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -21,7 +23,7 @@
                         Añadir Transacción
                     </button>
                     <div class="user-info">
-                        <span class="bell-icon">🔔</span>
+                        <i class="bi bi-bell-fill" style="font-size: 1.5rem; color: #6366f1;"></i>
                         <div class="user-details">
                             <p class="user-name">
                                 {% if user.is_authenticated %}
@@ -78,23 +80,23 @@
                     <input type="text" id="transactionDescription" placeholder="Ej: Venta de servicio..." required>
                 </div>
                 <div class="form-group">
-    <label>Categoría</label>
-    <select id="transactionCategory" required>
-        <option value="Abarrotes">Abarrotes</option>
-        <option value="Bebidas y Jugos">Bebidas y Jugos</option>
-        <option value="Perecibles">Perecibles</option>
-        <option value="Verduras">Verduras</option>
-        
-        <option value="Sueldos">Sueldos</option>
-        <option value="Proveedores">Proveedores</option>
-        <option value="Servicios Básicos">Servicios Básicos</option>
-        <option value="Obligaciones Tributarias">Obligaciones Tributarias</option>
-        <option value="Marketing">Marketing</option>
-        <option value="Oficina">Oficina</option>
-        
-        <option value="Otros">Otros</option>
-    </select>
-</div>
+                    <label>Categoría</label>
+                    <select id="transactionCategory" required>
+                        <option value="Abarrotes">Abarrotes</option>
+                        <option value="Bebidas y Jugos">Bebidas y Jugos</option>
+                        <option value="Perecibles">Perecibles</option>
+                        <option value="Verduras">Verduras</option>
+                        
+                        <option value="Sueldos">Sueldos</option>
+                        <option value="Proveedores">Proveedores</option>
+                        <option value="Servicios Básicos">Servicios Básicos</option>
+                        <option value="Obligaciones Tributarias">Obligaciones Tributarias</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Oficina">Oficina</option>
+                        
+                        <option value="Otros">Otros</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label>Monto (CLP)</label>
                     <input type="number" id="transactionAmount" placeholder="0" required>
@@ -119,28 +121,36 @@
                             <p class="kpi-label">Saldo Actual</p>
                             <p class="kpi-value" id="saldoActual">$8,500,000</p>
                         </div>
-                        <div class="kpi-icon bg-purple">💰</div>
+                        <div class="kpi-icon bg-purple">
+                            <i class="bi bi-wallet2" style="font-size: 2rem; color: white;"></i>
+                        </div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-content">
                             <p class="kpi-label">Ingresos del Mes</p>
                             <p class="kpi-value text-green" id="ingresosDelMes">$6,200,000</p>
                         </div>
-                        <div class="kpi-icon bg-green">📈</div>
+                        <div class="kpi-icon bg-green">
+                            <i class="bi bi-graph-up-arrow" style="font-size: 2rem; color: white;"></i>
+                        </div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-content">
                             <p class="kpi-label">Gastos del Mes</p>
                             <p class="kpi-value text-red" id="gastosDelMes">$4,300,000</p>
                         </div>
-                        <div class="kpi-icon bg-red">📉</div>
+                        <div class="kpi-icon bg-red">
+                            <i class="bi bi-graph-down-arrow" style="font-size: 2rem; color: white;"></i>
+                        </div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-content">
                             <p class="kpi-label">Resultado</p>
                             <p class="kpi-value text-green" id="resultado">$1,900,000</p>
                         </div>
-                        <div class="kpi-icon bg-green">✓</div>
+                        <div class="kpi-icon bg-green">
+                            <i class="bi bi-check-circle-fill" style="font-size: 2rem; color: white;"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -160,14 +170,14 @@
                 <div class="info-grid">
                     <div class="info-card">
                         <div class="info-header">
-                            <span>🔔</span>
+                            <i class="bi bi-bell-fill" style="font-size: 1.5rem; color: #6366f1;"></i>
                             <h3>Alertas y Notificaciones</h3>
                         </div>
                         <div class="alerts-container" id="alertsContainer"></div>
                     </div>
                     <div class="info-card">
                         <div class="info-header">
-                            <span>🎯</span>
+                            <i class="bi bi-bullseye" style="font-size: 1.5rem; color: #6366f1;"></i>
                             <h3>Meta Mensual</h3>
                         </div>
                         <div class="goal-container">
@@ -325,8 +335,12 @@
                             </div>
                         </div>
                         <div class="report-actions">
-                            <a href="{% url 'finanza:exportar_pdf' %}" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">📄 Exportar a PDF</a>
-                            <a href="{% url 'finanza:exportar_csv' %}" class="btn-success" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">📊 Descargar CSV</a>
+                            <a href="{% url 'finanza:exportar_pdf' %}" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                <i class="bi bi-file-pdf"></i> Exportar a PDF
+                            </a>
+                            <a href="{% url 'finanza:exportar_csv' %}" class="btn-success" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                <i class="bi bi-file-spreadsheet"></i> Descargar CSV
+                            </a>
                         </div>
                     </form>
                 </div>
