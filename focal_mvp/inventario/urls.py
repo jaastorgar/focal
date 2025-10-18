@@ -6,7 +6,7 @@ from .views import (
     retirar_lote, descargar_plantilla_ventas, buscar_producto_api, verificar_producto_api, 
     obtener_datos_sku_api, agregar_proveedor, lista_recordatorios, agregar_recordatorio, 
     editar_recordatorio, eliminar_recordatorio, completar_recordatorio, descontar_producto_view, 
-    metrics_view, flujo_opciones, producto_resumen
+    metrics_view, flujo_opciones, producto_resumen, post_creacion_producto, ajustar_stock
 )
 
 urlpatterns = [
@@ -37,4 +37,6 @@ urlpatterns = [
     path("metrics/", metrics_view, name="metrics"),
     path('flujo/opciones/<int:producto_id>/', flujo_opciones, name='flujo_opciones'),
     path('productos/resumen/<int:producto_id>/', producto_resumen, name='producto_resumen'),
+    path('productos/post-creacion/<int:producto_id>/', post_creacion_producto, name='post_creacion_producto'),
+    path('inventario/ajustar-stock/<int:producto_id>/', ajustar_stock, name='ajustar_stock'),
 ]

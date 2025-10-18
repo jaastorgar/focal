@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
+    <!-- NAVBAR -->
     <header class="app-header">
         <nav class="container">
             <a href="{% url 'home' %}" class="logo">FOCAL</a>
@@ -19,15 +20,22 @@
         </nav>
     </header>
 
+    <!-- CONTENIDO -->
     <main class="form-wrapper">
         <div class="form-card">
             <h1>Agregar Proveedor</h1>
 
-            <form method="post" id="proveedor-form">
+            {% if producto_id %}
+            <p class="text-center" style="color:var(--muted-text);font-family:var(--font-secondary);margin-top:-6px;">
+                Estás en el flujo guiado. Al guardar podrás volver a las opciones del producto.
+            </p>
+            {% endif %}
+
+            <form method="post" id="proveedor-form" novalidate>
                 {% csrf_token %}
 
                 {% if form.errors %}
-                    <div class="error-summary">
+                    <div class="error-summary" style="margin-bottom:16px;">
                         <h3>Por favor, corrige los siguientes errores:</h3>
                         <ul>
                             {% for field in form %}
@@ -79,13 +87,18 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="{% url 'flujo_opciones' producto.id %}" class="btn btn-cancel" role="button">Cancelar</a>
+                    {% if producto_id %}
+                        <a href="{% url 'flujo_opciones' producto_id %}" class="btn btn-outline-secondary" role="button">Cancelar</a>
+                    {% else %}
+                        <a href="{% url 'inventario' %}" class="btn btn-outline-secondary" role="button">Cancelar</a>
+                    {% endif %}
                     <button type="submit" id="submit-button" class="btn btn-submit">Guardar Proveedor</button>
                 </div>
             </form>
         </div>
     </main>
 
+    <!-- FOOTER -->
     <footer class="app-footer">
         <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
     </footer>

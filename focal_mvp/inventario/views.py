@@ -276,9 +276,9 @@ def agregar_producto(request):
     
     """
     Agrega un nuevo producto (o asocia uno existente) al inventario de la
-    empresa del usuario. Tras guardar, redirige al flujo encadenado:
-      /lotes/agregar/?producto_id=<ID>
-    para continuar con la creación de lote y proveedor.
+    empresa del usuario. Tras guardar, redirige a una pantalla de decisión:
+      /productos/post-creacion/<producto_id>/
+    donde se pregunta si desea agregar lote, asociar proveedor o finalizar.
     """
     # --- Validaciones iniciales: empresa y suscripción --------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
@@ -326,16 +326,15 @@ def agregar_producto(request):
                     empresa=empresa_usuario
                 )
 
-                # 3) Redirección al flujo encadenado
+                # 3) Redirección a PANTALLA DE PREGUNTA PREVIA
                 if creada_oferta:
                     accion = "agregado" if creado_producto else "asociado"
                     messages.success(
                         request,
-                        f"Producto «{producto.nombre}» {accion} a tu inventario. "
-                        "Ahora puedes registrar su lote y proveedor."
+                        f"Producto «{producto.nombre}» {accion} a tu inventario."
                     )
-                    # 🔄 redirige al flujo de agregar lote con producto_id
-                    url = reverse('agregar_lote') + f"?producto_id={producto.id}"
+                    # 🔄 ahora preguntamos el siguiente paso
+                    url = reverse('post_creacion_producto', kwargs={'producto_id': producto.id})
                     return redirect(url)
                 else:
                     # Ya estaba en el inventario de esta empresa
@@ -567,11 +566,14 @@ def eliminar_lote(request, lote_id):
 def agregar_proveedor(request):
     """
     Vista para agregar un nuevo proveedor.
-    - Si viene ?producto_id=, redirige a /flujo/opciones/<producto_id>/
-      para continuar con el flujo encadenado.
+    - Si viene ?producto_id=, vuelve al flujo encadenado.
+    - Si además viene ?next=add_lote, tras crear el proveedor redirige a agregar_lote.
     - Si no viene producto_id, redirige al inventario.
     """
+    from django.urls import reverse
+
     producto_id = request.GET.get('producto_id')
+    next_step = request.GET.get('next')  # soporte para 'add_lote'
 
     if request.method == 'POST':
         form = ProveedorForm(request.POST)
@@ -579,19 +581,37 @@ def agregar_proveedor(request):
             proveedor = form.save()
             messages.success(request, f"Proveedor '{proveedor.nombre}' agregado exitosamente.")
 
-            # 🔄 Redirigir según el contexto del flujo
-            from django.urls import reverse
+            if producto_id and next_step == 'add_lote':
+                # Atajo: Proveedor → Lote
+                return redirect(f"{reverse('agregar_lote')}?producto_id={producto_id}")
             if producto_id:
+                # Flujo normal: volver a las opciones del producto
                 return redirect(reverse('flujo_opciones', kwargs={'producto_id': producto_id}))
-            else:
-                return redirect('inventario')
+            # Sin contexto de flujo
+            return redirect('inventario')
     else:
         form = ProveedorForm()
-    
+
+    # (Opcional) puedes usar estos valores en el template para ajustar el botón "Cancelar"
     context = {
         'form': form,
+        'producto_id': producto_id,
+        'next_step': next_step,
     }
     return render(request, 'inventario/agregar_proveedor.html', context)
+
+@login_required
+def post_creacion_producto(request, producto_id):
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    producto = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
+
+    # Para mostrar info en la vista
+    oferta = OfertaProducto.objects.filter(producto=producto, empresa=empresa_usuario).first()
+
+    return render(request, 'inventario/post_creacion_producto.html', {
+        'producto': producto,
+        'oferta': oferta,
+    })
 
 @login_required
 def flujo_opciones(request, producto_id):
@@ -623,6 +643,73 @@ def producto_resumen(request, producto_id):
         'proveedores': proveedores,
     }
     return render(request, 'inventario/producto_resumen.html', context)
+
+@login_required
+@transaction.atomic
+def ajustar_stock(request, producto_id):
+    """
+    Ajusta +/- 1 (o 'cantidad' enviada) sobre el LOTE más próximo a vencer
+    del producto indicado (según la empresa del usuario).
+    - POST operacion: 'sumar' | 'restar'
+    - POST cantidad: entero >= 1 (default 1)
+    """
+    if request.method != 'POST':
+        return redirect('inventario')
+
+    empresa = obtener_empresa_del_usuario(request.user)
+    if not empresa:
+        messages.error(request, "No se encontró una empresa válida.")
+        return redirect('inventario')
+
+    operacion = (request.POST.get('operacion') or '').strip()
+    try:
+        cantidad = int(request.POST.get('cantidad') or 1)
+        if cantidad < 1:
+            cantidad = 1
+    except ValueError:
+        cantidad = 1
+
+    # Producto y oferta de la empresa
+    producto = get_object_or_404(Producto, pk=producto_id, empresas=empresa)
+    oferta = OfertaProducto.objects.filter(empresa=empresa, producto=producto).first()
+    if not oferta:
+        messages.error(request, "Este producto no está asociado a tu inventario.")
+        return redirect('inventario')
+
+    # Lote más próximo a vencer
+    lotes_qs = (LoteProducto.objects
+                .filter(producto=oferta)
+                .order_by('fecha_vencimiento', 'id'))
+
+    if operacion == 'restar':
+        # Buscar el primer lote con stock disponible
+        lote = next((l for l in lotes_qs if l.cantidad and l.cantidad > 0), None)
+        if not lote:
+            messages.warning(request, f"No hay stock disponible para «{producto.nombre}».")
+            return redirect('inventario')
+
+        descontar = min(cantidad, max(lote.cantidad, 0))
+        lote.cantidad = max(lote.cantidad - descontar, 0)
+        lote.save(update_fields=['cantidad'])
+        messages.success(request, f"Se descontaron {descontar} unidad(es) del lote que vence primero de «{producto.nombre}».")
+
+    elif operacion == 'sumar':
+        lote = lotes_qs.first()
+        if not lote:
+            messages.info(request, f"«{producto.nombre}» no tiene lotes. Crea el primero para registrar entrada.")
+            # Redirige a crear lote con el producto_id ya listo
+            from django.urls import reverse
+            return redirect(f"{reverse('agregar_lote')}?producto_id={producto.id}")
+
+        lote.cantidad = (lote.cantidad or 0) + cantidad
+        lote.save(update_fields=['cantidad'])
+        messages.success(request, f"Se agregaron {cantidad} unidad(es) al lote que vence primero de «{producto.nombre}».")
+
+    else:
+        messages.error(request, "Operación inválida.")
+        return redirect('inventario')
+
+    return redirect('inventario')
 
 # --- Vistas de Utilidades, Perfil y Sesión ---
 

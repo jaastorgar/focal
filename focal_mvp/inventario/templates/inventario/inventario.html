@@ -7,16 +7,10 @@
   <title>Inventario | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon"/>
 
-  <!-- Bootstrap Icons (lupa, +, -, basurero, tuerca, etc.) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}"/>
 
-  <!-- Para autocompletar por SKU -->
   <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}"/>
-
-  <!-- SKU a resaltar -->
   <meta name="highlight-sku" content="{{ request.GET.hl|default:highlight_sku|default:'' }}"/>
 </head>
 <body>
@@ -57,11 +51,9 @@
     <div class="search-section">
       <form method="GET" action="{% url 'inventario' %}" class="search-form">
         <input class="search-input" type="search" name="q" placeholder="Buscar por nombre, sku, marca..." aria-label="Buscar" value="{{ query|default:'' }}">
-        <!-- Lupa (submit) -->
         <button class="search-button" type="submit" aria-label="Buscar">
           <i class="bi bi-search" aria-hidden="true"></i>
         </button>
-        <!-- + (agregar producto) -->
         <a href="{% url 'agregar-producto' %}" class="search-button" aria-label="Agregar producto">
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
         </a>
@@ -100,30 +92,34 @@
             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
 
             <td class="acciones">
-              <!-- + Agregar lote (pasamos SKU por query) -->
-              <a href="{% url 'agregar_lote' %}?sku={{ producto.sku }}"
-                 class="btn icon-btn"
-                 title="Agregar lote" aria-label="Agregar lote">
-                <i class="bi bi-plus-lg" aria-hidden="true"></i>
-              </a>
+              <!-- + Sumar al lote más próximo a vencer (POST) -->
+              <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="operacion" value="sumar">
+                <input type="hidden" name="cantidad" value="1">
+                <button type="submit" class="btn icon-btn" title="Sumar 1 al lote que vence antes" aria-label="Sumar 1">
+                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                </button>
+              </form>
 
-              <!-- − Descontar (abre modal con SKU) -->
-              <a href="#modal-descontar"
-                 class="btn icon-btn js-open-descontar"
-                 data-sku="{{ producto.sku }}"
-                 title="Descontar stock" aria-label="Descontar stock">
-                <i class="bi bi-dash-lg" aria-hidden="true"></i>
-              </a>
+              <!-- − Descontar del lote más próximo a vencer (POST) -->
+              <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="operacion" value="restar">
+                <input type="hidden" name="cantidad" value="1">
+                <button type="submit" class="btn icon-btn" title="Descontar 1 del lote que vence antes" aria-label="Descontar 1">
+                  <i class="bi bi-dash-lg" aria-hidden="true"></i>
+                </button>
+              </form>
 
-              <!-- 🗑 Eliminar producto -> usa producto.id (según urls.py) -->
+              <!-- 🗑 Eliminar producto (sin confirm JS, ya tienes tu template de confirmación) -->
               <a href="{% url 'eliminar_producto' producto.id %}"
                  class="btn icon-btn icon-btn--danger"
-                 title="Eliminar producto" aria-label="Eliminar producto"
-                 onclick="return confirm('¿Eliminar el producto {{ producto.nombre }} (SKU {{ producto.sku }}) del inventario?');">
+                 title="Eliminar producto" aria-label="Eliminar producto">
                 <i class="bi bi-trash3" aria-hidden="true"></i>
               </a>
 
-              <!-- ⚙ Gestionar lotes y proveedores -> template dedicado -->
+              <!-- ⚙ Gestionar (flujo) -->
               <a href="{% url 'flujo_opciones' producto.id %}"
                  class="btn icon-btn icon-btn--primary"
                  title="Gestionar lotes y proveedores" aria-label="Gestionar lotes y proveedores">
@@ -151,22 +147,21 @@
     </div>
   {% endif %}
 
-<!-- Asistente FOCAL -->
-<div class="assistant-container">
-  <button id="assistantBtn" class="floating-assistant" type="button"
-          aria-haspopup="dialog" aria-label="Abrir asistente FOCAL"
-          data-idle-src="{% static 'inventario/img/servicioalcliente_focal.png' %}"
-          data-gif-src="{% static 'inventario/img/servicioalcliente-focal.gif' %}">
-    <img id="assistantImg" src="{% static 'inventario/img/servicioalcliente_focal.png' %}" alt="Asistente FOCAL">
-    <span id="assistantBubble" class="assistant-bubble" role="status" aria-live="polite"></span>
-  </button>
-</div>
+  <div class="assistant-container">
+    <button id="assistantBtn" class="floating-assistant" type="button"
+            aria-haspopup="dialog" aria-label="Abrir asistente FOCAL"
+            data-idle-src="{% static 'inventario/img/servicioalcliente_focal.png' %}"
+            data-gif-src="{% static 'inventario/img/servicioalcliente-focal.gif' %}">
+      <img id="assistantImg" src="{% static 'inventario/img/servicioalcliente_focal.png' %}" alt="Asistente FOCAL">
+      <span id="assistantBubble" class="assistant-bubble" role="status" aria-live="polite"></span>
+    </button>
+  </div>
+</main>
 
 <footer class="app-footer">
   <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
 </footer>
 
-<!-- JS -->
 <script src="{% static 'inventario/js/inventario.js' %}" defer></script>
 </body>
 </html>
