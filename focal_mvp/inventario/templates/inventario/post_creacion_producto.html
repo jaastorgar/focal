@@ -6,13 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Siguiente paso | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  <link rel="stylesheet" href="{% static 'inventario/css/flujo-styles.css' %}">
-  <style>
-    .hint{color:var(--muted-text);font-size:.95rem;margin:.25rem 0 1rem}
-    .stack{display:flex;gap:.75rem;flex-wrap:wrap}
-    .btn-ghost{border:2px solid var(--primary-purple);background:transparent;color:var(--primary-purple)}
-    .btn-ghost:hover{background:var(--primary-purple);color:#fff}
-  </style>
+  <link rel="stylesheet" href="{% static 'inventario/css/post-creacion-standalone.css' %}">
 </head>
 <body>
   <main class="container py-4">
@@ -28,29 +22,25 @@
 
     <div class="card">
       <div class="card-body">
-        <h3 class="mb-2" style="font-size:1.1rem">¿Qué deseas hacer ahora?</h3>
+        <h3 class="mb-2 subtitle">¿Qué deseas hacer ahora?</h3>
         <p class="hint">Si el lote tendrá proveedor, primero crea el proveedor y luego registra el lote.</p>
 
         <div class="stack">
-          <!-- Opción A: Agregar proveedor -->
           <a class="btn btn-outline-secondary"
              href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}">
             🧾 Asociar proveedor
           </a>
 
-          <!-- Opción B: Registrar lote ya -->
           <a class="btn btn-outline-primary"
              href="{% url 'agregar_lote' %}?producto_id={{ producto.id }}">
             ➕ Registrar primer lote
           </a>
 
-          <!-- Atajo opcional: Proveedor → Lote automáticamente -->
           <a class="btn btn-ghost"
              href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}&next=add_lote">
             🧾→📦 Proveedor y luego Lote
           </a>
 
-          <!-- Cierre -->
           <a class="btn btn-success" href="{% url 'producto_resumen' producto.id %}">
             ✅ Finalizar y ver resumen
           </a>
@@ -62,7 +52,7 @@
     </div>
   </main>
 
-  <footer class="text-center mt-5 mb-3" style="color:var(--muted-text);font-family:var(--font-secondary);">
+  <footer class="text-center mt-5 mb-3 footer-note">
     © {% now "Y" %} FOCAL. Todos los derechos reservados.
   </footer>
 </body>
