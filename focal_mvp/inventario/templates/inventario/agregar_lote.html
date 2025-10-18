@@ -4,8 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Agregar Lote | FOCAL</title>
+  <title>Registrar Lote | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+
+  <!-- Estilo principal del formulario -->
   <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
@@ -25,6 +27,12 @@
     <div class="form-card">
       <h1>Registrar Lote de Producto</h1>
 
+      {% if producto_id %}
+        <p class="text-center" style="color:var(--muted-text);font-family:var(--font-secondary);">
+          Estás en el flujo guiado de creación. Una vez guardes el lote podrás continuar con proveedor o finalizar.
+        </p>
+      {% endif %}
+
       <form method="post" id="lote-form" novalidate>
         {% csrf_token %}
 
@@ -36,21 +44,33 @@
         <fieldset>
           <legend><strong>1. Identificación del Producto</strong></legend>
 
-          <!-- Campo manual: Aseguramos id y for para evitar el warning del navegador -->
-          <div class="form-group" data-span="2">
-            <label for="id_codigo_barras">Escanea el Código de Barras (SKU)</label>
-            <input type="text" id="id_codigo_barras" class="form-control" autocomplete="off" inputmode="numeric" />
-          </div>
+          {% if producto_id %}
+            {# ——— Flujo con producto_id: NO pedimos SKU ——— #}
+            <div class="form-group" data-span="2">
+              <label>Producto seleccionado</label>
+              <input type="text" class="form-control" value="{{ oferta_seleccionada.producto.nombre }} (SKU {{ oferta_seleccionada.producto.sku }})" readonly disabled>
+            </div>
 
-          <div class="form-group" data-span="2">
-            <label for="id_nombre_producto">Nombre del Producto</label>
-            <input type="text" id="id_nombre_producto" class="form-control" readonly disabled />
-          </div>
+            {# Enviar el producto (OfertaProducto) como campo oculto del form #}
+            {{ form.producto.as_hidden }}
 
-          <!-- Campo oculto que enviamos al backend. No lleva <label> -->
-          <input type="hidden" name="producto" id="id_producto_id">
-          {% if form.producto.errors %}
-            <small class="error-message">{{ form.producto.errors|striptags }}</small>
+          {% else %}
+            {# ——— Flujo clásico por SKU: mantenemos tu escáner ——— #}
+            <div class="form-group" data-span="2">
+              <label for="id_codigo_barras">Escanea el Código de Barras (SKU)</label>
+              <input type="text" id="id_codigo_barras" class="form-control" autocomplete="off" inputmode="numeric" />
+            </div>
+
+            <div class="form-group" data-span="2">
+              <label for="id_nombre_producto">Nombre del Producto</label>
+              <input type="text" id="id_nombre_producto" class="form-control" readonly disabled />
+            </div>
+
+            {# Campo oculto donde tu JS coloca el ID de OfertaProducto #}
+            <input type="hidden" name="producto" id="id_producto_id">
+            {% if form.producto.errors %}
+              <small class="error-message">{{ form.producto.errors|striptags }}</small>
+            {% endif %}
           {% endif %}
         </fieldset>
 
@@ -109,6 +129,7 @@
               {% endif %}
             </div>
 
+            {% if form.lote_proveedor %}
             <div class="form-group" data-span="2">
               <label for="{{ form.lote_proveedor.id_for_label }}">{{ form.lote_proveedor.label }}</label>
               {{ form.lote_proveedor }}
@@ -116,11 +137,16 @@
                 <small class="error-message">{{ form.lote_proveedor.errors|striptags }}</small>
               {% endif %}
             </div>
+            {% endif %}
           </div>
         </fieldset>
 
         <div class="form-actions">
-          <a href="{% url 'gestionar_proveedores_precios' %}" class="btn btn-secondary" role="button">Cancelar</a>
+          {% if producto_id %}
+            <a href="{% url 'flujo_opciones' producto_id %}" class="btn btn-outline-secondary" role="button">Cancelar</a>
+          {% else %}
+            <a href="{% url 'inventario' %}" class="btn btn-outline-secondary" role="button">Cancelar</a>
+          {% endif %}
           <button type="submit" class="btn btn-submit">Guardar Lote</button>
         </div>
       </form>
@@ -132,6 +158,9 @@
     <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
   </footer>
 
-  <script src="{% static 'inventario/js/agregar_lote.js' %}"></script>
+  {# Solo necesitamos el JS de escaneo cuando NO hay producto_id #}
+  {% if not producto_id %}
+    <script src="{% static 'inventario/js/agregar_lote.js' %}"></script>
+  {% endif %}
 </body>
 </html>

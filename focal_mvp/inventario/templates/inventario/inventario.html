@@ -124,7 +124,7 @@
               </a>
 
               <!-- ⚙ Gestionar lotes y proveedores -> template dedicado -->
-              <a href="{% url 'gestionar_proveedores_precios' %}?sku={{ producto.sku }}"
+              <a href="{% url 'flujo_opciones' producto.id %}"
                  class="btn icon-btn icon-btn--primary"
                  title="Gestionar lotes y proveedores" aria-label="Gestionar lotes y proveedores">
                 <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>

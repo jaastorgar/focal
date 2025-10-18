@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resumen del Producto | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/flujo-styles.css' %}">
+</head>
+<body>
+  <main class="container py-4">
+    <h2 class="text-center mb-4">Resumen del producto</h2>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h4 class="card-title">{{ producto.nombre }}</h4>
+        <p><strong>SKU:</strong> {{ producto.sku }}</p>
+        <p><strong>Categoría:</strong> {{ producto.get_categoria_display }}</p>
+        <p><strong>Marca:</strong> {{ producto.marca|default:"-" }}</p>
+        <p><strong>Unidad:</strong> {{ producto.unidad_medida|default:"-" }}</p>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">📦 Lotes registrados</div>
+      <ul class="list-group list-group-flush">
+        {% for lote in lotes %}
+          <li class="list-group-item">
+            {{ lote.cantidad }} unidades — Vence: {{ lote.fecha_vencimiento|date:"d/m/Y" }}
+            {% if lote.proveedor %}<br><small>Proveedor: {{ lote.proveedor.nombre }}</small>{% endif %}
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No hay lotes registrados.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">🏭 Proveedores asociados</div>
+      <ul class="list-group list-group-flush">
+        {% for prov in proveedores %}
+          <li class="list-group-item">{{ prov.nombre }} — {{ prov.rut }}</li>
+        {% empty %}
+          <li class="list-group-item text-muted">No hay proveedores asociados.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="{% url 'agregar_lote' %}?producto_id={{ producto.id }}" class="btn btn-outline-primary me-2">➕ Agregar otro lote</a>
+      <a href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}" class="btn btn-outline-secondary me-2">Asociar proveedor</a>
+      <a href="{% url 'inventario' %}" class="btn btn-success">💾 Guardar y volver al inventario</a>
+    </div>
+  </main>
+
+  <footer class="text-center mt-5 mb-3" style="color:var(--muted-text);font-family:var(--font-secondary);">
+    © {% now "Y" %} FOCAL. Todos los derechos reservados.
+  </footer>
+</body>
+</html>

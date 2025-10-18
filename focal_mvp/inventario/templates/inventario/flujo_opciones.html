@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opciones del Producto | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/flujo-styles.css' %}">
+</head>
+<body>
+  <main class="container py-4">
+    <h2 class="mb-3 text-center">¿Qué deseas hacer con <strong>{{ producto.nombre }}</strong>?</h2>
+
+    <div class="d-flex flex-column align-items-center gap-3 mt-4">
+      <a href="{% url 'agregar_lote' %}?producto_id={{ producto.id }}" class="btn btn-outline-primary w-50">
+        ➕ Agregar otro lote
+      </a>
+      <a href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}" class="btn btn-outline-secondary w-50">
+        🧾 Asociar proveedor
+      </a>
+      <a href="{% url 'producto_resumen' producto.id %}" class="btn btn-success w-50">
+        ✅ Finalizar y ver resumen
+      </a>
+      <a href="{% url 'inventario' %}" class="btn btn-link mt-2">⬅️ Volver al inventario</a>
+    </div>
+  </main>
+
+  <footer class="text-center mt-5 mb-3" style="color:var(--muted-text);font-family:var(--font-secondary);">
+    © {% now "Y" %} FOCAL. Todos los derechos reservados.
+  </footer>
+</body>
+</html>

@@ -4,9 +4,9 @@ from .views import (
     agregar_producto, editar_producto, eliminar_producto,
     agregar_lote_producto, detalle_producto, editar_lote, eliminar_lote,
     retirar_lote, descargar_plantilla_ventas, buscar_producto_api, verificar_producto_api, 
-    obtener_datos_sku_api, gestionar_proveedores_precios, agregar_proveedor,
-    lista_recordatorios, agregar_recordatorio, editar_recordatorio, eliminar_recordatorio,
-    completar_recordatorio, descontar_producto_view, metrics_view
+    obtener_datos_sku_api, agregar_proveedor, lista_recordatorios, agregar_recordatorio, 
+    editar_recordatorio, eliminar_recordatorio, completar_recordatorio, descontar_producto_view, 
+    metrics_view, flujo_opciones, producto_resumen
 )
 
 urlpatterns = [
@@ -27,7 +27,6 @@ urlpatterns = [
     path('api/buscar-producto/<str:codigo_barras>/', buscar_producto_api, name='buscar_producto_api'),
     path('api/verificar-producto/<str:codigo_barras>/', verificar_producto_api, name='verificar_producto_api'),
     path('api/obtener-datos-sku/<str:sku>/', obtener_datos_sku_api, name='obtener_datos_sku_api'),
-    path('inventario/proveedores-precios/', gestionar_proveedores_precios, name='gestionar_proveedores_precios'),
     path('proveedores/agregar/', agregar_proveedor, name='agregar_proveedor'),
     path('recordatorios/', lista_recordatorios, name='lista_recordatorios'),
     path('recordatorios/agregar/', agregar_recordatorio, name='agregar_recordatorio'),
@@ -36,4 +35,6 @@ urlpatterns = [
     path('recordatorios/<int:recordatorio_id>/completar/', completar_recordatorio, name='completar_recordatorio'),
     path('descontar-producto/', descontar_producto_view, name='descontar_producto'),
     path("metrics/", metrics_view, name="metrics"),
+    path('flujo/opciones/<int:producto_id>/', flujo_opciones, name='flujo_opciones'),
+    path('productos/resumen/<int:producto_id>/', producto_resumen, name='producto_resumen'),
 ]

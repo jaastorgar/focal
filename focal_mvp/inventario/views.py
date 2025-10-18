@@ -276,9 +276,9 @@ def agregar_producto(request):
     
     """
     Agrega un nuevo producto (o asocia uno existente) al inventario de la
-    empresa del usuario. Tras guardar, redirige al inventario con:
-      ?created=1&created_sku=<SKU>&hl=<SKU>
-    para mostrar el toast y destacar la fila del producto.
+    empresa del usuario. Tras guardar, redirige al flujo encadenado:
+      /lotes/agregar/?producto_id=<ID>
+    para continuar con la creación de lote y proveedor.
     """
     # --- Validaciones iniciales: empresa y suscripción --------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
@@ -326,11 +326,16 @@ def agregar_producto(request):
                     empresa=empresa_usuario
                 )
 
-                # 3) Mensaje + redirect con highlight siempre que se haya agregado/asociado
+                # 3) Redirección al flujo encadenado
                 if creada_oferta:
                     accion = "agregado" if creado_producto else "asociado"
-                    messages.success(request, f"Producto «{producto.nombre}» {accion} a tu inventario.")
-                    url = reverse('inventario') + f"?created=1&created_sku={producto.sku}&hl={producto.sku}"
+                    messages.success(
+                        request,
+                        f"Producto «{producto.nombre}» {accion} a tu inventario. "
+                        "Ahora puedes registrar su lote y proveedor."
+                    )
+                    # 🔄 redirige al flujo de agregar lote con producto_id
+                    url = reverse('agregar_lote') + f"?producto_id={producto.id}"
                     return redirect(url)
                 else:
                     # Ya estaba en el inventario de esta empresa
@@ -419,9 +424,9 @@ def agregar_lote_producto(request):
     from django.urls import reverse
     
     """
-    Alta de Lote con preselección por ?sku=…
-    - Si viene ?sku=, busca el Producto de la empresa y lo setea como initial en el form.
-    - Tras guardar, redirige al hub de inventario con ?sku=…#tab-gestionar
+    Alta de Lote con preselección por ?producto_id= o ?sku=.
+    - Si viene producto_id, se asocia automáticamente y al guardar redirige a flujo_opciones.
+    - Si viene sku, mantiene el comportamiento clásico y redirige al inventario.
     """
     empresa = obtener_empresa_del_usuario(request.user)
     if not empresa:
@@ -429,20 +434,31 @@ def agregar_lote_producto(request):
         return redirect('inventario')
 
     sku = (request.GET.get('sku') or '').strip()
+    producto_id = request.GET.get('producto_id')
     oferta_seleccionada = None
+    producto = None
 
-    if sku:
-        # Comprueba que ese producto exista y esté ofrecido por la empresa
+    # --- Buscar producto por ID o SKU ---
+    if producto_id:
+        producto = get_object_or_404(Producto, pk=producto_id, empresas=empresa)
+        oferta_seleccionada = OfertaProducto.objects.filter(empresa=empresa, producto=producto).first()
+    elif sku:
         producto = Producto.objects.filter(sku=sku, empresas=empresa).first()
         if producto:
             oferta_seleccionada = OfertaProducto.objects.filter(empresa=empresa, producto=producto).first()
 
+    # --- POST: guardar el lote ---
     if request.method == 'POST':
         form = LoteProductoForm(request.POST, empresa_usuario=empresa)
         if form.is_valid():
             lote = form.save()
             messages.success(request, f"Lote para '{lote.producto.producto.nombre}' agregado correctamente.")
-            # Redirige al hub de gestionar con el SKU
+
+            # ✅ Si el flujo viene de producto_id, redirige al flujo encadenado
+            if producto_id:
+                return redirect(reverse('flujo_opciones', kwargs={'producto_id': producto_id}))
+
+            # 🔙 Si no, vuelve al inventario (modo clásico)
             try:
                 sku_ok = lote.producto.producto.sku
             except Exception:
@@ -452,18 +468,23 @@ def agregar_lote_producto(request):
         else:
             messages.error(request, "Revisa los errores del formulario.")
     else:
+        # --- GET: inicialización del formulario ---
         initial = {}
         if oferta_seleccionada:
             initial['producto'] = oferta_seleccionada
+
         form = LoteProductoForm(empresa_usuario=empresa, initial=initial)
-        # Si hay oferta seleccionada, podrías restringir el queryset del campo 'producto' a esa oferta:
+
+        # Restringir opciones de producto si ya hay selección
         if oferta_seleccionada and 'producto' in form.fields:
             form.fields['producto'].queryset = OfertaProducto.objects.filter(pk=oferta_seleccionada.pk)
 
+    # --- Render final ---
     return render(request, 'inventario/agregar_lote.html', {
         'form': form,
         'sku_prefill': sku,
         'oferta_seleccionada': oferta_seleccionada,
+        'producto_id': producto_id,
     })
 
 @login_required
@@ -543,32 +564,27 @@ def eliminar_lote(request, lote_id):
     return render(request, 'inventario/eliminar_lote_confirm.html', {'lote': lote})
 
 @login_required
-def gestionar_proveedores_precios(request):
-    from django.urls import reverse
-    
-    # Mantén validación de empresa si quieres:
-    empresa_usuario = obtener_empresa_del_usuario(request.user)
-    if not empresa_usuario:
-        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
-        return redirect('inventario')
-
-    sku = (request.GET.get('sku') or '').strip()
-    if sku:
-        return redirect(f"{reverse('inventario')}?sku={sku}#tab-gestionar")
-    return redirect(f"{reverse('inventario')}#tab-gestionar")
-
-@login_required
 def agregar_proveedor(request):
     """
     Vista para agregar un nuevo proveedor.
+    - Si viene ?producto_id=, redirige a /flujo/opciones/<producto_id>/
+      para continuar con el flujo encadenado.
+    - Si no viene producto_id, redirige al inventario.
     """
-    
+    producto_id = request.GET.get('producto_id')
+
     if request.method == 'POST':
         form = ProveedorForm(request.POST)
         if form.is_valid():
             proveedor = form.save()
             messages.success(request, f"Proveedor '{proveedor.nombre}' agregado exitosamente.")
-            return redirect('gestionar_proveedores_precios')
+
+            # 🔄 Redirigir según el contexto del flujo
+            from django.urls import reverse
+            if producto_id:
+                return redirect(reverse('flujo_opciones', kwargs={'producto_id': producto_id}))
+            else:
+                return redirect('inventario')
     else:
         form = ProveedorForm()
     
@@ -576,6 +592,37 @@ def agregar_proveedor(request):
         'form': form,
     }
     return render(request, 'inventario/agregar_proveedor.html', context)
+
+@login_required
+def flujo_opciones(request, producto_id):
+    """
+    Pantalla intermedia que ofrece continuar con el flujo:
+    agregar lote, agregar proveedor o finalizar.
+    """
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    producto = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
+    return render(request, 'inventario/flujo_opciones.html', {'producto': producto})
+
+@login_required
+def producto_resumen(request, producto_id):
+    """
+    Muestra un resumen del producto, sus lotes y sus proveedores asociados.
+    """
+    empresa_usuario = obtener_empresa_del_usuario(request.user)
+    producto = get_object_or_404(Producto, id=producto_id, empresas=empresa_usuario)
+
+    # Buscar oferta de la empresa
+    oferta = OfertaProducto.objects.filter(producto=producto, empresa=empresa_usuario).first()
+    lotes = LoteProducto.objects.filter(producto=oferta).select_related('proveedor')
+    proveedores = Proveedor.objects.filter(lotes__producto=oferta).distinct()
+
+    context = {
+        'producto': producto,
+        'oferta': oferta,
+        'lotes': lotes,
+        'proveedores': proveedores,
+    }
+    return render(request, 'inventario/producto_resumen.html', context)
 
 # --- Vistas de Utilidades, Perfil y Sesión ---
 
