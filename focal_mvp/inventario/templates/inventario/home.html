@@ -1,12 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es"
-      data-username="{% if almacenero and almacenero.nombres %}{{ almacenero.nombres }}{% elif request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}">
+<html lang="es" data-username="{{ display_name }}">
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard | FOCAL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="app-username" content="{% if almacenero and almacenero.nombres %}{{ almacenero.nombres }}{% elif request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}">
+  <meta name="app-username" content="{{ display_name }}">
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
 
   <!-- Estilos -->
@@ -14,7 +13,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
-<body data-username="{% if almacenero and almacenero.nombres %}{{ almacenero.nombres }}{% elif request.user.first_name %}{{ request.user.first_name }}{% else %}{{ request.user.username }}{% endif %}">
+<body data-username="{{ display_name }}">
 
   <!-- ================= NAVBAR ================= -->
   <header class="app-header">
@@ -24,9 +23,9 @@
       </div>
 
       <div class="navbar-right">
-        <!-- Bloque a DOS líneas: arriba el NOMBRE (lo inyecta JS tras 5s), abajo "Menú" -->
+        <!-- Bloque a DOS líneas: arriba el NOMBRE, abajo "Menú" -->
         <div class="nav-user-block" id="navUserBlock">
-          <div id="nav-username" class="nav-username"></div>
+          <div id="nav-username" class="nav-username">{{ display_name }}</div>
 
           <!-- Disparador del dropdown -->
           <button id="nav-menu-label"
@@ -53,9 +52,11 @@
   </header>
 
   <!-- ================ CONTENIDO ================ -->
-  <section id="welcome-banner" class="welcome-banner" role="status" aria-live="polite">
-    <h1 id="welcome-text" class="welcome-text"></h1>
-  </section>
+  {% if show_welcome %}
+    <section id="welcome-banner" class="welcome-banner" role="status" aria-live="polite">
+      <h1 id="welcome-text" class="welcome-text">Bienvenido, {{ display_name }}</h1>
+    </section>
+  {% endif %}
 
   <main class="dashboard-container">
     <section class="main-navigation">

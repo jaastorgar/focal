@@ -31,18 +31,32 @@ def home(request):
     """
     Muestra el panel principal con alertas de vencimiento y stock bajo
     para la empresa del usuario actual.
+    Además, el banner de bienvenida se muestra solo una vez por sesión.
     """
     empresa = obtener_empresa_del_usuario(request.user)
     alertas_vencimiento = []
     alertas_stock_bajo = []
 
+    # --- Banner de bienvenida: solo una vez por sesión ---
+    show_welcome = not request.session.get('saw_welcome_banner', False)
+    if show_welcome:
+        request.session['saw_welcome_banner'] = True
+
+    # Nombre a mostrar
+    display_name = (
+        getattr(request.user, "nombres", None)
+        or request.user.first_name
+        or request.user.username
+    )
+
     if empresa:
         fecha_limite = date.today() + timedelta(days=30)
-        alertas_vencimiento = LoteProducto.objects.filter(
-            producto__empresa=empresa,
-            cantidad__gt=0,
-            fecha_vencimiento__lte=fecha_limite
-        ).select_related('producto__producto').order_by('fecha_vencimiento')[:5]
+        alertas_vencimiento = (
+            LoteProducto.objects
+            .filter(producto__empresa=empresa, cantidad__gt=0, fecha_vencimiento__lte=fecha_limite)
+            .select_related('producto__producto')
+            .order_by('fecha_vencimiento')[:5]
+        )
 
         lotes_de_la_empresa = LoteProducto.objects.filter(
             producto__producto=OuterRef('pk'),
@@ -53,12 +67,17 @@ def home(request):
             .annotate(total=Sum('cantidad'))
             .values('total')
         )
-        alertas_stock_bajo = Producto.objects.filter(empresas=empresa).annotate(
-            stock_total=subquery_stock
-        ).filter(stock_total__gt=0, stock_total__lte=5).order_by('stock_total')[:5]
+        alertas_stock_bajo = (
+            Producto.objects.filter(empresas=empresa)
+            .annotate(stock_total=subquery_stock)
+            .filter(stock_total__gt=0, stock_total__lte=5)
+            .order_by('stock_total')[:5]
+        )
 
     context = {
         'almacenero': request.user,
+        'display_name': display_name,
+        'show_welcome': show_welcome,
         'alertas_vencimiento': alertas_vencimiento,
         'alertas_stock_bajo': alertas_stock_bajo,
     }
