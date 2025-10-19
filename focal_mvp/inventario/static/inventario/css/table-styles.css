@@ -143,10 +143,28 @@ main.container h1{
 .tabla-inventario tbody tr{border-bottom:1px solid #f1f3f5}
 .tabla-inventario tbody tr:last-child{border-bottom:0}
 
-/* Señales visuales */
-.tabla-inventario tr.vencido{box-shadow:inset 4px 0 0 #c62828;background:#fff5f5}
-.tabla-inventario tr.proximo-vencer{box-shadow:inset 4px 0 0 #f57c00;background:#fff8e1}
-.tabla-inventario tr.stock-bajo{box-shadow:inset 4px 0 0 #1565c0;background:#eef6ff}
+/* =======================================================================
+   ALERTAS DE VENCIMIENTO
+   ======================================================================= */
+
+/* Lotes vencidos (rojo) */
+.tabla-inventario tr.vencido{
+  box-shadow: inset 4px 0 0 #c62828;
+  background:#fff5f5 !important;
+}
+
+/* Lotes próximos a vencer (amarillo) — MEJORA */
+.tabla-inventario tr.proximo-vencer{
+  /* banda amarilla en el borde izquierdo + fondo suave */
+  box-shadow: inset 4px 0 0 #f6c343;     /* amarillo señal */
+  background:#fff8e1 !important;        /* amarillo muy claro */
+}
+
+/* Stock bajo (azul) */
+.tabla-inventario tr.stock-bajo{
+  box-shadow: inset 4px 0 0 #1565c0;
+  background:#eef6ff !important;
+}
 
 /* 6) Acciones */
 .acciones{display:flex;gap:.45rem;align-items:center}
@@ -173,12 +191,12 @@ main.container h1{
 }
 .btn-accion-principal:hover{background:#38006B;border-color:#38006B;transform:translateY(-1px)}
 
-/* 8) Footer fijo (ahora por encima de todo) */
+/* 8) Footer fijo (por encima de la tabla; primera col pasa por detrás) */
 .app-footer{
   position:fixed;left:0;right:0;bottom:0;height:var(--footer-height);
   background:var(--primary-purple);color:#fff;display:flex;align-items:center;justify-content:center;
   box-shadow:0 -2px 10px rgba(0,0,0,.08);font-size:.95rem;
-  z-index:200; /* <= asegura que la columna Producto quede por detrás */
+  z-index:200;
 }
 
 /* 9) Toasts */

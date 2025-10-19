@@ -7,9 +7,10 @@ from django.views.decorators.http import require_http_methods
 from django.db import transaction
 from inventario.forms import RegistroAlmaceneroForm, EmailLoginForm, EmpresaForm
 from inventario.models import PlanSuscripcion, SuscripcionUsuario
+from django.views.decorators.cache import never_cache
 
 
-@cache_page(60 * 15)
+@never_cache
 def landing_page_view(request):
     from .forms import ContactoForm
     

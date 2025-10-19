@@ -89,141 +89,61 @@ def inventario_view(request):
     Lista de productos del inventario de la empresa actual.
     Si viene ?sku=, precarga el panel "Gestionar" con ese SKU.
 
-    Flags soportadas (Django messages + highlight de fila):
-      - ?created=1&created_sku=XXXXXXXX
-      - ?updated=1&sku=XXXXXXXX
-      - ?deleted=1&sku=XXXXXXXX
-      - ?discounted=1&sku=XXXXXXXX
-    Además, si viene ?hl=SKU (o si created_sku está presente), se pasa ese SKU
-    al template para que el JS resalte la fila.
-
-    También realiza housekeeping de vencimientos:
-      - Elimina lotes con fecha < hoy (vencidos) y muestra alerta.
-      - En el template, si el próximo vencimiento es dentro de 15 días,
-        se pinta en amarillo; si fuera hoy o anterior, sería rojo, pero
-        como los lotes vencidos se eliminan aquí, ya no aparecerán.
+    - Pinta en amarillo los productos cuyo lote más próximo vence en ≤15 días.
+    - Elimina los lotes ya vencidos y muestra alerta.
+    - Agrega alerta general si existen productos próximos a vencer.
     """
-    # ------------------------------------------------------------------
-    # 0) Empresa del usuario
-    # ------------------------------------------------------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
         messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
         return render(request, 'inventario/inventario.html', {
             'productos': Producto.objects.none(),
-            'sku': '',
-            'producto_sel': None,
-            'lotes_sel': LoteProducto.objects.none(),
             'query': '',
-            'today': date.today(),
-            'hoy_mas_15dias': int(time.mktime((date.today() + timedelta(days=15)).timetuple())),
-            'highlight_sku': '',
+            'today': now().date(),
+            'hoy_mas_15dias': int(time.mktime((now().date() + timedelta(days=15)).timetuple())),
+            'highlight_sku': '',   # <-- evitar error en el template
         })
 
-    # ------------------------------------------------------------------
-    # 1) Housekeeping de vencidos (rojo): eliminar y alertar
-    # ------------------------------------------------------------------
     hoy = now().date()
-    lotes_vencidos_qs = (
+    hoy_mas_15 = hoy + timedelta(days=15)
+
+    # --- 1) Lotes vencidos: eliminar y alertar ---
+    lotes_vencidos = (
         LoteProducto.objects
         .select_related('producto', 'producto__producto')
         .filter(producto__empresa=empresa_usuario, fecha_vencimiento__lt=hoy)
     )
-
-    if lotes_vencidos_qs.exists():
-        # Guardamos datos para el mensaje ANTES de borrar
-        info_lotes = list(
-            lotes_vencidos_qs.values(
-                'id',
-                'fecha_vencimiento',
-                'producto__producto__sku',
-                'producto__producto__nombre',
-            )
-        )
-
-        # Borrado en base de datos
-        deleted_count, _ = lotes_vencidos_qs.delete()
-
-        # Armamos un mensaje compacto
-        # Mostramos hasta 5 ítems y luego "y N más..."
-        detalle = []
-        for item in info_lotes[:5]:
-            detalle.append(
-                f"SKU {item['producto__producto__sku']} · «{item['producto__producto__nombre']}» (lote #{item['id']}, {item['fecha_vencimiento']:%d-%m-%Y})"
-            )
+    if lotes_vencidos.exists():
+        info_lotes = list(lotes_vencidos.values(
+            'id', 'fecha_vencimiento', 'producto__producto__sku', 'producto__producto__nombre'
+        ))
+        deleted_count, _ = lotes_vencidos.delete()
+        detalle = " | ".join([
+            f"{l['producto__producto__nombre']} ({l['producto__producto__sku']})"
+            for l in info_lotes[:5]
+        ])
         extras = max(0, len(info_lotes) - 5)
-        detalle_txt = " | ".join(detalle) + (f" … y {extras} más." if extras else "")
+        if extras:
+            detalle += f" … y {extras} más."
+        messages.warning(request, f"Se eliminaron {deleted_count} lotes vencidos: {detalle}")
 
-        messages.warning(
-            request,
-            "Se eliminaron lotes vencidos. Retira los productos vencidos de la vitrina. "
-            f"Detalle: {detalle_txt}"
-        )
-
-    # ------------------------------------------------------------------
-    # 2) Flags de retorno (toasts) + highlight
-    # ------------------------------------------------------------------
-    created = request.GET.get('created') == '1'
-    created_sku = (request.GET.get('created_sku') or '').strip()
-
-    updated = request.GET.get('updated') == '1'
-    deleted = request.GET.get('deleted') == '1'
-    discounted = request.GET.get('discounted') == '1'
-    sku_flag = (request.GET.get('sku') or '').strip()
-
-    # Mensajes
-    if created:
-        nombre_txt = None
-        if created_sku:
-            try:
-                p = Producto.objects.get(sku=created_sku, empresas=empresa_usuario)
-                nombre_txt = p.nombre
-            except Producto.DoesNotExist:
-                pass
-        if nombre_txt:
-            messages.success(request, f"¡Producto «{nombre_txt}» ingresado correctamente!")
-        elif created_sku:
-            messages.success(request, f"¡Producto con SKU {created_sku} ingresado correctamente!")
-        else:
-            messages.success(request, "¡Producto ingresado correctamente!")
-
-    if updated and sku_flag:
-        messages.info(request, f"Producto (SKU {sku_flag}) actualizado.")
-    if deleted and sku_flag:
-        messages.warning(request, f"Producto (SKU {sku_flag}) eliminado del inventario.")
-    if discounted and sku_flag:
-        messages.success(request, f"Se descontó stock del producto (SKU {sku_flag}).")
-
-    # SKU a resaltar: ?hl=... o, si no viene, usa created_sku
-    highlight_sku = (request.GET.get('hl') or '').strip() or created_sku
-
-    # ------------------------------------------------------------------
-    # 3) Base de productos + subconsultas (stock, vencimiento, #lotes)
-    # ------------------------------------------------------------------
+    # --- 2) Subconsultas ---
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
-
     lotes_empresa = LoteProducto.objects.filter(
         producto__producto=OuterRef('pk'),
-        producto__empresa=empresa_usuario,
+        producto__empresa=empresa_usuario
     )
-
     subquery_stock = Subquery(
         lotes_empresa.values('producto__producto')
-        .annotate(total=Sum('cantidad'))
-        .values('total')[:1]
+        .annotate(total=Sum('cantidad')).values('total')[:1]
     )
     subquery_vencimiento = Subquery(
         lotes_empresa.values('producto__producto')
-        .annotate(proximo=Min('fecha_vencimiento'))
-        .values('proximo')[:1]
+        .annotate(proximo=Min('fecha_vencimiento')).values('proximo')[:1]
     )
     subquery_cantidad_lotes = Subquery(
-        LoteProducto.objects.filter(
-            producto__producto=OuterRef('pk'),
-            producto__empresa=empresa_usuario,
-        ).values('producto__producto')
-         .annotate(count=Count('id'))
-         .values('count')[:1]
+        lotes_empresa.values('producto__producto')
+        .annotate(count=Count('id')).values('count')[:1]
     )
 
     productos = productos_base.annotate(
@@ -232,9 +152,7 @@ def inventario_view(request):
         cantidad_lotes=subquery_cantidad_lotes,
     )
 
-    # ------------------------------------------------------------------
-    # 4) Buscador
-    # ------------------------------------------------------------------
+    # --- 3) Buscador ---
     query = (request.GET.get('q') or '').strip()
     if query:
         productos = productos.filter(
@@ -246,40 +164,26 @@ def inventario_view(request):
         if not productos.exists():
             messages.info(request, f"No se encontraron resultados para «{query}».")
 
-    # ------------------------------------------------------------------
-    # 5) Panel "Gestionar" por SKU
-    # ------------------------------------------------------------------
-    sku = (request.GET.get('sku') or '').strip()
-    producto_sel = None
-    lotes_sel = LoteProducto.objects.none()
+    # --- 4) Alerta de próximos a vencer (amarillo) ---
+    productos_proximos = productos.filter(proximo_vencimiento__lte=hoy_mas_15, proximo_vencimiento__gte=hoy)
+    if productos_proximos.exists():
+        lista_alerta = ", ".join(p.nombre for p in productos_proximos[:5])
+        extras = max(0, productos_proximos.count() - 5)
+        if extras:
+            lista_alerta += f" … y {extras} más."
+        messages.warning(request, f"Tienes productos próximos a vencer: {lista_alerta}")
 
-    if sku:
-        try:
-            producto_sel = get_object_or_404(Producto, sku=sku, empresas=empresa_usuario)
-            oferta_producto = get_object_or_404(OfertaProducto, producto=producto_sel, empresa=empresa_usuario)
-            lotes_sel = (
-                LoteProducto.objects
-                .filter(producto=oferta_producto)
-                .select_related('proveedor')
-                .order_by('-fecha_vencimiento')
-            )
-        except Exception:
-            messages.error(request, "Producto no encontrado o no autorizado.")
-            producto_sel = None
-            lotes_sel = LoteProducto.objects.none()
+    # --- 5) Highlight seguro para el template (evita KeyError) ---
+    created_sku = (request.GET.get('created_sku') or '').strip()
+    highlight_sku = (request.GET.get('hl') or '').strip() or created_sku
 
-    # ------------------------------------------------------------------
-    # 6) Render
-    # ------------------------------------------------------------------
+    # --- 6) Render ---
     context = {
-        'productos': productos, 
+        'productos': productos,
         'query': query,
         'today': hoy,
-        'hoy_mas_15dias': int(time.mktime((hoy + timedelta(days=15)).timetuple())),
-        'sku': sku,
-        'producto_sel': producto_sel,
-        'lotes_sel': lotes_sel,
-        'highlight_sku': highlight_sku,
+        'hoy_mas_15dias': int(time.mktime(hoy_mas_15.timetuple())),
+        'highlight_sku': highlight_sku,  # <-- siempre presente
     }
     return render(request, 'inventario/inventario.html', context)
 
@@ -764,11 +668,13 @@ def perfil(request):
     }
     return render(request, 'inventario/perfil.html', context)
 
+from django.views.decorators.cache import never_cache
 
-@login_required
+@never_cache
 def logout_view(request):
+    """Cierra sesión y muestra mensaje de confirmación."""
     logout(request)
-    messages.info(request, "Has cerrado sesión correctamente.")
+    messages.success(request, "Has cerrado sesión correctamente.")
     return redirect('landing:landing')
 
 # --- Vistas de API ---
@@ -827,21 +733,6 @@ def verificar_producto_api(request, codigo_barras):
 
 
 # --- Vistas de Gestión de Archivos y Planes ---
-
-@login_required
-def descargar_plantilla_ventas(request):
-    from openpyxl import Workbook
-    from django.http import HttpResponse
-
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Plantilla Ventas"
-    ws.append(['sku', 'cantidad'])
-
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=plantilla_ventas.xlsx'
-    wb.save(response)
-    return response
 
 @login_required
 def seleccionar_plan(request, plan_id):

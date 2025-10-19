@@ -3,7 +3,7 @@ from .views import (
     home, seleccionar_plan, logout_view, perfil, inventario_view,
     agregar_producto, editar_producto, eliminar_producto,
     agregar_lote_producto, detalle_producto, editar_lote, eliminar_lote,
-    retirar_lote, descargar_plantilla_ventas, buscar_producto_api, verificar_producto_api, 
+    retirar_lote, buscar_producto_api, verificar_producto_api, 
     obtener_datos_sku_api, agregar_proveedor, lista_recordatorios, agregar_recordatorio, 
     editar_recordatorio, eliminar_recordatorio, completar_recordatorio, descontar_producto_view, 
     metrics_view, flujo_opciones, producto_resumen, post_creacion_producto, ajustar_stock
@@ -23,7 +23,6 @@ urlpatterns = [
     path('lotes/<int:lote_id>/editar/', editar_lote, name='editar_lote'),
     path('lotes/<int:lote_id>/eliminar/', eliminar_lote, name='eliminar_lote'),
     path('lotes/<int:lote_id>/retirar/', retirar_lote, name='retirar_lote'),
-    path('descargar-plantilla/', descargar_plantilla_ventas, name='descargar_plantilla'),
     path('api/buscar-producto/<str:codigo_barras>/', buscar_producto_api, name='buscar_producto_api'),
     path('api/verificar-producto/<str:codigo_barras>/', verificar_producto_api, name='verificar_producto_api'),
     path('api/obtener-datos-sku/<str:sku>/', obtener_datos_sku_api, name='obtener_datos_sku_api'),
