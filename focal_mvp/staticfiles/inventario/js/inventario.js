@@ -1,9 +1,10 @@
-/*! FOCAL - inventario.js (sin HUB/TABS)
+/*! FOCAL - inventario.js
    - Highlight de fila recién agregada
    - Modal descontar
    - Stepper cantidad
-   - Fade de alerts (toasts siguen en CSS)
+   - Fade de alerts
    - Asistente flotante
+   - Sombra del header de tabla cuando hay scroll
 */
 (function () {
   'use strict';
@@ -32,7 +33,16 @@
     setTimeout(() => row.classList.remove('row--highlight'), 4500);
   })();
 
-  // ============= MODAL: Descontar =============
+  // ===== Sombra de encabezado cuando la tabla scrollea =====
+  (function shadowOnScroll(){
+    const tc = document.querySelector('.table-container');
+    if (!tc) return;
+    const update = () => tc.classList.toggle('has-scroll', tc.scrollTop > 0);
+    on(tc, 'scroll', update);
+    update();
+  })();
+
+  // ============= MODAL: Descontar (si lo usas) =============
   const modal = $('#modal-descontar');
   const mdSku = $('#md_sku');
   const mdQty = $('#md_qty');
