@@ -7,7 +7,10 @@
   <title>Inventario | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon"/>
 
+  <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Estilos de la tabla / página -->
   <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}"/>
 
   <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}"/>
@@ -51,12 +54,28 @@
     <div class="search-section">
       <form method="GET" action="{% url 'inventario' %}" class="search-form">
         <input class="search-input" type="search" name="q" placeholder="Buscar por nombre, sku, marca..." aria-label="Buscar" value="{{ query|default:'' }}">
-        <button class="search-button" type="submit" aria-label="Buscar">
+
+        <!-- Buscar -->
+        <button class="search-button" type="submit" aria-label="Buscar" title="Buscar">
           <i class="bi bi-search" aria-hidden="true"></i>
         </button>
-        <a href="{% url 'agregar-producto' %}" class="search-button" aria-label="Agregar producto">
+
+        <!-- Agregar producto -->
+        <a href="{% url 'agregar-producto' %}" class="search-button" aria-label="Agregar producto" title="Agregar producto">
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
         </a>
+
+        <!-- Agregar proveedor (nuevo) -->
+        <a href="{% url 'agregar_proveedor' %}" class="search-button search-button--provider"
+           aria-label="Agregar proveedor" title="Agregar proveedor">
+          <!-- Ícono sólido, estilo “fill” para look similar a Flaticon -->
+          <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
+          <!--
+            Si luego descargas un SVG de Flaticon, reemplaza la línea anterior por:
+            <img src="{% static 'inventario/icons/person-add-fill.svg' %}" alt="" class="fi-person-plus" aria-hidden="true">
+          -->
+        </a>
+
         {% if query %}
           <a href="{% url 'inventario' %}" class="clear-search-button" role="button">Limpiar Búsqueda</a>
         {% endif %}
@@ -92,7 +111,7 @@
             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
 
             <td class="acciones">
-              <!-- + Sumar al lote más próximo a vencer (POST) -->
+              <!-- + Sumar al lote que vence antes -->
               <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
                 {% csrf_token %}
                 <input type="hidden" name="operacion" value="sumar">
@@ -102,7 +121,7 @@
                 </button>
               </form>
 
-              <!-- − Descontar del lote más próximo a vencer (POST) -->
+              <!-- − Restar del lote que vence antes -->
               <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
                 {% csrf_token %}
                 <input type="hidden" name="operacion" value="restar">
@@ -112,7 +131,7 @@
                 </button>
               </form>
 
-              <!-- 🗑 Eliminar producto (sin confirm JS, ya tienes tu template de confirmación) -->
+              <!-- 🗑 Eliminar (vista de confirmación propia) -->
               <a href="{% url 'eliminar_producto' producto.id %}"
                  class="btn icon-btn icon-btn--danger"
                  title="Eliminar producto" aria-label="Eliminar producto">
