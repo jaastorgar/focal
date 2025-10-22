@@ -549,11 +549,23 @@ class Proveedor(models.Model):
 # MODELO PRODUCTO
 # ===========================
 class Producto(models.Model):
-    sku = models.CharField(max_length=100) 
+    from django.core.validators import RegexValidator
+    
+    # Solo dígitos, hasta 30, sin espacios
+    sku = models.CharField(
+        max_length=30,
+        validators=[
+            RegexValidator(
+                regex=r'^\d+$',
+                message='El SKU debe contener solo números (sin espacios).',
+                code='invalid_sku_digits'
+            )
+        ]
+    )
     nombre = models.CharField(max_length=200)
     marca = models.CharField(max_length=100, blank=True, null=True)
     categoria = models.CharField(max_length=100, choices=CATEGORIA_CHOICES, blank=True, null=True)
-    gramage = models.CharField(max_length=50, blank=True, null=True)
+    gramaje = models.CharField(max_length=50, blank=True, null=True)
     unidad_medida = models.CharField(max_length=50, choices=UNIDAD_MEDIDA_CHOICES, blank=True, null=True)
     empresas = models.ManyToManyField(Empresa, through='OfertaProducto', related_name='productos_ofrecidos')
     creado = models.DateTimeField(auto_now_add=True)

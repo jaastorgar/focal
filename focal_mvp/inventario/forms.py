@@ -157,28 +157,51 @@ class EmpresaForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        exclude = ('empresas',)  
+        exclude = ('empresas',)
 
     def __init__(self, *args, **kwargs):
         self.empresa = kwargs.pop('empresa_usuario', None)
         super().__init__(*args, **kwargs)
-        
+
+        # Clases base
         for field_name, field in self.fields.items():
             if not isinstance(field.widget, (forms.Select, forms.SelectMultiple)):
                 if 'class' not in field.widget.attrs:
                     field.widget.attrs['class'] = 'form-control'
 
+        # Endurecer input del SKU en el DOM
+        if 'sku' in self.fields:
+            self.fields['sku'].widget.attrs.update({
+                'maxlength': '30',
+                'inputmode': 'numeric',   # teclado numérico en móviles
+                'pattern': r'[0-9]*',     # ayuda al browser, no reemplaza el backend
+                'autocomplete': 'off',
+                'placeholder': 'Solo números (máx. 30)'
+            })
+
     def clean_sku(self):
-        sku = self.cleaned_data.get('sku')
-        
+        sku = (self.cleaned_data.get('sku') or '').strip()
+
+        # 1) Sin espacios en ninguna parte
+        if re.search(r'\s', sku):
+            raise forms.ValidationError("El SKU no debe contener espacios.")
+
+        # 2) Solo dígitos
+        if not sku.isdigit():
+            raise forms.ValidationError("El SKU debe contener solo números.")
+
+        # 3) Máximo 30 dígitos (sin mínimo)
+        if len(sku) > 30:
+            raise forms.ValidationError("El SKU no puede superar los 30 dígitos.")
+
+        # 4) Duplicidad en el inventario de la empresa (mantengo tu lógica)
         if sku and self.empresa:
             qs = OfertaProducto.objects.filter(producto__sku=sku, empresa=self.empresa)
-            
             if self.instance and self.instance.pk:
                 qs = qs.exclude(producto=self.instance)
             if qs.exists():
                 raise forms.ValidationError("Este SKU ya está siendo utilizado por otro producto en tu inventario.")
-        
+
         return sku
 
 class OfertaProductoForm(forms.ModelForm):

@@ -681,7 +681,19 @@ def logout_view(request):
 
 @login_required
 def obtener_datos_sku_api(request, sku):
+    from django.http import HttpResponseBadRequest
+    import re
+
     empresa_actual = obtener_empresa_del_usuario(request.user)
+
+    # Normalizar y validar SKU recibido por URL
+    sku = (sku or '').strip()
+    if re.search(r'\s', sku) or (not sku.isdigit()) or len(sku) > 30:
+        return JsonResponse({
+            'status': 'invalido',
+            'mensaje': 'SKU inválido: usa solo números, sin espacios, máximo 30 dígitos.'
+        }, status=400)
+
     if OfertaProducto.objects.filter(producto__sku=sku, empresa=empresa_actual).exists():
         return JsonResponse({'status': 'duplicado_local', 'mensaje': 'Este producto ya existe en tu inventario.'})
 
@@ -694,7 +706,7 @@ def obtener_datos_sku_api(request, sku):
                 'sku': producto_global.sku,
                 'marca': producto_global.marca,
                 'categoria': producto_global.categoria,
-                'dramage': producto_global.dramage,
+                'gramaje': producto_global.gramaje,
                 'unidad_medida': producto_global.unidad_medida,
             }
         }

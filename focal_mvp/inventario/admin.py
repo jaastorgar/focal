@@ -64,7 +64,7 @@ class AlmaceneroAdmin(UserAdmin):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'sku', 'marca', 'categoria', 'gramage')
+    list_display = ('nombre', 'sku', 'marca', 'categoria', 'gramaje')
     list_filter = ('categoria',)
     search_fields = ('nombre', 'sku', 'marca')
     # Ya no se necesita el inline de Oferta aquí si se gestiona por separado
