@@ -71,7 +71,7 @@
           <button type="submit" class="btn-primary-solid btn-block">Ingresar</button>
 
           <div class="login-links">
-            <a class="link-muted" href="#" aria-disabled="true">¿Has olvidado la contraseña?</a>
+            <a href="{% url 'password_reset' %}">¿Has olvidado la contraseña?</a>
             <span class="link-muted">¿No tienes cuenta?
               <a class="link-strong" href="{% url 'landing:registro' %}">Regístrate aquí</a>
             </span>
