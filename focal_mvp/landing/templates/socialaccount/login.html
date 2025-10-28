@@ -1,0 +1,44 @@
+{% load static %}
+{% load i18n %}
+{% load allauth %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conectar con Google | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <!-- 🎨 Estilos de marca FOCAL -->
+  <link rel="stylesheet" href="{% static 'landing/css/allauth.css' %}">
+</head>
+
+<body class="login-body">
+  <main class="login-page">
+    <section class="login-wrap container">
+      <div class="login-card">
+        {% if process == "connect" %}
+          <h1 class="login-title">{% blocktrans with provider.name as provider %}Conectar cuenta de {{ provider }}{% endblocktrans %}</h1>
+          <p class="text-muted">{% blocktrans with provider.name as provider %}Estás a punto de vincular una nueva cuenta de {{ provider }} a tu perfil FOCAL.{% endblocktrans %}</p>
+        {% else %}
+          <h1 class="login-title">{% blocktrans with provider.name as provider %}Iniciar sesión con {{ provider }}{% endblocktrans %}</h1>
+          <p class="text-muted">{% blocktrans with provider.name as provider %}Estás a punto de iniciar sesión en FOCAL usando tu cuenta de {{ provider }}.{% endblocktrans %}</p>
+        {% endif %}
+
+        {% element form method="post" no_visible_fields=True %}
+          {% slot actions %}
+            {% csrf_token %}
+            <button type="submit" class="btn-primary-solid btn-block">
+              {% trans "Continuar" %}
+            </button>
+          {% endslot %}
+        {% endelement %}
+
+        <div class="login-links">
+          <a href="{% url 'account_login' %}" class="link-muted">Volver al inicio de sesión</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

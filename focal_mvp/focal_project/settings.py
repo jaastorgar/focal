@@ -17,8 +17,15 @@ SECRET_KEY = config('SECRET_KEY') # Lee la SECRET_KEY del archivo .env
 DEBUG = config('DEBUG', default=False, cast=bool) # Lee DEBUG del .env, con default=False y convierte a booleano
 
 # Lee ALLOWED_HOSTS del .env y convierte la cadena separada por comas en una lista
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1").split(",")
+CSRF_TRUSTED_ORIGINS = [
+    "https://soyfocal.cl",
+    "https://www.soyfocal.cl",
+]
 
+# Cookies seguras en prod (sirviendo por HTTPS)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # Application definition
 
@@ -30,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     'landing',
     'inventario',
     'rest_framework',
@@ -42,7 +54,35 @@ AUTH_USER_MODEL = 'inventario.Almacenero'
 AUTHENTICATION_BACKENDS = [
     'inventario.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+# Allauth – usa tu flujo por email
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "optional" 
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
+# Si tu User usa email como identificador, mantén esto:
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# (opcional) normalizar nombres que llegan desde Google
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+
+# Para que el correo del link sea el tuyo:
+DEFAULT_FROM_EMAIL = "FOCAL <plataforma.focal@gmail.com>"
+
+# Proveedor Google (scopes básicos)
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,6 +92,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'focal_project.urls'
@@ -59,7 +100,10 @@ ROOT_URLCONF = 'focal_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'inventario' / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'landing' / 'templates',
+            BASE_DIR / 'inventario' / 'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

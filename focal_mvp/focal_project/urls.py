@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include(('landing.urls', 'landing'), namespace='landing')),
     path('', include('inventario.urls')),
     path('finanza/', include('finanza.urls')),
+    path("accounts/", include("allauth.urls")),
     
     # Password reset
     path(

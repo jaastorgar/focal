@@ -1,0 +1,229 @@
+/* =========================================================
+   FOCAL — Estilos para pantallas de django-allauth
+   (login social, signup, conexiones, etc.)
+   ========================================================= */
+
+/* ------------------ Variables de marca ------------------ */
+:root{
+  --primary-purple:#4A008B;
+  --secondary-purple:#7B1FA2;
+  --light-purple:#F3E8FF;
+  --header-footer-bg:#2C0140;
+  --dark-text:#343A40;
+  --muted-text:#555555;
+  --white:#FFFFFF;
+  --hover-dark-purple:#38006B;
+  --hover-light-purple:#E0B3FF;
+  --turquoise:#0AE8C6;
+  --border-color:#e6e6e6;
+  --shadow-1:0 2px 10px rgba(0,0,0,.08);
+  --shadow-2:0 8px 22px rgba(0,0,0,.14);
+  --shadow-3:0 18px 44px rgba(0,0,0,.22);
+  --font-primary:'InterTight', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --font-secondary:'HankenGrotesk', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* ---------------------- Tipografías ---------------------- */
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight:800;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
+}
+
+/* =========================================================
+   Base / Layout (scope suave para no romper otras vistas)
+   ========================================================= */
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-secondary);
+  color:var(--dark-text);
+  background:var(--light-purple);
+  line-height:1.6;
+}
+
+/* La mayoría de los templates de allauth usan <main> */
+main{
+  min-height:100svh;
+  display:grid;
+  place-items:center;
+  padding: clamp(24px, 4vw, 48px);
+}
+
+/* Card central (si no existe wrapper, lo creamos visualmente) */
+.allauth-card,
+main > form,
+main > div,
+main > section{
+  width:min(520px, 94%);
+  background:var(--white);
+  border:1px solid rgba(0,0,0,.03);
+  border-radius:20px;
+  padding:clamp(22px, 3.2vw, 36px);
+  box-shadow:0 16px 40px rgba(0,0,0,.12);
+}
+
+/* Títulos y párrafos */
+h1,h2,h3{
+  font-family:var(--font-primary);
+  color:var(--dark-text);
+  margin:0 0 12px;
+}
+h1{ font-weight:800; font-size: clamp(1.75rem, 3.8vw, 2.35rem); }
+p{ color:var(--muted-text); margin:.25rem 0 1rem; }
+
+/* Links */
+a{ color:var(--primary-purple); text-decoration:none; font-weight:700; }
+a:hover{ color:var(--hover-dark-purple); text-decoration:underline; }
+
+/* =========================================================
+   Formularios
+   ========================================================= */
+form .field, form .form-group, form p, form .control-group{ margin:12px 0; }
+
+label{
+  display:block;
+  font-size:.95rem;
+  margin:0 0 6px;
+  color:var(--dark-text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+select, textarea{
+  width:100%;
+  border:1px solid var(--border-color);
+  background:var(--white);
+  color:var(--dark-text);
+  border-radius:10px;
+  padding:12px 12px;
+  font:inherit;
+  transition:border .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+input:focus, select:focus, textarea:focus{
+  outline:none;
+  border-color:var(--primary-purple);
+  box-shadow:0 0 0 3px rgba(74,0,139,.12);
+}
+
+.help, .helptext{ color:#6b7280; font-size:.85rem; margin-top:6px; }
+
+/* Errores */
+.errorlist, .errors{ margin:.25rem 0 .5rem; padding-left:18px; color:#dc2626; }
+.alert, .messages .error{ background:#FFF5F5; border:1px solid #FECACA; color:#991B1B; border-radius:10px; padding:10px 12px; }
+
+/* =========================================================
+   Botones
+   ========================================================= */
+.btn, button, [type="submit"], .allauth .button, .button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.6rem;
+  padding:1rem 1.25rem;
+  border-radius:12px;
+  border:2px solid transparent;
+  background:var(--primary-purple);
+  color:#fff;
+  font-family:var(--font-primary);
+  font-weight:800;
+  letter-spacing:.01em;
+  cursor:pointer;
+  width:100%;
+  transition:transform .12s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  box-shadow:0 12px 28px rgba(74,0,139,.28);
+}
+
+.btn:hover, button:hover, [type="submit"]:hover, .allauth .button:hover{
+  background:var(--hover-dark-purple);
+  border-color:var(--hover-dark-purple);
+  transform:translateY(-1px);
+  box-shadow:0 16px 34px rgba(74,0,139,.36);
+}
+
+.btn.outline, .button.outline{
+  background:#fff;
+  color:var(--primary-purple);
+  border-color:var(--primary-purple);
+  box-shadow:var(--shadow-1);
+}
+.btn.outline:hover, .button.outline:hover{
+  background:var(--hover-light-purple);
+}
+
+/* Grupo de acciones (login + alternativos) */
+.actions, .button-group{ display:grid; gap:10px; margin-top:14px; }
+
+/* =========================================================
+   Botones de OAuth (Google etc.)
+   ========================================================= */
+.oauth-list, .socialaccount_providers, .provider-list{
+  list-style:none; margin:14px 0 0; padding:0; display:grid; gap:10px;
+}
+
+.oauth-btn, .provider, .socialaccount_provider, .btn-google{
+  display:inline-flex; align-items:center; justify-content:center; gap:.6rem;
+  width:100%;
+  padding:.9rem 1rem;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  color:#222;
+  font-weight:700; font-family:var(--font-primary);
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+  transition:background .15s ease, box-shadow .2s ease, transform .12s ease, border-color .15s ease;
+}
+.oauth-btn:hover, .provider:hover, .socialaccount_provider:hover, .btn-google:hover{
+  background:#f7f7f8; transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+.oauth-btn img, .btn-google img{ width:20px; height:20px; display:inline-block; }
+
+/* Separador “o continúa con” (si lo usas) */
+.oauth-separator{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:10px;
+  margin:16px 0 10px;
+  color:#6b7280;
+  font-size:.9rem;
+}
+.oauth-separator::before,
+.oauth-separator::after{ content:""; height:1px; background:var(--border-color); }
+
+/* =========================================================
+   Cabeceras/links auxiliares
+   ========================================================= */
+.minor-links{
+  margin-top:18px; text-align:center; font-size:.9rem; color:var(--muted-text);
+}
+.minor-links a{ font-weight:700; }
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+@media (max-width:640px){
+  .allauth-card,
+  main > form,
+  main > div,
+  main > section{ border-radius:16px; padding:22px; }
+  h1{ font-size: clamp(1.55rem, 5.2vw, 1.9rem); }
+}

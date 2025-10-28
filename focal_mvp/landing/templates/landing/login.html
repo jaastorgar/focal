@@ -1,4 +1,5 @@
 {% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,11 +7,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Iniciar sesión | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-  {# Carga el CSS global y el CSS específico de login #}
   <link rel="stylesheet" href="{% static 'landing/css/login.css' %}">
 </head>
 <body class="login-body">
 
+  <!-- ======================= HEADER ======================= -->
   <header class="main-header" id="home">
     <div class="container">
       <a class="logo" href="{% url 'landing:landing' %}" aria-label="Inicio">
@@ -32,12 +33,12 @@
     </div>
   </header>
 
+  <!-- ======================== MAIN ======================== -->
   <main class="login-page" id="main-content">
     <section class="login-wrap container">
       <div class="login-card" role="form" aria-labelledby="login-title">
         <h1 id="login-title" class="login-title">Iniciar sesión</h1>
 
-        {# Mensajes del framework #}
         {% if messages %}
           <div class="login-messages">
             {% for message in messages %}
@@ -49,7 +50,6 @@
         <form method="post" novalidate>
           {% csrf_token %}
 
-          {# Errores no asociados a un campo #}
           {% if form.non_field_errors %}
             <div class="alert alert-error">
               {% for error in form.non_field_errors %}
@@ -68,8 +68,19 @@
             </div>
           {% endfor %}
 
+          <!-- Botón principal -->
           <button type="submit" class="btn-primary-solid btn-block">Ingresar</button>
 
+          <!-- Separador visual -->
+          <div class="oauth-separator"><span>o continúa con</span></div>
+
+          <!-- Botón de Google -->
+          <a href="{% provider_login_url 'google' process='login' %}" class="btn-google">
+            <img class="btn-google__icon" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+            <span class="btn-google__label">Continuar con Google</span>
+          </a>
+
+          <!-- Enlaces inferiores -->
           <div class="login-links">
             <a href="{% url 'password_reset' %}">¿Has olvidado la contraseña?</a>
             <span class="link-muted">¿No tienes cuenta?
@@ -81,6 +92,7 @@
     </section>
   </main>
 
+  <!-- ======================= FOOTER ======================= -->
   <footer class="main-footer">
     <div class="container">
       <div class="footer-grid">
@@ -88,7 +100,6 @@
           <p class="footer-text">
             Herramientas simples para un control inteligente de tu inventario.
           </p>
-
           <ul class="contact-list">
             <li>
               <a class="contact-chip" href="mailto:soporte@soyfocal.cl">
@@ -124,14 +135,11 @@
 
       <div class="footer-bottom">
         <p class="footer-copy">© <span id="year"></span> FOCAL. Todos los derechos reservados.</p>
-      </div>    
+      </div>
     </div>
   </footer>
 
   <script src="{% static 'landing/js/login.js' %}"></script>
-  <script>
-    // Año dinámico en el footer
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
