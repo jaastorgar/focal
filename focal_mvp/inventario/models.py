@@ -399,23 +399,42 @@ UNIDAD_MEDIDA_CHOICES = [
 ]
 
 CATEGORIA_CHOICES = [
+    # 🛒 Abarrotes y básicos
     ('abarrotes', 'Abarrotes'),
+    ('cereales_legumbres', 'Cereales y Legumbres'),
+    ('aceites_vinagres', 'Aceites y Vinagres'),
+    ('conservas', 'Conservas y Enlatados'),
+    ('especias_condimentos', 'Especias y Condimentos'),
+    ('reposteria', 'Repostería y Postres'),
+
+    # 🥬 Frescos y perecibles
     ('frutas_verduras', 'Frutas y Verduras'),
     ('carniceria', 'Carnicería'),
+    ('pollo_granel', 'Pollo al Granel'),
+    ('pescados_mariscos', 'Pescados y Mariscos'),
     ('panaderia', 'Panadería'),
     ('lacteos_huevos', 'Lácteos y Huevos'),
-    ('bebidas', 'Bebidas'),
-    ('snacks', 'Snacks y Dulces'),
-    ('congelados', 'Congelados'),
-    ('limpieza', 'Artículos de Limpieza'),
-    ('personal', 'Cuidado Personal'),
-    ('licores', 'Licores'),
     ('embutidos', 'Embutidos'),
-    ('pollo_granel', 'Pollo al Granel'),
-    ('especias', 'Especias y Condimentos'),
-    ('mascotas', 'Mascotas'),
+    ('congelados', 'Congelados'),
+
+    # 🥤 Bebidas y consumo inmediato
+    ('bebidas', 'Bebidas'),
+    ('aguas', 'Aguas y Jugos'),
+    ('cervezas', 'Cervezas'),
+    ('licores', 'Licores y Vinos'),
+    ('snacks', 'Snacks y Dulces'),
+    ('helados', 'Helados'),
+
+    # 🧼 Limpieza y cuidado personal
+    ('limpieza', 'Artículos de Limpieza'),
+    ('cuidado_personal', 'Cuidado Personal'),
+    ('papeleria', 'Papelería e Higiene'),
+
+    # 🏠 Hogar y otros
     ('hogar', 'Artículos de Hogar'),
-    ('reposteria', 'Repostería y Postres'),
+    ('mascotas', 'Productos para Mascotas'),
+    ('ferreteria_basica', 'Ferretería Básica'),
+    ('bazar', 'Bazar y Misceláneos'),
 ]
 
 # ===========================

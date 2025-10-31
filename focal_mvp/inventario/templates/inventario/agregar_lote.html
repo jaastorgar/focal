@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registrar Lote | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-
-  <!-- Estilo principal del formulario -->
   <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
@@ -48,12 +46,35 @@
             {# ——— Flujo con producto_id: NO pedimos SKU ——— #}
             <div class="form-group" data-span="2">
               <label>Producto seleccionado</label>
-              <input type="text" class="form-control" value="{{ oferta_seleccionada.producto.nombre }} (SKU {{ oferta_seleccionada.producto.sku }})" readonly disabled>
+              <input type="text" class="form-control"
+                     value="{{ oferta_seleccionada.producto.nombre }} (SKU {{ oferta_seleccionada.producto.sku }})"
+                     readonly disabled>
             </div>
 
-            {# Enviar el producto (OfertaProducto) como campo oculto del form #}
             {{ form.producto.as_hidden }}
 
+            {# --- Bloque inteligente para venta por peso --- #}
+            {% if oferta_seleccionada %}
+              {% if oferta_seleccionada.sell_by_weight %}
+                <div class="alert-info" style="margin:10px 0;padding:10px 12px;border:1px solid #e6e6e6;border-radius:10px;background:#F3E8FF;color:#4A008B;">
+                  <strong>Venta por peso activada.</strong>
+                  Precio vigente: <b>${{ oferta_seleccionada.price_per_kg|floatformat:0 }}/kg</b>,
+                  redondeo: <b>{{ oferta_seleccionada.min_step_grams }} g</b>.
+                  <br>⚠️ Ingrese <b>cantidad en gramos</b> (ej.: 3 kg → <code>3000</code>).
+                </div>
+              {% else %}
+                {% with n=oferta_seleccionada.producto.nombre|lower c=oferta_seleccionada.producto.categoria|default_if_none:""|lower %}
+                  {% if "cecina" in n or "queso" in n or "jamon" in n or "fiambre" in n or "carne" in n or "pollo" in n or "pescado" in n or "charcuteria" in c or "frescos" in c %}
+                    <div class="alert-info" style="margin:10px 0;padding:10px 12px;border:1px solid #e6e6e6;border-radius:10px;background:#F3E8FF;color:#4A008B;">
+                      <strong>Venta por peso detectada automáticamente.</strong>
+                      FOCAL ha identificado que este producto podría venderse por gramos.
+                      <br>⚙️ Se configurará automáticamente como <b>“venta por peso”</b> al guardar este lote.
+                      <br>⚠️ Ingrese <b>cantidad en gramos</b> (ej.: 3 kg → <code>3000</code>).
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
+            {% endif %}
           {% else %}
             {# ——— Flujo clásico por SKU: mantenemos tu escáner ——— #}
             <div class="form-group" data-span="2">
@@ -66,7 +87,6 @@
               <input type="text" id="id_nombre_producto" class="form-control" readonly disabled />
             </div>
 
-            {# Campo oculto donde tu JS coloca el ID de OfertaProducto #}
             <input type="hidden" name="producto" id="id_producto_id">
             {% if form.producto.errors %}
               <small class="error-message">{{ form.producto.errors|striptags }}</small>
@@ -82,8 +102,19 @@
 
           <div class="form-grid">
             <div class="form-group">
-              <label for="{{ form.cantidad.id_for_label }}">{{ form.cantidad.label }}</label>
+              <label for="{{ form.cantidad.id_for_label }}">
+                {% if oferta_seleccionada and oferta_seleccionada.sell_by_weight %}
+                  Cantidad (en <b>gramos</b>)
+                {% else %}
+                  {{ form.cantidad.label }}
+                {% endif %}
+              </label>
               {{ form.cantidad }}
+              {% if oferta_seleccionada and oferta_seleccionada.sell_by_weight %}
+                <small class="hint" style="display:block;color:#555;margin-top:6px;">
+                  Ejemplo: 2 kg → <code>2000</code> (gramos)
+                </small>
+              {% endif %}
               {% if form.cantidad.errors %}
                 <small class="error-message">{{ form.cantidad.errors|striptags }}</small>
               {% endif %}
@@ -130,13 +161,13 @@
             </div>
 
             {% if form.lote_proveedor %}
-            <div class="form-group" data-span="2">
-              <label for="{{ form.lote_proveedor.id_for_label }}">{{ form.lote_proveedor.label }}</label>
-              {{ form.lote_proveedor }}
-              {% if form.lote_proveedor.errors %}
-                <small class="error-message">{{ form.lote_proveedor.errors|striptags }}</small>
-              {% endif %}
-            </div>
+              <div class="form-group" data-span="2">
+                <label for="{{ form.lote_proveedor.id_for_label }}">{{ form.lote_proveedor.label }}</label>
+                {{ form.lote_proveedor }}
+                {% if form.lote_proveedor.errors %}
+                  <small class="error-message">{{ form.lote_proveedor.errors|striptags }}</small>
+                {% endif %}
+              </div>
             {% endif %}
           </div>
         </fieldset>
@@ -158,7 +189,6 @@
     <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
   </footer>
 
-  {# Solo necesitamos el JS de escaneo cuando NO hay producto_id #}
   {% if not producto_id %}
     <script src="{% static 'inventario/js/agregar_lote.js' %}"></script>
   {% endif %}

@@ -22,7 +22,7 @@
   <nav class="container">
     <a href="{% url 'home' %}" class="logo">FOCAL</a>
     <ul class="nav-links">
-      <li><a href="{% url 'metrics' %}" class="btn-accion">Metricas</a></li>
+      <li><a href="{% url 'metrics' %}" class="btn-accion">Métricas</a></li>
       <li><a href="{% url 'home' %}" class="btn-accion">Volver al Home</a></li>
     </ul>
   </nav>
@@ -65,15 +65,10 @@
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
         </a>
 
-        <!-- Agregar proveedor (nuevo) -->
+        <!-- Agregar proveedor -->
         <a href="{% url 'agregar_proveedor' %}" class="search-button search-button--provider"
            aria-label="Agregar proveedor" title="Agregar proveedor">
-          <!-- Ícono sólido, estilo “fill” para look similar a Flaticon -->
           <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
-          <!--
-            Si luego descargas un SVG de Flaticon, reemplaza la línea anterior por:
-            <img src="{% static 'inventario/icons/person-add-fill.svg' %}" alt="" class="fi-person-plus" aria-hidden="true">
-          -->
         </a>
 
         {% if query %}
@@ -111,34 +106,42 @@
             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
 
             <td class="acciones">
-              <!-- + Sumar al lote que vence antes -->
-              <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
-                {% csrf_token %}
-                <input type="hidden" name="operacion" value="sumar">
-                <input type="hidden" name="cantidad" value="1">
-                <button type="submit" class="btn icon-btn" title="Sumar 1 al lote que vence antes" aria-label="Sumar 1">
-                  <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                </button>
-              </form>
+              {% if producto.sell_by_weight %}
+                <!-- 🧠 Producto por peso: solo mostrar botón de monto -->
+                <a href="{% url 'salida_cecina_monto' %}?sku={{ producto.sku }}"
+                   class="btn icon-btn icon-btn--cash"
+                   title="Descontar por monto ($→g)" aria-label="Descontar por monto">
+                  <i class="bi bi-cash-coin" aria-hidden="true"></i>
+                </a>
+              {% else %}
+                <!-- Producto por unidad: mostrar + y − -->
+                <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <input type="hidden" name="operacion" value="sumar">
+                  <input type="hidden" name="cantidad" value="1">
+                  <button type="submit" class="btn icon-btn" title="Sumar 1" aria-label="Sumar 1">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                  </button>
+                </form>
 
-              <!-- − Restar del lote que vence antes -->
-              <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
-                {% csrf_token %}
-                <input type="hidden" name="operacion" value="restar">
-                <input type="hidden" name="cantidad" value="1">
-                <button type="submit" class="btn icon-btn" title="Descontar 1 del lote que vence antes" aria-label="Descontar 1">
-                  <i class="bi bi-dash-lg" aria-hidden="true"></i>
-                </button>
-              </form>
+                <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <input type="hidden" name="operacion" value="restar">
+                  <input type="hidden" name="cantidad" value="1">
+                  <button type="submit" class="btn icon-btn" title="Restar 1" aria-label="Restar 1">
+                    <i class="bi bi-dash-lg" aria-hidden="true"></i>
+                  </button>
+                </form>
+              {% endif %}
 
-              <!-- 🗑 Eliminar (vista de confirmación propia) -->
+              <!-- 🗑 Eliminar (común) -->
               <a href="{% url 'eliminar_producto' producto.id %}"
                  class="btn icon-btn icon-btn--danger"
                  title="Eliminar producto" aria-label="Eliminar producto">
                 <i class="bi bi-trash3" aria-hidden="true"></i>
               </a>
 
-              <!-- ⚙ Gestionar (flujo) -->
+              <!-- ⚙ Gestionar (común) -->
               <a href="{% url 'flujo_opciones' producto.id %}"
                  class="btn icon-btn icon-btn--primary"
                  title="Gestionar lotes y proveedores" aria-label="Gestionar lotes y proveedores">
@@ -166,6 +169,7 @@
     </div>
   {% endif %}
 
+  <!-- FOCAL Assistant -->
   <div class="assistant-container">
     <button id="assistantBtn" class="floating-assistant" type="button"
             aria-haspopup="dialog" aria-label="Abrir asistente FOCAL"

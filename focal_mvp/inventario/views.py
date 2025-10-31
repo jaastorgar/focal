@@ -92,6 +92,8 @@ def inventario_view(request):
     - Pinta en amarillo los productos cuyo lote más próximo vence en ≤15 días.
     - Elimina los lotes ya vencidos y muestra alerta.
     - Agrega alerta general si existen productos próximos a vencer.
+    - 🧠 Anota en cada producto si su OfertaProducto vende por peso (sell_by_weight),
+      más price_per_kg y min_step_grams para lógica de interfaz.
     """
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
@@ -101,7 +103,7 @@ def inventario_view(request):
             'query': '',
             'today': now().date(),
             'hoy_mas_15dias': int(time.mktime((now().date() + timedelta(days=15)).timetuple())),
-            'highlight_sku': '',   # <-- evitar error en el template
+            'highlight_sku': '',
         })
 
     hoy = now().date()
@@ -127,8 +129,9 @@ def inventario_view(request):
             detalle += f" … y {extras} más."
         messages.warning(request, f"Se eliminaron {deleted_count} lotes vencidos: {detalle}")
 
-    # --- 2) Subconsultas ---
+    # --- 2) Subconsultas de lotes (stock, vencimiento, cantidad) ---
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
+
     lotes_empresa = LoteProducto.objects.filter(
         producto__producto=OuterRef('pk'),
         producto__empresa=empresa_usuario
@@ -146,10 +149,23 @@ def inventario_view(request):
         .annotate(count=Count('id')).values('count')[:1]
     )
 
+    # --- 2.b) Subconsultas de oferta (inteligencia por peso) ---
+    oferta_empresa = OfertaProducto.objects.filter(
+        empresa=empresa_usuario,
+        producto=OuterRef('pk')
+    )
+    sub_sell_by_weight = Subquery(oferta_empresa.values('sell_by_weight')[:1])
+    sub_price_per_kg = Subquery(oferta_empresa.values('price_per_kg')[:1])
+    sub_min_step = Subquery(oferta_empresa.values('min_step_grams')[:1])
+
     productos = productos_base.annotate(
         stock_total=subquery_stock,
         proximo_vencimiento=subquery_vencimiento,
         cantidad_lotes=subquery_cantidad_lotes,
+        # 🧠 campos para el template
+        sell_by_weight=sub_sell_by_weight,
+        price_per_kg=sub_price_per_kg,
+        min_step_grams=sub_min_step,
     )
 
     # --- 3) Buscador ---
@@ -164,7 +180,7 @@ def inventario_view(request):
         if not productos.exists():
             messages.info(request, f"No se encontraron resultados para «{query}».")
 
-    # --- 4) Alerta de próximos a vencer (amarillo) ---
+    # --- 4) Alerta de próximos a vencer ---
     productos_proximos = productos.filter(proximo_vencimiento__lte=hoy_mas_15, proximo_vencimiento__gte=hoy)
     if productos_proximos.exists():
         lista_alerta = ", ".join(p.nombre for p in productos_proximos[:5])
@@ -173,7 +189,7 @@ def inventario_view(request):
             lista_alerta += f" … y {extras} más."
         messages.warning(request, f"Tienes productos próximos a vencer: {lista_alerta}")
 
-    # --- 5) Highlight seguro para el template (evita KeyError) ---
+    # --- 5) Highlight seguro para el template ---
     created_sku = (request.GET.get('created_sku') or '').strip()
     highlight_sku = (request.GET.get('hl') or '').strip() or created_sku
 
@@ -183,7 +199,7 @@ def inventario_view(request):
         'query': query,
         'today': hoy,
         'hoy_mas_15dias': int(time.mktime(hoy_mas_15.timetuple())),
-        'highlight_sku': highlight_sku,  # <-- siempre presente
+        'highlight_sku': highlight_sku,
     }
     return render(request, 'inventario/inventario.html', context)
 
@@ -192,16 +208,21 @@ def inventario_view(request):
 # Configurar logger
 logger = logging.getLogger(__name__)
 
+from django.urls import reverse
+
 @login_required
 @transaction.atomic
 def agregar_producto(request):
-    from django.urls import reverse
-    
     """
     Agrega un nuevo producto (o asocia uno existente) al inventario de la
     empresa del usuario. Tras guardar, redirige a una pantalla de decisión:
       /productos/post-creacion/<producto_id>/
     donde se pregunta si desea agregar lote, asociar proveedor o finalizar.
+
+    ✨ Nivel 1: Detección automática de "venta por peso" (cecina, queso, carnes, etc.)
+    La oferta se marcará sell_by_weight=True cuando el nombre/categoría del
+    producto lo sugieran. Además fija min_step_grams (5) y deja price_per_kg
+    en 0 para que luego pueda definirse (o ajustarse al cargar el primer lote).
     """
     # --- Validaciones iniciales: empresa y suscripción --------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
@@ -230,6 +251,20 @@ def agregar_producto(request):
         if form_prod.is_valid():
             sku = form_prod.cleaned_data.get('sku')
 
+            # -------- Heurística de venta por peso (nivel 1) --------
+            # Palabras clave típicas de venta a granel/gramos
+            KEYWORDS_PESO = [
+                "cecina", "queso", "jamón", "fiambre", "longaniza", "salame",
+                "salami", "mortadela", "arrechera", "vacuno", "cerdo", "pavo",
+                "pollo", "carne", "pescado", "jamon", "lomo", "entraña", "atun"
+            ]
+            # Categorías que suelen venderse por peso (ajusta a tus choices)
+            CATEGORIAS_PESO = [
+                "fiambres", "quesos", "carnes", "pescados", "charcutería",
+                "charcuteria", "frescos", "granel"
+            ]
+            # ---------------------------------------------------------
+
             try:
                 # 1) Crear o recuperar el Producto por SKU
                 producto, creado_producto = Producto.objects.get_or_create(
@@ -248,6 +283,47 @@ def agregar_producto(request):
                     producto=producto,
                     empresa=empresa_usuario
                 )
+
+                # ---- Detección automática: decidir si es "por peso" ----
+                # Tomamos nombre/categoría de lo recién ingresado o del producto
+                nombre_lower = (
+                    (form_prod.cleaned_data.get('nombre') or producto.nombre or "").lower()
+                )
+                categoria_val = form_prod.cleaned_data.get('categoria') or getattr(producto, 'categoria', "")
+                categoria_lower = str(categoria_val).lower()
+
+                es_por_peso = any(k in nombre_lower for k in KEYWORDS_PESO) or \
+                              any(c in categoria_lower for c in CATEGORIAS_PESO)
+
+                # Si detectamos que es por peso y aún no estaba configurado, lo activamos
+                campos_actualizar = []
+                if es_por_peso and not getattr(oferta, 'sell_by_weight', False):
+                    oferta.sell_by_weight = True
+                    campos_actualizar.append('sell_by_weight')
+
+                # Asegura redondeo por defecto (5g) si no existe o es 0
+                min_step = getattr(oferta, 'min_step_grams', 0) or 0
+                if es_por_peso and (min_step <= 0):
+                    oferta.min_step_grams = 5
+                    campos_actualizar.append('min_step_grams')
+
+                # price_per_kg lo dejamos en 0 para que luego se defina explícitamente
+                # (evitamos asignar un valor erróneo). Si quieres poner 1 como placeholder:
+                # oferta.price_per_kg = oferta.price_per_kg or 1
+                if es_por_peso and (getattr(oferta, 'price_per_kg', 0) or 0) <= 0:
+                    oferta.price_per_kg = 0
+                    campos_actualizar.append('price_per_kg')
+
+                if campos_actualizar:
+                    oferta.save(update_fields=campos_actualizar)
+                    messages.info(
+                        request,
+                        "Detectamos que «{0}» se vende por peso (gramos). "
+                        "Redondeo fijado en {1} g. "
+                        "Define el precio por kg al cargar el primer lote o en la pantalla de configuración."
+                        .format(producto.nombre, oferta.min_step_grams)
+                    )
+                # ---------------------------------------------------------
 
                 # 3) Redirección a PANTALLA DE PREGUNTA PREVIA
                 if creada_oferta:
@@ -343,12 +419,15 @@ def detalle_producto(request, producto_id):
 @login_required
 @transaction.atomic
 def agregar_lote_producto(request):
-    from django.urls import reverse
-    
     """
     Alta de Lote con preselección por ?producto_id= o ?sku=.
     - Si viene producto_id, se asocia automáticamente y al guardar redirige a flujo_opciones.
     - Si viene sku, mantiene el comportamiento clásico y redirige al inventario.
+
+    Nivel 2: Detección inteligente de "venta por peso" al guardar el lote:
+      - Si la oferta no tenía sell_by_weight=True pero el nombre/categoría lo sugiere,
+        se activa automáticamente, fija min_step_grams (5) y, si price_per_kg=0
+        y el form trae precio_venta>0, lo usa como precio/kg inicial.
     """
     empresa = obtener_empresa_del_usuario(request.user)
     if not empresa:
@@ -372,7 +451,64 @@ def agregar_lote_producto(request):
     # --- POST: guardar el lote ---
     if request.method == 'POST':
         form = LoteProductoForm(request.POST, empresa_usuario=empresa)
+
         if form.is_valid():
+            # Antes de guardar, aplicamos la detección inteligente sobre la oferta seleccionada
+            oferta_form = form.cleaned_data.get('producto')  # suele ser OfertaProducto
+            oferta_obj = oferta_form or oferta_seleccionada  # fallback por si viene prefijada
+
+            # Heurística simple por nombre/categoría
+            KEYWORDS_PESO = [
+                "cecina", "queso", "jamón", "jamon", "fiambre", "longaniza", "salame",
+                "salami", "mortadela", "vacuno", "cerdo", "pavo", "pollo", "carne",
+                "pescado", "atun", "charcutería", "charcuteria"
+            ]
+            CATEGORIAS_PESO = [
+                "fiambres", "quesos", "carnes", "pescados", "charcutería", "charcuteria", "frescos", "granel"
+            ]
+
+            if oferta_obj:
+                nombre_lower = (oferta_obj.producto.nombre or "").lower()
+                categoria_lower = str(getattr(oferta_obj.producto, 'categoria', "") or "").lower()
+
+                es_por_peso = any(k in nombre_lower for k in KEYWORDS_PESO) or \
+                              any(c in categoria_lower for c in CATEGORIAS_PESO)
+
+                campos_update = []
+                info_msgs = []
+
+                if es_por_peso and not getattr(oferta_obj, 'sell_by_weight', False):
+                    oferta_obj.sell_by_weight = True
+                    campos_update.append('sell_by_weight')
+                    info_msgs.append("venta por peso activada automáticamente")
+
+                min_step = getattr(oferta_obj, 'min_step_grams', 0) or 0
+                if es_por_peso and (min_step <= 0):
+                    oferta_obj.min_step_grams = 5
+                    campos_update.append('min_step_grams')
+                    info_msgs.append("redondeo fijado en 5 g")
+
+                # Si no hay precio/kg y el form trae precio_venta (>0), úsalo como inicial
+                precio_venta_lote = form.cleaned_data.get('precio_venta')
+                if es_por_peso and (getattr(oferta_obj, 'price_per_kg', 0) or 0) <= 0:
+                    try:
+                        pv = float(precio_venta_lote or 0)
+                    except (TypeError, ValueError):
+                        pv = 0.0
+                    if pv > 0:
+                        oferta_obj.price_per_kg = pv
+                        campos_update.append('price_per_kg')
+                        info_msgs.append(f"precio/kg inicial = ${int(pv)}")
+                # Guardamos cambios en la oferta si corresponde
+                if campos_update:
+                    oferta_obj.save(update_fields=campos_update)
+                    messages.info(
+                        request,
+                        f"FOCAL detectó {', '.join(info_msgs)} para «{oferta_obj.producto.nombre}». "
+                        "Ingrese la cantidad en gramos (ej.: 3000 para 3 kg)."
+                    )
+
+            # Guardar el lote
             lote = form.save()
             messages.success(request, f"Lote para '{lote.producto.producto.nombre}' agregado correctamente.")
 
@@ -387,6 +523,7 @@ def agregar_lote_producto(request):
                 sku_ok = sku
             inv = reverse('inventario')
             return redirect(f"{inv}?sku={sku_ok}#tab-gestionar" if sku_ok else inv)
+
         else:
             messages.error(request, "Revisa los errores del formulario.")
     else:

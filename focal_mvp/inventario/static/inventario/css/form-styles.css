@@ -1,6 +1,6 @@
 /* =====================================================
-   FOCAL – Estilos de Formularios (v2.0)
-   Actualizado para flujo de "Registrar Lote"
+   FOCAL – Estilos de Formularios (v2.1)
+   Para: Registrar Lote de Producto
    ===================================================== */
 
 /* ---------- Variables de marca ---------- */
@@ -13,7 +13,7 @@
   --page-bg:#F5EAFE;
   --white:#FFFFFF;
   --dark-text:#343A40;
-  --muted-text:#555;
+  --muted-text:#555555;
   --border-color:#E5E7EB;
   --turquoise:#0AE8C6;
   --shadow-s:0 2px 10px rgba(0,0,0,.06);
@@ -26,6 +26,29 @@
   --header-footer-bg:#2C0140;
 }
 
+/* ---------- Tipografías locales (opcional) ---------- */
+/* Ajusta rutas si usas fuentes locales en /static/inventario/fonts/ */
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight:800;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
+}
+
 /* ---------- Reset ---------- */
 *{ box-sizing:border-box; margin:0; padding:0; }
 html, body{ height:100%; scroll-behavior:smooth; }
@@ -36,7 +59,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header / Navbar ---------- */
 .app-header{
   background:var(--header-footer-bg);
   color:var(--white);
@@ -59,6 +82,7 @@ body{
   font-size:1.4rem;
   text-decoration:none;
   letter-spacing:0.5px;
+  font-family:var(--font-primary);
 }
 .nav-links{
   list-style:none;
@@ -79,7 +103,7 @@ body{
   border-color:rgba(255,255,255,.3);
 }
 
-/* ---------- Contenedor ---------- */
+/* ---------- Contenedor principal ---------- */
 .form-wrapper{
   padding:42px 18px 60px;
 }
@@ -220,12 +244,30 @@ textarea:focus{
   margin-bottom:16px;
   font-weight:600;
 }
+.alert-info{
+  background:var(--light-purple);
+  color:var(--primary-purple);
+  border:1px solid var(--secondary-purple);
+  padding:12px 14px;
+  border-radius:12px;
+  margin:10px 0 16px;
+  box-shadow:var(--shadow-s);
+}
 .error-message{
   display:block;
   margin-top:6px;
   color:#B42318;
   font-size:.85rem;
 }
+.hint{
+  display:block;
+  color:#555;
+  margin-top:6px;
+  font-size:.9rem;
+}
+
+/* ---------- Utilidades ---------- */
+.text-center{ text-align:center; }
 
 /* ---------- Footer ---------- */
 .app-footer{
