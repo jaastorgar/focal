@@ -1,0 +1,293 @@
+/* ------------------ Variables de marca ------------------ */
+:root{
+  --primary-purple:#4A008B;
+  --secondary-purple:#7B1FA2;
+  --light-purple:#F3E8FF;
+  --header-footer-bg:#2C0140;
+  --dark-text:#343A40;
+  --muted-text:#555555;
+  --white:#FFFFFF;
+  --hover-dark-purple:#38006B;
+  --hover-light-purple:#E0B3FF;
+  --turquoise:#0AE8C6;
+  --border-color:#e6e6e6;
+  --shadow-1:0 2px 10px rgba(0,0,0,.08);
+  --shadow-2:0 8px 22px rgba(0,0,0,.14);
+  --shadow-3:0 18px 44px rgba(0,0,0,.22);
+  --font-primary:'InterTight', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --font-secondary:'HankenGrotesk', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  /* Escalas fluidas */
+  --fs-xxs: clamp(0.80rem, 0.73rem + 0.30vw, 0.90rem);
+  --fs-xs : clamp(0.90rem, 0.82rem + 0.40vw, 1.00rem);
+  --fs-sm : clamp(0.95rem, 0.85rem + 0.55vw, 1.05rem);
+  --fs-md : clamp(1.05rem, 0.90rem + 0.80vw, 1.15rem);
+  --fs-lg : clamp(1.20rem, 1.00rem + 1.20vw, 1.40rem);
+  --fs-xl : clamp(1.45rem, 1.15rem + 1.80vw, 1.90rem);
+}
+
+/* ---------------------- Tipografías ---------------------- */
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
+  font-weight:800;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'InterTight';
+  src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:'HankenGrotesk';
+  src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
+  font-weight:300;font-style:normal;font-display:swap;
+}
+
+/* ---------------------- Layout base ---------------------- */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family:var(--font-primary);
+  color:var(--dark-text);
+  background: linear-gradient(180deg, #fff 0%, var(--light-purple) 100%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.wrap{
+  width: 100%;
+  max-width: 960px;              /* más aire en desktop */
+  margin: clamp(16px, 2.8vw, 40px) auto;
+  padding: 0 clamp(12px, 3.5vw, 24px);
+}
+
+.card{
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-2);
+  padding: clamp(16px, 3.4vw, 28px);
+}
+
+/* -------------------- Titulares & textos -------------------- */
+h1{
+  margin: 0 0 6px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--primary-purple);
+  font-family: var(--font-primary);
+  font-size: var(--fs-xl);
+  line-height: 1.15;
+}
+
+p.subtitle{
+  margin: 0 0 18px;
+  color: var(--muted-text);
+  font-family: var(--font-secondary);
+  line-height: 1.5;
+  font-size: var(--fs-sm);
+}
+
+/* ------------------------ Formulario ------------------------ */
+form .row{
+  display: grid;
+  grid-template-columns: 1fr;        /* mobile first: una columna */
+  gap: 12px;
+}
+form .row.single{ grid-template-columns: 1fr; }
+
+@media (min-width: 560px){
+  form .row{ grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 840px){
+  form .row{ gap: 16px; }
+}
+
+label{
+  display:block;
+  font-size: var(--fs-xs);
+  color: var(--muted-text);
+  margin: 6px 0;
+  font-family: var(--font-secondary);
+}
+
+input[type="text"],
+input[type="number"]{
+  width: 100%;
+  padding: clamp(10px, 1.8vw, 14px) clamp(12px, 2.2vw, 16px);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  color: var(--dark-text);
+  outline: none;
+  font-family: var(--font-secondary);
+  font-size: var(--fs-sm);
+  transition: box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
+}
+
+input::placeholder{ color:#999; }
+
+input:focus{
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 4px rgba(74,0,139,.12), 0 0 0 1px var(--primary-purple) inset;
+  background: #fff;
+}
+
+/* ------------------------- Botones ------------------------- */
+.btnbar{
+  display:flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;                 /* para evitar overflow en móviles */
+}
+
+button{
+  cursor:pointer;
+  border:none;
+  border-radius:12px;
+  padding: clamp(10px, 1.8vw, 14px) clamp(14px, 2.6vw, 18px);
+  font-weight:700;
+  font-family: var(--font-primary);
+  font-size: var(--fs-sm);
+  transition: transform .06s ease, box-shadow .2s ease, background-color .15s ease, color .15s ease;
+  will-change: transform;
+}
+
+.btn-primary{
+  background: var(--primary-purple);
+  color: var(--white);
+  box-shadow: var(--shadow-1);
+}
+.btn-primary:hover{ background: var(--hover-dark-purple); transform: translateY(-1px); }
+.btn-primary:active{ transform: translateY(0); }
+
+.btn-ghost{
+  background: transparent;
+  color: var(--primary-purple);
+  border: 1px dashed var(--secondary-purple);
+}
+.btn-ghost:hover{
+  background: var(--hover-light-purple);
+  color: var(--header-footer-bg);
+}
+
+/* ------------------------- Ayudas -------------------------- */
+.helper{
+  margin-top:10px;
+  font-size: var(--fs-xs);
+  color: var(--muted-text);
+  font-family: var(--font-secondary);
+}
+
+/* ------------------------ Preview box ---------------------- */
+.preview{
+  margin-top:14px;
+  padding: clamp(12px, 2.4vw, 16px);
+  border-radius:12px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-1);
+}
+
+.preview .ok{ color: var(--primary-purple); font-weight:800; }
+.preview .warn{ color:#D7263D; font-weight:800; }
+
+.badge{
+  display:inline-block;
+  padding: 4px 8px;
+  border-radius:999px;
+  font-size: var(--fs-xxs);
+  background: var(--light-purple);
+  color: var(--primary-purple);
+  border: 1px solid var(--secondary-purple);
+  font-family: var(--font-secondary);
+}
+
+.muted{ color: var(--muted-text); font-size: var(--fs-xs); }
+
+.grid2{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+@media (min-width: 560px){
+  .grid2{ grid-template-columns: 1fr 1fr; }
+}
+
+.hr{
+  height:1px;
+  background: var(--border-color);
+  margin:12px 0;
+}
+
+#calcLine{ font-size: var(--fs-sm); }
+
+/* ------------------------- Mensajes ------------------------ */
+.messages{ margin-bottom:12px; }
+.msg{
+  padding:10px 12px;
+  border-radius:10px;
+  margin:8px 0;
+  font-size: var(--fs-xs);
+  font-family: var(--font-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.msg.ok{
+  background: #E9FDF8; /* suave con turquesa */
+  border-color: #BFF7EC;
+  color: #10796B;
+}
+.msg.err{
+  background: #FFEDEE;
+  border-color: #FFC9CE;
+  color: #9B1C28;
+}
+
+/* -------------------- Focus visible / A11y -------------------- */
+:focus-visible{
+  outline: 3px solid var(--turquoise);
+  outline-offset: 2px;
+}
+
+/* Respeto a usuarios con reducción de movimiento */
+@media (prefers-reduced-motion: reduce){
+  *{ scroll-behavior: auto !important; }
+  button{ transition: none; }
+}
+
+/* ------------------ Header/Footer (opcional) ------------------ */
+.header, .footer{
+  background: var(--header-footer-bg);
+  color: var(--white);
+  padding: 12px 16px;
+  border-radius: 14px;
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-primary);
+}
+
+/* ---------------------- Utilidades pequeñas ---------------------- */
+.text-right{ text-align:right; }
+.text-center{ text-align:center; }
+.hidden{ display:none !important; }
+
+/* ---------------------- Breakpoints extra ---------------------- */
+/* Tablets en modo paisaje */
+@media (min-width: 768px){
+  .wrap{ max-width: 960px; }
+  .card{ border-radius: 18px; }
+}
+
+/* Desktop amplio */
+@media (min-width: 1024px){
+  .wrap{ max-width: 1080px; }
+  h1{ letter-spacing: .3px; }
+}

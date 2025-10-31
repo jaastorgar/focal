@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Salida por monto (cecina) | FOCAL</title>
+
+  <!-- Archivos estáticos -->
+  <link rel="stylesheet" href="{% static 'inventario/css/salida_cecina_monto.css' %}">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Salida por monto (cecina)</h1>
+    <p class="subtitle">Convierte <b>CLP</b> a <b>gramos</b> según el <b>precio por kg</b> del SKU y descuenta por <span class="badge">FEFO</span>.</p>
+
+    <div class="messages">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="msg {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <form method="post" id="form-salida" action="">
+      {% csrf_token %}
+
+      <div class="row single">
+        <div>
+          <label>SKU (código de barras)</label>
+          <input type="text" name="sku" id="sku" value="{{ sku_prefill|default:'' }}" placeholder="Ej: 7801234567890" required />
+          <div class="helper">
+            {% if producto_nombre %}
+              Producto: <b>{{ producto_nombre }}</b>
+            {% else %}
+              Ingresa el SKU y presiona <span class="badge">Enter</span> para previsualizar (o agrega <code>?sku=...</code> a la URL).
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Monto pagado (CLP)</label>
+          <input type="number" name="amount_clp" id="amount_clp" min="1" step="1" placeholder="Ej: 2000" required />
+        </div>
+        <div>
+          <label>Nota (opcional)</label>
+          <input type="text" name="nota" id="nota" placeholder="Observación o ajuste" />
+        </div>
+      </div>
+
+      <div class="preview" id="preview"
+           data-precio-kg="{{ precio_por_kg|default:'0' }}"
+           data-min-step="{{ min_step_grams|default:'5' }}">
+        <div class="grid2">
+          <div>
+            <div class="muted">Precio vigente</div>
+            <div><b>$<span id="precioKgLabel">{{ precio_por_kg|default:'0' }}</span></b> / kg</div>
+          </div>
+          <div>
+            <div class="muted">Redondeo</div>
+            <div><b><span id="stepLabel">{{ min_step_grams|default:'5' }}</span> g</b></div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div id="calcLine" class="muted">
+          Escribe un monto para calcular los gramos sugeridos.
+        </div>
+      </div>
+
+      <div class="btnbar">
+        <button type="submit" class="btn-primary">Confirmar salida</button>
+        <button type="button" class="btn-ghost" id="btnPreviewSKU">Previsualizar SKU</button>
+      </div>
+
+      <p class="tips">
+        • Si el corte real difiere, puedes ajustar la nota. <br/>
+        • El sistema descarga del(los) lote(s) con vencimiento más próximo (FEFO). <br/>
+        • Stock insuficiente detendrá la operación con mensaje.
+      </p>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'inventario/js/salida_cecina_monto.js' %}"></script>
+</body>
+</html>

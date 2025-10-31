@@ -238,7 +238,7 @@ def agregar_producto(request):
                         'nombre': form_prod.cleaned_data.get('nombre'),
                         'marca': form_prod.cleaned_data.get('marca'),
                         'categoria': form_prod.cleaned_data.get('categoria'),
-                        'gramage': form_prod.cleaned_data.get('gramage'),
+                        'gramaje': form_prod.cleaned_data.get('gramaje'),
                         'unidad_medida': form_prod.cleaned_data.get('unidad_medida'),
                     }
                 )
@@ -633,6 +633,81 @@ def ajustar_stock(request, producto_id):
         return redirect('inventario')
 
     return redirect('inventario')
+
+from .services import venta_cecina_por_monto
+from django.core.exceptions import ValidationError
+
+@login_required
+@transaction.atomic
+def salida_cecina_por_monto_view(request):
+    """
+    GET: permite previsualizar precio/kg y producto al ingresar SKU (querystring ?sku=...)
+    POST: confirma la salida por monto (CLP → gramos).
+    """
+    empresa = obtener_empresa_del_usuario(request.user)
+    if not empresa:
+        messages.error(request, "Tu cuenta no está asociada a una empresa válida.")
+        return redirect('home')
+
+    context = {
+        "sku_prefill": (request.GET.get('sku') or '').strip(),
+        "producto_nombre": "",
+        "precio_por_kg": None,
+        "min_step_grams": 5,
+    }
+
+    # Si viene ?sku=... por GET, pre-carga datos para el preview
+    if context["sku_prefill"]:
+        try:
+            producto = get_object_or_404(Producto, sku=context["sku_prefill"], empresas=empresa)
+            oferta = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa)
+            context["producto_nombre"] = producto.nombre
+            context["precio_por_kg"] = float(oferta.price_per_kg or 0)
+            context["min_step_grams"] = int(oferta.min_step_grams or 5)
+        except Exception:
+            pass  # si falla, simplemente no hay preview
+
+    if request.method == 'POST':
+        sku = (request.POST.get('sku') or '').strip()
+        try:
+            amount = int(request.POST.get('amount_clp') or '0')
+        except ValueError:
+            amount = 0
+        nota = (request.POST.get('nota') or '').strip()
+
+        if not sku:
+            messages.error(request, "Ingresa el SKU (código de barras).")
+            return render(request, 'inventario/salida_cecina_monto.html', context)
+
+        if amount <= 0:
+            messages.error(request, "Ingresa un monto válido en CLP (entero positivo).")
+            context["sku_prefill"] = sku
+            return render(request, 'inventario/salida_cecina_monto.html', context)
+
+        producto = get_object_or_404(Producto, sku=sku, empresas=empresa)
+        oferta = get_object_or_404(OfertaProducto, producto=producto, empresa=empresa)
+
+        try:
+            result = venta_cecina_por_monto(oferta.id, amount, request.user, nota=nota)
+            g = result['grams_final']
+            p = result['price_per_kg']
+            messages.success(
+                request,
+                f"Salida registrada: ${amount:,} → {g} g de «{producto.nombre}» (a ${p:,.0f}/kg)."
+            )
+            return redirect('inventario')  # ajusta a tu vista de inventario
+        except (ValidationError, Exception) as e:
+            messages.error(request, f"No se pudo registrar la salida: {e}")
+            # Mantén el preview en el re-render
+            context.update({
+                "sku_prefill": sku,
+                "producto_nombre": producto.nombre,
+                "precio_por_kg": float(oferta.price_per_kg or 0),
+                "min_step_grams": int(oferta.min_step_grams or 5),
+            })
+            return render(request, 'inventario/salida_cecina_monto.html', context)
+
+    return render(request, 'inventario/salida_cecina_monto.html', context)
 
 # --- Vistas de Utilidades, Perfil y Sesión ---
 

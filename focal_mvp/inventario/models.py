@@ -585,6 +585,9 @@ class OfertaProducto(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+    sell_by_weight = models.BooleanField(default=False)
+    price_per_kg = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    min_step_grams = models.IntegerField(default=5)
     activo = models.BooleanField(default=True)
 
     class Meta:
