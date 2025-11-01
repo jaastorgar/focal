@@ -61,7 +61,7 @@ body{
 
 /* ---------- Header / Navbar ---------- */
 .app-header{
-  background:var(--header-footer-bg);
+  background:var(--primary-purple);
   color:var(--white);
   position:sticky;
   top:0;
@@ -271,7 +271,7 @@ textarea:focus{
 
 /* ---------- Footer ---------- */
 .app-footer{
-  background:var(--header-footer-bg);
+  background:var(--primary-purple);
   color:#EDE7F6;
   text-align:center;
   padding:28px 16px;
