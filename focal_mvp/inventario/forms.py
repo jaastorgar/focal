@@ -361,4 +361,21 @@ class RecordatorioForm(forms.ModelForm):
         if proxima_fecha_ejecucion < fecha_primera_ejecucion:
             raise forms.ValidationError("La próxima fecha de ejecución no puede ser anterior a la fecha de primera ejecución.")
         
-        return cleaned_data    
+        return cleaned_data
+
+class AlmaceneroProfileForm(forms.Form):
+    nombres = forms.CharField(max_length=25, required=False, label="Nombres")
+    apellidos = forms.CharField(max_length=25, required=False, label="Apellidos")
+    telefono = forms.CharField(max_length=20, required=False, label="Teléfono")
+    direccion = forms.CharField(max_length=255, required=False, label="Dirección")
+    region = forms.CharField(max_length=100, required=False, label="Región")
+    comuna = forms.CharField(max_length=100, required=False, label="Comuna")
+
+class PlanSelectForm(forms.Form):
+    from .models import PlanSuscripcion
+    plan = forms.ModelChoiceField(
+        queryset=PlanSuscripcion.objects.all().order_by("precio"),
+        required=True,
+        empty_label=None,
+        label="Selecciona tu plan"
+    )

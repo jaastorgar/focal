@@ -1,0 +1,63 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Completa tu perfil | FOCAL</title>
+  <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
+</head>
+<body>
+  <main class="form-wrapper">
+    <div class="form-card">
+      <h1>¡Bienvenido! Completa tu perfil</h1>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <fieldset>
+          <legend>Datos del Almacenero</legend>
+          {{ f_user.non_field_errors }}
+          <div class="form-grid">
+            {% for field in f_user %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                <small class="error-message">{{ field.errors|striptags }}</small>
+              </div>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Datos de la Empresa</legend>
+          {{ f_emp.non_field_errors }}
+          <div class="form-grid">
+            {% for field in f_emp %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                <small class="error-message">{{ field.errors|striptags }}</small>
+              </div>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Plan</legend>
+          {{ f_plan.non_field_errors }}
+          <div class="form-group">
+            <label for="{{ f_plan.plan.id_for_label }}">{{ f_plan.plan.label }}</label>
+            {{ f_plan.plan }}
+            <small class="hint">Podrás cambiar tu plan más adelante.</small>
+          </div>
+        </fieldset>
+
+        <div class="form-actions">
+          <a href="{% url 'home' %}" class="btn btn-outline-secondary">Omitir por ahora</a>
+          <button class="btn btn-submit" type="submit">Guardar y continuar</button>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

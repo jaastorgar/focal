@@ -7,7 +7,7 @@ from .views import (
     obtener_datos_sku_api, agregar_proveedor, lista_recordatorios, agregar_recordatorio, 
     editar_recordatorio, eliminar_recordatorio, completar_recordatorio, descontar_producto_view, 
     metrics_view, flujo_opciones, producto_resumen, post_creacion_producto, ajustar_stock,
-    salida_cecina_por_monto_view
+    salida_cecina_por_monto_view, post_login_router, onboarding_inicial
 )
 
 urlpatterns = [
@@ -40,4 +40,6 @@ urlpatterns = [
     path('productos/post-creacion/<int:producto_id>/', post_creacion_producto, name='post_creacion_producto'),
     path('inventario/ajustar-stock/<int:producto_id>/', ajustar_stock, name='ajustar_stock'),
     path('inventario/salida-cecina-monto/', salida_cecina_por_monto_view, name='salida_cecina_monto'),
+    path("post-login/", post_login_router, name="post_login_router"),
+    path("onboarding/", onboarding_inicial, name="onboarding_inicial"),
 ]

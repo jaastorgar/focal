@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from datetime import date
+from django.db.models import Q
 
 # ===========================
 # DEFINICIÓN DE REGIONES Y COMUNAS POR REGIÓN
@@ -476,7 +477,11 @@ class Almacenero(AbstractUser):
     email = models.EmailField('correo electrónico', unique=True)
     nombres = models.CharField(max_length=25, blank=True)
     apellidos = models.CharField(max_length=25, blank=True)
-    run = models.CharField(max_length=12, unique=True)
+    run = models.CharField(
+        max_length=12,
+        null=True, blank=True, default=None,
+        db_index=True
+    )
     telefono = models.CharField(max_length=20, blank=True)
     direccion = models.CharField(max_length=255, blank=True)
     comuna = models.CharField(max_length=100, choices=COMUNA_CHOICES, default='', blank=True)
@@ -489,9 +494,9 @@ class Almacenero(AbstractUser):
         blank=True,
         related_name='almaceneros'
     )
-
+    
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nombres', 'apellidos', 'run']
+    REQUIRED_FIELDS = []
 
     objects = AlmaceneroManager()
 
@@ -500,15 +505,27 @@ class Almacenero(AbstractUser):
 
     def clean(self):
         super().clean()
+        # Normaliza: si llega '', guárdalo como None
+        if self.run == '':
+            self.run = None
+
         if self.region and not self.comuna:
             raise ValidationError({'comuna': 'Debe seleccionar una comuna de la región elegida.'})
         if self.comuna and not self.region:
             raise ValidationError({'region': 'Debe seleccionar una región primero.'})
         if self.region and self.comuna:
-            # Validar que la comuna pertenezca a la región
             comunas_validas = [c[0] for c in REGIONES_COMUNAS.get(self.region, [])]
             if self.comuna not in comunas_validas:
                 raise ValidationError({'comuna': f'La comuna "{self.comuna}" no pertenece a la región "{self.region}".'})
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['run'],
+                name='uniq_almacenero_run_not_null',
+                condition=~Q(run__isnull=True),
+            )
+        ]
 
 # ===========================
 # MODELO EMPRESA

@@ -14,7 +14,10 @@ from .forms import (
     LoteProductoForm, 
     OfertaProductoForm,
     ProveedorForm,
-    RecordatorioForm
+    RecordatorioForm,
+    AlmaceneroProfileForm,
+    PlanSelectForm,
+    EmpresaForm
 )
 
 # Se importan los modelos correctos
@@ -1448,3 +1451,103 @@ def metrics_view(request):
         "today": hoy,
     }
     return render(request, "inventario/metrics.html", context)
+
+@login_required
+def post_login_router(request):
+    """
+    Si falta empresa o plan => onboarding.
+    Si está todo ok => home.
+    """
+    user = request.user
+    if not getattr(user, "empresa_id", None):
+        return redirect('onboarding_inicial')
+
+    tiene_plan = SuscripcionUsuario.objects.filter(
+        empresa=user.empresa, activa=True
+    ).exists()
+
+    if not tiene_plan:
+        return redirect('onboarding_inicial')  # mismo flujo con selección de plan
+
+    # Todo ok
+    return redirect('home')
+
+@login_required
+@transaction.atomic
+def onboarding_inicial(request):
+    """
+    Permite completar/editar datos del usuario y su empresa
+    y seleccionar un plan (si no lo tiene). Se usa al primer login o si falta algo.
+    """
+    user = request.user
+
+    # Instancias iniciales
+    empresa = getattr(user, "empresa", None)
+    if not empresa:
+        from .models import Empresa
+        empresa = Empresa()  # temporal (no guardada aún)
+
+    if request.method == "POST":
+        f_user = AlmaceneroProfileForm(request.POST)
+        f_emp = EmpresaForm(request.POST, instance=empresa if empresa.pk else None)
+        f_plan = PlanSelectForm(request.POST)
+
+        if f_user.is_valid() and f_emp.is_valid() and f_plan.is_valid():
+            # 1) Usuario
+            cd = f_user.cleaned_data
+            changed = []
+            for field in ["nombres", "apellidos", "telefono", "direccion", "region", "comuna"]:
+                val = cd.get(field)
+                if getattr(user, field, None) != val:
+                    setattr(user, field, val)
+                    changed.append(field)
+            if changed:
+                user.save(update_fields=changed)
+
+            # 2) Empresa (crea si no existe)
+            empresa = f_emp.save(commit=False)
+            if not empresa.pk:
+                empresa.save()
+            else:
+                empresa.save()
+
+            # vincular user.empresa si hacía falta
+            if getattr(user, "empresa_id", None) != empresa.pk:
+                user.empresa = empresa
+                user.save(update_fields=["empresa"])
+
+            # 3) Plan (si no existe activo)
+            plan = f_plan.cleaned_data["plan"]
+            if not SuscripcionUsuario.objects.filter(empresa=empresa, activa=True).exists():
+                SuscripcionUsuario.objects.create(empresa=empresa, plan=plan, activa=True)
+
+            messages.success(request, "¡Listo! Tu información y plan quedaron configurados.")
+            return redirect('home')
+        else:
+            messages.error(request, "Revisa los campos del formulario.")
+    else:
+        initial_user = {
+            "nombres": getattr(user, "nombres", ""),
+            "apellidos": getattr(user, "apellidos", ""),
+            "telefono": getattr(user, "telefono", ""),
+            "direccion": getattr(user, "direccion", ""),
+            "region": getattr(user, "region", ""),
+            "comuna": getattr(user, "comuna", ""),
+        }
+        f_user = AlmaceneroProfileForm(initial=initial_user)
+        f_emp = EmpresaForm(instance=empresa if empresa.pk else None)
+        # Preselecciona un plan “free” si existe
+        f_plan = PlanSelectForm()
+        try:
+            from .models import Plan
+            free = Plan.objects.filter(codigo__iexact="free", activo=True).first()
+            if free:
+                f_plan.fields["plan"].initial = free.pk
+        except Exception:
+            pass
+
+    return render(request, "inventario/onboarding_inicial.html", {
+        "f_user": f_user,
+        "f_emp": f_emp,
+        "f_plan": f_plan,
+    })

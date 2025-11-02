@@ -1,7 +1,7 @@
 # focal_project/settings.py
 
 from pathlib import Path
-from decouple import config, Csv
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,10 +43,10 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     'landing',
-    'inventario',
     'rest_framework',
     'widget_tweaks',
     'finanza',
+    "inventario.apps.InventarioConfig",
 ]
 
 AUTH_USER_MODEL = 'inventario.Almacenero'
@@ -62,9 +62,10 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "optional" 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "/"
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+DEBUG = True
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 
 # Si tu User usa email como identificador, mantén esto:
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -76,13 +77,20 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 # Para que el correo del link sea el tuyo:
 DEFAULT_FROM_EMAIL = "FOCAL <plataforma.focal@gmail.com>"
 
+LOGIN_REDIRECT_URL = 'post_login_router'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 # Proveedor Google (scopes básicos)
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"access_type": "online"},
+        "AUTH_PARAMS": {"prompt": "consent", "access_type": "online"},
     }
 }
+
+# Nuestros adapters (nuevo)
+ACCOUNT_ADAPTER = "inventario.adapters.FocalAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "inventario.adapters.FocalSocialAdapter"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
