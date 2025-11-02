@@ -2,74 +2,85 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Producto | FOCAL</title>
-    <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Producto | FOCAL</title>
+  <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'inventario/css/form-styles.css' %}">
 </head>
 <body>
-    <header class="app-header">
-        <nav class="container">
-            <a href="{% url 'home' %}" class="logo">FOCAL</a>
-            <ul class="nav-links">
-                <li><a href="{% url 'home' %}">Inicio</a></li>
-                <li><a href="{% url 'inventario' %}">Inventario</a></li>
-            </ul>
-        </nav>
-    </header>
+  <!-- NAVBAR -->
+  <header class="app-header">
+    <nav class="container">
+      <a href="{% url 'home' %}" class="logo">FOCAL</a>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Inicio</a></li>
+        <li><a href="{% url 'inventario' %}">Inventario</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <main class="form-wrapper">
-        <div class="form-card">
-            <h1>Editar Producto y Oferta</h1>
-            
-            <form method="post">
-                {% csrf_token %}
-                
-                <h2>Datos del Producto</h2>
-                {% if form_prod.non_field_errors %}
-                    <div class="alert-error">{{ form_prod.non_field_errors|striptags }}</div>
-                {% endif %}
-                {% for field in form_prod %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <small class="error-message">{{ field.errors|striptags }}</small>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+  <!-- CONTENIDO -->
+  <main class="form-wrapper">
+    <div class="form-card">
+      <h1>Editar Producto</h1>
 
-                <hr>
+      <form method="post" novalidate>
+        {% csrf_token %}
 
-                <h2>Mi Oferta de Precios (Precio Base de Venta)</h2>
-                {% if form_oferta.non_field_errors %}
-                    <div class="alert-error">{{ form_oferta.non_field_errors|striptags }}</div>
-                {% endif %}
-                <div style="display:none;">{{ form_oferta.empresa }}</div>
-                
-                <!-- Campo nuevo: Precio base de venta -->
-                <div class="form-group">
-                    <label for="{{ form_oferta.precio_venta_base.id_for_label }}">{{ form_oferta.precio_venta_base.label }}</label>
-                    {{ form_oferta.precio_venta_base }}
-                    <small class="form-text text-muted">
-                        Precio de venta sugerido/referencia para este producto en tu inventario.
-                    </small>
-                    {% if form_oferta.precio_venta_base.errors %}
-                        <small class="error-message">{{ form_oferta.precio_venta_base.errors|striptags }}</small>
-                    {% endif %}
-                </div>
+        <!-- DATOS DEL PRODUCTO -->
+        <h2>Datos del Producto</h2>
+        {% if form_prod.non_field_errors %}
+          <div class="alert-error">{{ form_prod.non_field_errors|striptags }}</div>
+        {% endif %}
 
-                <div class="form-actions">
-                    <a href="{% url 'gestionar_proveedores_precios' %}" class="btn btn-cancel" role="button">Cancelar</a>
-                    <button type="submit" class="btn btn-submit">Guardar Cambios</button>
-                </div>
-            </form>
+        {% for field in form_prod %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <small class="error-message">{{ field.errors|striptags }}</small>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <hr>
+
+        {# OFERTA / PRECIOS — sin título ni texto explicativo #}
+        {% if form_oferta.non_field_errors %}
+          <div class="alert-error">{{ form_oferta.non_field_errors|striptags }}</div>
+        {% endif %}
+
+        <div style="display:none;">
+          {{ form_oferta.empresa }}
         </div>
-    </main>
 
-    <footer class="app-footer">
-        <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
-    </footer>
+        <div class="form-group">
+          <label for="{{ form_oferta.precio_venta_base.id_for_label }}">
+            {{ form_oferta.precio_venta_base.label }}
+          </label>
+          {{ form_oferta.precio_venta_base }}
+          {% if form_oferta.precio_venta_base.errors %}
+            <small class="error-message">{{ form_oferta.precio_venta_base.errors|striptags }}</small>
+          {% endif %}
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="form-actions">
+          <a href="{% url 'flujo_opciones' producto.id %}" class="btn btn-outline-secondary" role="button">
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-submit">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>&copy; {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
+  </footer>
 </body>
 </html>

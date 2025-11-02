@@ -7,26 +7,46 @@
   <title>Opciones del Producto | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
   <link rel="stylesheet" href="{% static 'inventario/css/opciones-producto.css' %}">
+  <!-- ✅ Librería de íconos profesionales -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 <body>
   <main class="container py-4">
-    <h2 class="mb-3 text-center">¿Qué deseas hacer con <strong>{{ producto.nombre }}</strong>?</h2>
+    <h2 class="mb-3 text-center" style="font-family:var(--font-primary);color:var(--header-footer-bg);">
+      ¿Qué deseas hacer con <strong>{{ producto.nombre }}</strong>?
+    </h2>
 
     <div class="d-flex flex-column align-items-center gap-3 mt-4">
-      <a href="{% url 'agregar_lote' %}?producto_id={{ producto.id }}" class="btn btn-outline-primary w-50">
-        ➕ Agregar otro lote
+      <!-- Agregar otro lote -->
+      <a href="{% url 'agregar_lote' %}?producto_id={{ producto.id }}" class="btn btn-outline-primary w-50 d-flex align-items-center justify-content-center gap-2">
+        <i class="bi bi-box-seam-fill"></i> Agregar otro lote
       </a>
-      <a href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}" class="btn btn-outline-secondary w-50">
-        🧾 Asociar proveedor
+
+      <!-- Asociar proveedor -->
+      <a href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}" class="btn btn-outline-secondary w-50 d-flex align-items-center justify-content-center gap-2">
+        <i class="bi bi-file-earmark-text"></i> Asociar proveedor
       </a>
-      <a href="{% url 'producto_resumen' producto.id %}" class="btn btn-success w-50">
-        ✅ Ver resumen del producto
+
+      <!-- Ver resumen del producto -->
+      <a href="{% url 'producto_resumen' producto.id %}" class="btn btn-success w-50 d-flex align-items-center justify-content-center gap-2">
+        <i class="bi bi-bar-chart-line-fill"></i> Ver resumen del producto
       </a>
-      <a href="{% url 'inventario' %}" class="btn btn-link mt-2">⬅️ Volver al inventario</a>
+
+      <!-- Editar producto -->
+      <a href="{% url 'editar_producto' producto.id %}" class="btn w-50 d-flex align-items-center justify-content-center gap-2"
+         style="background-color:var(--turquoise);color:var(--header-footer-bg);font-weight:600;">
+        <i class="bi bi-pencil-square"></i> Editar producto
+      </a>
+
+      <!-- Volver al inventario -->
+      <a href="{% url 'inventario' %}" class="btn btn-link mt-2 d-flex align-items-center justify-content-center gap-2" style="color:var(--secondary-purple);">
+        <i class="bi bi-arrow-left-circle"></i> Volver al inventario
+      </a>
     </div>
   </main>
 
-  <footer class="text-center mt-5 mb-3" style="color:var(--muted-text);font-family:var(--font-secondary);">
+  <footer class="text-center mt-5 mb-3"
+          style="color:var(--muted-text);font-family:var(--font-secondary);">
     © {% now "Y" %} FOCAL. Todos los derechos reservados.
   </footer>
 </body>
