@@ -10,9 +10,10 @@
   <!-- Iconos -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-  <!-- Estilos de la tabla / página -->
+  <!-- Estilos -->
   <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}"/>
 
+  <!-- Utilidades -->
   <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}"/>
   <meta name="highlight-sku" content="{{ request.GET.hl|default:highlight_sku|default:'' }}"/>
 </head>
@@ -51,21 +52,19 @@
   <h1>Inventario</h1>
 
   {% if productos %}
+    <!-- Buscador / Acciones superiores -->
     <div class="search-section">
       <form method="GET" action="{% url 'inventario' %}" class="search-form">
         <input class="search-input" type="search" name="q" placeholder="Buscar por nombre, sku, marca..." aria-label="Buscar" value="{{ query|default:'' }}">
 
-        <!-- Buscar -->
         <button class="search-button" type="submit" aria-label="Buscar" title="Buscar">
           <i class="bi bi-search" aria-hidden="true"></i>
         </button>
 
-        <!-- Agregar producto -->
         <a href="{% url 'agregar-producto' %}" class="search-button" aria-label="Agregar producto" title="Agregar producto">
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
         </a>
 
-        <!-- Agregar proveedor -->
         <a href="{% url 'agregar_proveedor' %}" class="search-button search-button--provider"
            aria-label="Agregar proveedor" title="Agregar proveedor">
           <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
@@ -77,6 +76,7 @@
       </form>
     </div>
 
+    <!-- Tabla -->
     <div class="table-container">
       <table class="tabla-inventario" id="tablaInventario">
         <thead>
@@ -106,47 +106,70 @@
             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
 
             <td class="acciones">
-              {% if producto.sell_by_weight %}
-                <!-- 🧠 Producto por peso: solo mostrar botón de monto -->
-                <a href="{% url 'salida_cecina_monto' %}?sku={{ producto.sku }}"
-                   class="btn icon-btn icon-btn--cash"
-                   title="Descontar por monto ($→g)" aria-label="Descontar por monto">
-                  <i class="bi bi-cash-coin" aria-hidden="true"></i>
+              {% comment %}
+                has_lotes: True si hay al menos 1 lote. En Django, 0 es False y >0 es True,
+                así que podemos usar 'if producto.cantidad_lotes'.
+              {% endcomment %}
+              {% with has_lotes=producto.cantidad_lotes %}
+
+                {% if producto.sell_by_weight %}
+                  {# ========= Producto PEsable ========= #}
+                  {% if has_lotes %}
+                    <a href="{% url 'salida_cecina_monto' %}?sku={{ producto.sku }}"
+                       class="btn icon-btn icon-btn--cash"
+                       title="Descontar por monto ($→g)" aria-label="Descontar por monto">
+                      <i class="bi bi-cash-coin" aria-hidden="true"></i>
+                    </a>
+                  {% else %}
+                    <a href="#"
+                       class="btn icon-btn icon-btn--cash is-disabled"
+                       aria-disabled="true" tabindex="-1"
+                       title="Sin lotes registrados">
+                      <i class="bi bi-cash-coin" aria-hidden="true"></i>
+                    </a>
+                  {% endif %}
+                {% else %}
+                  {# ========= Producto POR UNIDAD ========= #}
+                  <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="operacion" value="sumar">
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit"
+                            class="btn icon-btn"
+                            {% if not has_lotes %}disabled aria-disabled="true" title="Sin lotes registrados"{% else %}title="Sumar 1"{% endif %}
+                            aria-label="Sumar 1">
+                      <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    </button>
+                  </form>
+
+                  <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="operacion" value="restar">
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit"
+                            class="btn icon-btn"
+                            {% if not has_lotes %}disabled aria-disabled="true" title="Sin lotes registrados"{% else %}title="Restar 1"{% endif %}
+                            aria-label="Restar 1">
+                      <i class="bi bi-dash-lg" aria-hidden="true"></i>
+                    </button>
+                  </form>
+                {% endif %}
+
+                <!-- 🗑 Eliminar (SIEMPRE disponible) -->
+                <a href="{% url 'eliminar_producto' producto.id %}"
+                   class="btn icon-btn icon-btn--danger"
+                   title="Eliminar producto" aria-label="Eliminar producto">
+                  <i class="bi bi-trash3" aria-hidden="true"></i>
                 </a>
-              {% else %}
-                <!-- Producto por unidad: mostrar + y − -->
-                <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
-                  {% csrf_token %}
-                  <input type="hidden" name="operacion" value="sumar">
-                  <input type="hidden" name="cantidad" value="1">
-                  <button type="submit" class="btn icon-btn" title="Sumar 1" aria-label="Sumar 1">
-                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                  </button>
-                </form>
 
-                <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
-                  {% csrf_token %}
-                  <input type="hidden" name="operacion" value="restar">
-                  <input type="hidden" name="cantidad" value="1">
-                  <button type="submit" class="btn icon-btn" title="Restar 1" aria-label="Restar 1">
-                    <i class="bi bi-dash-lg" aria-hidden="true"></i>
-                  </button>
-                </form>
-              {% endif %}
+                <!-- ⚙ Gestionar (SIEMPRE disponible) -->
+                <a href="{% url 'flujo_opciones' producto.id %}"
+                   class="btn icon-btn icon-btn--primary"
+                   title="Gestionar lotes y proveedores" aria-label="Gestionar lotes y proveedores">
+                  <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
+                </a>
 
-              <!-- 🗑 Eliminar (común) -->
-              <a href="{% url 'eliminar_producto' producto.id %}"
-                 class="btn icon-btn icon-btn--danger"
-                 title="Eliminar producto" aria-label="Eliminar producto">
-                <i class="bi bi-trash3" aria-hidden="true"></i>
-              </a>
-
-              <!-- ⚙ Gestionar (común) -->
-              <a href="{% url 'flujo_opciones' producto.id %}"
-                 class="btn icon-btn icon-btn--primary"
-                 title="Gestionar lotes y proveedores" aria-label="Gestionar lotes y proveedores">
-                <i class="bi bi-gear-wide-connected" aria-hidden="true"></i>
-              </a>
+              {% endwith %}
             </td>
           </tr>
           {% endfor %}
@@ -154,6 +177,7 @@
       </table>
     </div>
   {% else %}
+    <!-- Estado vacío / sin resultados -->
     <div class="empty-state-wrapper">
       <div class="empty-state">
         <h2 class="empty-state-title">

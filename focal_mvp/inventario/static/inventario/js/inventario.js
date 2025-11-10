@@ -5,22 +5,23 @@
    - Fade de alerts
    - Asistente flotante
    - Sombra del header de tabla cuando hay scroll
+   - Bloqueo seguro de acciones deshabilitadas (anchors/buttons)
 */
 (function () {
   'use strict';
 
-  // Helpers
+  // ========= Helpers =========
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => r.querySelectorAll(s);
   const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
 
   // ========= HIGHLIGHT fila recién agregada =========
   (function highlightNewRow() {
-    const params  = new URLSearchParams(location.search);
-    const metaHL  = document.querySelector('meta[name="highlight-sku"]');
-    const fromQS  = (params.get('hl') || '').trim();
+    const params   = new URLSearchParams(location.search);
+    const metaHL   = document.querySelector('meta[name="highlight-sku"]');
+    const fromQS   = (params.get('hl') || '').trim();
     const fromMeta = metaHL ? (metaHL.getAttribute('content') || '').trim() : '';
-    const skuToHL = fromMeta || fromQS;
+    const skuToHL  = fromMeta || fromQS;
     if (!skuToHL) return;
 
     const tbody = $('#tablaInventario tbody');
@@ -33,7 +34,7 @@
     setTimeout(() => row.classList.remove('row--highlight'), 4500);
   })();
 
-  // ===== Sombra de encabezado cuando la tabla scrollea =====
+  // ========= Sombra de encabezado cuando la tabla scrollea =========
   (function shadowOnScroll(){
     const tc = document.querySelector('.table-container');
     if (!tc) return;
@@ -42,7 +43,7 @@
     update();
   })();
 
-  // ============= MODAL: Descontar (si lo usas) =============
+  // ========= MODAL: Descontar (si lo usas) =========
   const modal = $('#modal-descontar');
   const mdSku = $('#md_sku');
   const mdQty = $('#md_qty');
@@ -68,10 +69,12 @@
     });
   });
   $$('.js-close-descontar').forEach(b => on(b, 'click', closeModalDescontar));
-  on(document, 'keydown', (e) => { if (e.key === 'Escape' && modal?.classList.contains('is-open')) closeModalDescontar(); });
+  on(document, 'keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('is-open')) closeModalDescontar();
+  });
   on($('.modal__backdrop'), 'click', (e) => { if (e.target.dataset.close) closeModalDescontar(); });
 
-  // =============== STEPPER +/- ===============
+  // ========= STEPPER +/- =========
   function hookSteppers(root = document) {
     root.querySelectorAll('.stepper-btn').forEach(btn => {
       on(btn, 'click', () => {
@@ -86,7 +89,7 @@
   }
   hookSteppers(document);
 
-  // ====== Fade automático de .alert (si existieran) ======
+  // ========= Fade automático de .alert =========
   $$('.alert').forEach(msg => {
     setTimeout(() => {
       msg.classList.add('fade-out');
@@ -94,7 +97,7 @@
     }, 5000);
   });
 
-  // =================== ASISTENTE ===================
+  // ========= ASISTENTE FLOTANTE =========
   const btn    = $('#assistantBtn');
   const img    = $('#assistantImg');
   const bubble = $('#assistantBubble');
@@ -141,4 +144,58 @@
     on(btn, 'touchstart', (e) => { e.preventDefault(); playAssistant(); }, { passive: false });
     on(document, 'touchstart', (e) => { if (!btn.contains(e.target)) stopAssistant(); }, { passive: true });
   }
+
+  // ========= BLOQUEO SEGURO DE ACCIONES DESHABILITADAS =========
+  // 1) Enlaces con .is-disabled o aria-disabled="true"
+  $$('.is-disabled, a[aria-disabled="true"]').forEach(a => {
+    on(a, 'click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Hint accesible opcional
+      const title = a.getAttribute('title') || 'Acción no disponible';
+      a.setAttribute('aria-label', title);
+    });
+  });
+
+  // 2) Botones/inputs con [disabled]
+  on(document, 'click', (e) => {
+    const target = e.target.closest('button, input[type="submit"]');
+    if (!target) return;
+    if (target.hasAttribute('disabled') || target.getAttribute('aria-disabled') === 'true') {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+
+  // ========= Tooltips simples para deshabilitados (opcional) =========
+  // Muestra un pequeño tooltip mientras está el mouse encima de un botón o link deshabilitado
+  (function disabledTooltips(){
+    let tip;
+    function showTip(el) {
+      const msg = el.getAttribute('title') || el.getAttribute('aria-label') || 'No disponible';
+      if (!msg) return;
+      tip = document.createElement('div');
+      tip.className = 'mini-tip';
+      tip.textContent = msg;
+      document.body.appendChild(tip);
+      const r = el.getBoundingClientRect();
+      tip.style.left = `${Math.round(r.left + (r.width/2) - (tip.offsetWidth/2))}px`;
+      tip.style.top  = `${Math.round(r.top - 12 - tip.offsetHeight)}px`;
+    }
+    function hideTip() {
+      if (tip && tip.parentNode) tip.parentNode.removeChild(tip);
+      tip = null;
+    }
+    document.addEventListener('mouseover', (e) => {
+      const el = e.target.closest('.is-disabled,[disabled][title],[aria-disabled="true"][title]');
+      if (!el) { hideTip(); return; }
+      hideTip();
+      // esperar a que se agregue al DOM para calcular ancho
+      requestAnimationFrame(() => showTip(el));
+    });
+    document.addEventListener('mouseout', (e) => {
+      if (!e.relatedTarget || !e.currentTarget) hideTip();
+    });
+  })();
+
 })();

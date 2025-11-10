@@ -1,5 +1,6 @@
 /* =======================================================================
-   FOCAL - Estilos inventario (tabla, header y footer fijos)
+   FOCAL - Estilos inventario (tabla, header y footer)
+   Paleta y tipografías oficiales
    ======================================================================= */
 
 /* ---------- Variables de marca ---------- */
@@ -104,7 +105,7 @@ main.container h1{
   margin:.2rem 0 1rem;
 }
 
-/* ---------- Buscador ---------- */
+/* ---------- Buscador / Acciones superiores ---------- */
 .search-section{margin:0 0 1.2rem;}
 .search-form{
   display:flex;
@@ -151,6 +152,21 @@ main.container h1{
   transform:translateY(-1px);
 }
 .search-button--provider i{font-size:1.1rem;}
+.clear-search-button{
+  padding:.7rem 1rem;
+  border-radius:10px;
+  border:1px solid var(--border-color);
+  background:#fff;
+  color:var(--dark-text);
+  text-decoration:none;
+  font-weight:700;
+  transition:box-shadow .2s, transform .15s, background .2s;
+}
+.clear-search-button:hover{
+  background:#f9fafb;
+  box-shadow:var(--shadow-light);
+  transform:translateY(-1px);
+}
 
 /* ---------- Tabla Inventario ---------- */
 .table-container{
@@ -167,7 +183,7 @@ main.container h1{
   border-collapse:separate;
   border-spacing:0;
   font-size:.96rem;
-  min-width:980px;
+  min-width:980px; /* asegura layout estable en notebook/escritorio */
 }
 .tabla-inventario thead{
   position:sticky;
@@ -190,34 +206,38 @@ main.container h1{
 .tabla-inventario td{
   padding:.9rem 1rem;
   text-align:left;
-  vertical-align:top;
+  vertical-align:middle; /* centrado vertical en todas las celdas */
   background:#fff;
 }
+
+/* cebras, hover y bordes */
 .tabla-inventario tbody tr:nth-child(even){background:#fcfcfd;}
 .tabla-inventario tbody tr:hover{background:#faf6ff;}
 .tabla-inventario tbody tr{border-bottom:1px solid #f1f3f5;}
 .tabla-inventario tbody tr:last-child{border-bottom:0;}
 
-/* ---------- Alertas ---------- */
-.tabla-inventario tr.vencido{
-  box-shadow:inset 4px 0 0 #c62828;
-  background:#fff5f5 !important;
-}
-.tabla-inventario tr.proximo-vencer{
-  box-shadow:inset 4px 0 0 #f6c343;
-  background:#fff8e1 !important;
-}
-.tabla-inventario tr.stock-bajo{
-  box-shadow:inset 4px 0 0 #1565c0;
-  background:#eef6ff !important;
-}
-
-/* ---------- Acciones ---------- */
-.acciones{
-  display:flex;
+/* ---------- Columna ACCIONES (alinear a la derecha) ---------- */
+/* evita quiebres: mínimo de ancho para caber 5 botones cómodos */
+.tabla-inventario th:last-child{min-width:220px;}
+.tabla-inventario td.acciones{
+  white-space:nowrap;
+  padding:.6rem 1rem;
+  display:grid;                   /* distribución uniforme y alineada */
+  grid-auto-flow:column;
+  grid-auto-columns:min-content;  /* cada “columna-botón” al ancho mínimo */
+  align-items:center;             /* centrado vertical */
+  justify-content:end;            /* ← clave: pegado a la derecha */
   gap:.45rem;
-  align-items:center;
 }
+/* Los <form> de + / - no deben romper el grid */
+.tabla-inventario td.acciones form{
+  display:contents; /* su contenido participa directo en el grid */
+  margin:0;
+}
+.tabla-inventario td.acciones a,
+.tabla-inventario td.acciones button{vertical-align:middle;}
+
+/* ---------- Botones de acción ---------- */
 .icon-btn{
   display:inline-flex;
   align-items:center;
@@ -228,7 +248,8 @@ main.container h1{
   border:1px solid #e5e7eb;
   background:#fff;
   color:#374151;
-  transition:transform .12s ease, box-shadow .2s ease, background .2s ease;
+  transition:transform .12s ease, box-shadow .2s ease, background .2s ease, opacity .2s;
+  flex:0 0 36px; /* tamaño uniforme */
 }
 .icon-btn:hover{
   background:#f9fafb;
@@ -243,9 +264,7 @@ main.container h1{
   background:#fef2f2;
   border-color:#fca5a5;
 }
-.icon-btn--primary{
-  color:var(--primary-purple);
-}
+.icon-btn--primary{color:var(--primary-purple);}
 .icon-btn--primary:hover{
   background:#F3E8FF;
   border-color:#d1c4e9;
@@ -260,6 +279,29 @@ main.container h1{
   color:var(--primary-purple);
   border-color:var(--secondary-purple);
   box-shadow:0 4px 14px rgba(10,232,198,.25);
+}
+
+/* ---------- Estados deshabilitados (sin lotes) ---------- */
+.icon-btn[disabled],
+.icon-btn.is-disabled{
+  opacity:.45;
+  pointer-events:none;
+  filter:grayscale(.25);
+  background:#f5f6f7;
+}
+
+/* ---------- Alertas por fila ---------- */
+.tabla-inventario tr.vencido{
+  box-shadow:inset 4px 0 0 #c62828;
+  background:#fff5f5 !important;
+}
+.tabla-inventario tr.proximo-vencer{
+  box-shadow:inset 4px 0 0 #f6c343;
+  background:#fff8e1 !important;
+}
+.tabla-inventario tr.stock-bajo{
+  box-shadow:inset 4px 0 0 #1565c0;
+  background:#eef6ff !important;
 }
 
 /* ---------- Estado vacío ---------- */
@@ -411,34 +453,98 @@ main.container h1{
   transform:translateY(0) scale(1);
 }
 
-/* ---------- Responsive ---------- */
+/* =======================================================================
+   RESPONSIVE
+   - notebooks chicos / tablets
+   - tablets y móviles
+   - móviles pequeños
+   ======================================================================= */
+@media (max-width:1200px){
+  .tabla-inventario{min-width:900px;}
+}
+
 @media (max-width:1024px){
   .nav-links{gap:.4rem;}
   .btn-accion{padding:.5rem .72rem;}
   .tabla-inventario{min-width:820px;}
   .tabla-inventario th,.tabla-inventario td{padding:.8rem .75rem;}
+  /* asegurar que la columna Acciones mantenga alineación en pantallas medianas */
+  .tabla-inventario th:last-child{min-width:210px;}
 }
+
+@media (max-width:860px){
+  .tabla-inventario{min-width:740px;}
+  .tabla-inventario th:last-child{min-width:200px;}
+}
+
 @media (max-width:768px){
   main.container{width:min(1100px,94%);}
   .search-form{flex-wrap:wrap;gap:.5rem;}
   .search-input{width:100%;}
   .search-button{flex:1;text-align:center;}
-  .table-container{border-radius:12px;overflow:hidden;max-height:none;}
-  .tabla-inventario{border-collapse:separate;border-spacing:0 12px;min-width:0;width:100%;font-size:1rem;}
-  .tabla-inventario thead{position:absolute;clip:rect(1px,1px,1px,1px);width:1px;height:1px;overflow:hidden;}
-  .tabla-inventario tr{display:block;background:#fff;border:1px solid var(--border-color);border-radius:12px;box-shadow:var(--shadow-light);padding:.6rem .75rem;margin:0 0 12px 0;}
-  .tabla-inventario td{display:grid;grid-template-columns:44% 56%;gap:.4rem;padding:.55rem .25rem;border:0;border-bottom:1px dashed #eee;}
+
+  /* Tabla “mobile-first card” */
+  .table-container{
+    border-radius:12px;
+    overflow:hidden;
+    max-height:none;
+  }
+  .tabla-inventario{
+    border-collapse:separate;
+    border-spacing:0 12px;
+    min-width:0;
+    width:100%;
+    font-size:1rem;
+  }
+  .tabla-inventario thead{
+    position:absolute;
+    clip:rect(1px,1px,1px,1px);
+    width:1px; height:1px;
+    overflow:hidden;
+  }
+  .tabla-inventario tr{
+    display:block;
+    background:#fff;
+    border:1px solid var(--border-color);
+    border-radius:12px;
+    box-shadow:var(--shadow-light);
+    padding:.6rem .75rem;
+    margin:0 0 12px 0;
+  }
+  .tabla-inventario td{
+    display:grid;
+    grid-template-columns:44% 56%;
+    gap:.4rem;
+    padding:.55rem .25rem;
+    border:0;
+    border-bottom:1px dashed #eee;
+  }
   .tabla-inventario td:last-child{border-bottom:0;}
-  .tabla-inventario td::before{
-    content:attr(data-label);
-    font-family:var(--font-primary);
-    font-weight:800;
-    color:var(--dark-text);
-    letter-spacing:.2px;
-    font-size:.92rem;
+
+  /* Etiquetas automáticas por columna para móviles */
+  .tabla-inventario td:nth-child(1)::before{content:"Producto";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(2)::before{content:"SKU";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(3)::before{content:"Marca";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(4)::before{content:"Categoría";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(5)::before{content:"Stock Total";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(6)::before{content:"Lotes";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(7)::before{content:"Acciones";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+
+  /* Acciones en móviles: que no se desordenen y sigan a la derecha dentro del grid de la celda */
+  .tabla-inventario td.acciones{
+    grid-template-columns:1fr;   /* etiqueta arriba, botones abajo */
+    justify-content:stretch;
+  }
+  .tabla-inventario td.acciones::before{
+    margin-bottom:.35rem;
+  }
+  .tabla-inventario td.acciones{
+    display:flex; flex-wrap:wrap; gap:.45rem; justify-content:flex-end;
   }
 }
+
 @media (max-width:420px){
   .btn-accion{padding:.45rem .6rem;font-size:.92rem;}
   .tabla-inventario td{grid-template-columns:48% 52%;padding:.5rem .2rem;}
+  .tabla-inventario td.acciones{justify-content:flex-end;}
 }
