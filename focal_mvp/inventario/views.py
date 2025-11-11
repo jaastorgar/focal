@@ -216,35 +216,33 @@ from django.urls import reverse
 @login_required
 @transaction.atomic
 def agregar_producto(request):
-    """
-    Agrega un nuevo producto (o asocia uno existente) al inventario de la
-    empresa del usuario. Tras guardar, redirige a una pantalla de decisión:
-      /productos/post-creacion/<producto_id>/
-    donde se pregunta si desea agregar lote, asociar proveedor o finalizar.
+    from django.template.loader import render_to_string
+    
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
-    ✨ Nivel 1: Detección automática de "venta por peso" (cecina, queso, carnes, etc.)
-    La oferta se marcará sell_by_weight=True cuando el nombre/categoría del
-    producto lo sugieran. Además fija min_step_grams (5) y deja price_per_kg
-    en 0 para que luego pueda definirse (o ajustarse al cargar el primer lote).
-    """
     # --- Validaciones iniciales: empresa y suscripción --------------------
     empresa_usuario = obtener_empresa_del_usuario(request.user)
     if not empresa_usuario:
-        messages.error(request, "Debes estar asociado a una empresa para agregar productos.")
+        msg = "Debes estar asociado a una empresa para agregar productos."
+        if is_ajax:
+            return JsonResponse({'ok': False, 'html': f'<p>{msg}</p>'}, status=400)
+        messages.error(request, msg)
         return redirect('home')
 
     try:
         suscripcion = SuscripcionUsuario.objects.get(empresa=empresa_usuario, activa=True)
         productos_actuales = Producto.objects.filter(empresas=empresa_usuario).count()
-        # Si el plan limita el número de productos (max_productos != 0)
         if suscripcion.plan.max_productos != 0 and productos_actuales >= suscripcion.plan.max_productos:
-            messages.error(
-                request,
-                f"Has alcanzado el límite de productos para tu plan ({suscripcion.plan.max_productos})."
-            )
+            msg = f"Has alcanzado el límite de productos para tu plan ({suscripcion.plan.max_productos})."
+            if is_ajax:
+                return JsonResponse({'ok': False, 'html': f'<p>{msg}</p>'}, status=403)
+            messages.error(request, msg)
             return redirect('inventario')
     except SuscripcionUsuario.DoesNotExist:
-        messages.error(request, "No tienes una suscripción activa.")
+        msg = "No tienes una suscripción activa."
+        if is_ajax:
+            return JsonResponse({'ok': False, 'html': f'<p>{msg}</p>'}, status=403)
+        messages.error(request, msg)
         return redirect('home')
     # ---------------------------------------------------------------------
 
@@ -255,13 +253,11 @@ def agregar_producto(request):
             sku = form_prod.cleaned_data.get('sku')
 
             # -------- Heurística de venta por peso (nivel 1) --------
-            # Palabras clave típicas de venta a granel/gramos
             KEYWORDS_PESO = [
                 "cecina", "queso", "jamón", "fiambre", "longaniza", "salame",
                 "salami", "mortadela", "arrechera", "vacuno", "cerdo", "pavo",
                 "pollo", "carne", "pescado", "jamon", "lomo", "entraña", "atun"
             ]
-            # Categorías que suelen venderse por peso (ajusta a tus choices)
             CATEGORIAS_PESO = [
                 "fiambres", "quesos", "carnes", "pescados", "charcutería",
                 "charcuteria", "frescos", "granel"
@@ -287,8 +283,7 @@ def agregar_producto(request):
                     empresa=empresa_usuario
                 )
 
-                # ---- Detección automática: decidir si es "por peso" ----
-                # Tomamos nombre/categoría de lo recién ingresado o del producto
+                # 3) Detección automática: decidir si es "por peso"
                 nombre_lower = (
                     (form_prod.cleaned_data.get('nombre') or producto.nombre or "").lower()
                 )
@@ -298,21 +293,16 @@ def agregar_producto(request):
                 es_por_peso = any(k in nombre_lower for k in KEYWORDS_PESO) or \
                               any(c in categoria_lower for c in CATEGORIAS_PESO)
 
-                # Si detectamos que es por peso y aún no estaba configurado, lo activamos
                 campos_actualizar = []
                 if es_por_peso and not getattr(oferta, 'sell_by_weight', False):
                     oferta.sell_by_weight = True
                     campos_actualizar.append('sell_by_weight')
 
-                # Asegura redondeo por defecto (5g) si no existe o es 0
                 min_step = getattr(oferta, 'min_step_grams', 0) or 0
                 if es_por_peso and (min_step <= 0):
                     oferta.min_step_grams = 5
                     campos_actualizar.append('min_step_grams')
 
-                # price_per_kg lo dejamos en 0 para que luego se defina explícitamente
-                # (evitamos asignar un valor erróneo). Si quieres poner 1 como placeholder:
-                # oferta.price_per_kg = oferta.price_per_kg or 1
                 if es_por_peso and (getattr(oferta, 'price_per_kg', 0) or 0) <= 0:
                     oferta.price_per_kg = 0
                     campos_actualizar.append('price_per_kg')
@@ -326,29 +316,56 @@ def agregar_producto(request):
                         "Define el precio por kg al cargar el primer lote o en la pantalla de configuración."
                         .format(producto.nombre, oferta.min_step_grams)
                     )
-                # ---------------------------------------------------------
 
-                # 3) Redirección a PANTALLA DE PREGUNTA PREVIA
+                # 4) Mensajes y preparación de respuesta
                 if creada_oferta:
                     accion = "agregado" if creado_producto else "asociado"
-                    messages.success(
-                        request,
-                        f"Producto «{producto.nombre}» {accion} a tu inventario."
-                    )
-                    # 🔄 ahora preguntamos el siguiente paso
-                    url = reverse('post_creacion_producto', kwargs={'producto_id': producto.id})
-                    return redirect(url)
+                    messages.success(request, f"Producto «{producto.nombre}» {accion} a tu inventario.")
                 else:
-                    # Ya estaba en el inventario de esta empresa
                     messages.info(request, f"El producto «{producto.nombre}» ya estaba en tu inventario.")
-                    url = reverse('inventario') + f"?hl={producto.sku}"
-                    return redirect(url)
+
+                if is_ajax:
+                    # Render de la fila para inserción/actualización en vivo
+                    today = date.today()
+                    hoy_mas_15dias = int((today + timedelta(days=15)).strftime('%s'))  # epoch como en template
+
+                    row_html = render_to_string(
+                        'inventario/_producto_row.html',
+                        {
+                            'producto': producto,
+                            'today': today,
+                            'hoy_mas_15dias': hoy_mas_15dias,
+                        },
+                        request=request,
+                    )
+
+                    return JsonResponse({
+                        'ok': True,
+                        'action': 'create' if creada_oferta else 'update',
+                        'sku': producto.sku,
+                        'row_html': row_html,
+                        # Si quieres forzar el flujo posterior, descomenta:
+                        # 'redirect': reverse('post_creacion_producto', kwargs={'producto_id': producto.id}),
+                    })
+
+                # Flujo no-AJAX (página completa)
+                if creada_oferta:
+                    return redirect(reverse('post_creacion_producto', kwargs={'producto_id': producto.id}))
+                else:
+                    return redirect(reverse('inventario') + f"?hl={producto.sku}")
 
             except IntegrityError:
-                messages.error(request, "Ocurrió un problema guardando el producto. Intenta nuevamente.")
+                err_msg = "Ocurrió un problema guardando el producto. Intenta nuevamente."
+                if is_ajax:
+                    return JsonResponse({'ok': False, 'html': f'<p>{err_msg}</p>'}, status=500)
+                messages.error(request, err_msg)
                 return redirect('inventario')
 
-        # Form inválido: enviar errores a messages
+        # Form inválido
+        if is_ajax:
+            html = render(request, 'productos/_producto_form.html', {'form': form_prod}).content.decode('utf-8')
+            return JsonResponse({'ok': False, 'html': html}, status=422)
+
         for field, errors in form_prod.errors.items():
             for error in errors:
                 messages.error(request, f"Error en {field}: {error}")
@@ -358,10 +375,11 @@ def agregar_producto(request):
     else:
         # GET
         form_prod = ProductoForm(empresa_usuario=empresa_usuario)
+        if is_ajax:
+            return render(request, 'productos/_producto_form.html', {'form': form_prod})
 
-    context = {
-        'form_prod': form_prod,
-    }
+    # Render de página completa (fallback no-AJAX)
+    context = {'form_prod': form_prod}
     return render(request, 'inventario/agregar-producto.html', context)
 
 @login_required

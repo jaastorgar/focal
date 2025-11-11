@@ -1,0 +1,228 @@
+/* ======================================================
+   MODAL FOCAL - Estilos completos (responsivo + accesible)
+   Archivo: static/inventario/css/modal.css
+   ====================================================== */
+
+/* Overlay oscuro translúcido */
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 0, 35, 0.45);
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Caja principal del modal */
+.modal {
+  width: min(720px, 92vw);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalIn 0.18s ease-out;
+  transform-origin: center;
+}
+
+@keyframes modalIn {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Encabezado */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #4B0082; /* Morado FOCAL */
+  color: #fff;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modal-close:hover {
+  color: #ffd9ff;
+  transform: scale(1.1);
+}
+
+/* Cuerpo del modal */
+.modal-body {
+  padding: 16px 18px 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Campos del formulario */
+.form-field {
+  margin-bottom: 14px;
+}
+
+.form-field .label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #3b3b3b;
+  font-size: 14px;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e6e2ef;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+  color: #2a2a2a;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: #9C27B0;
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.12);
+}
+
+/* Mensajes de error */
+.form-field .error {
+  color: #b00020;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.help {
+  display: block;
+  font-size: 12px;
+  color: #777;
+  margin-top: 3px;
+}
+
+/* Acciones del formulario (botones inferiores) */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Botones FOCAL */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Botón principal */
+.btn-primary {
+  background: #6A0DAD;
+  color: #fff;
+  border-color: #6A0DAD;
+}
+
+.btn-primary:hover {
+  background: #7d22c3;
+  border-color: #7d22c3;
+}
+
+/* Botón claro */
+.btn-light {
+  background: #f4f1fb;
+  color: #4B0082;
+  border-color: #e6e2ef;
+}
+
+.btn-light:hover {
+  background: #efeafd;
+}
+
+/* Icon-only */
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Estado deshabilitado */
+.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Accesibilidad */
+.modal:focus {
+  outline: none;
+}
+
+/* Adaptación responsive */
+@media (max-width: 768px) {
+  .modal {
+    width: 94vw;
+    border-radius: 12px;
+  }
+  .modal-body {
+    max-height: 78vh;
+    padding: 14px;
+  }
+  .modal-title {
+    font-size: 16px;
+  }
+  .btn {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+}
+
+/* Scrollbar sutil */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background-color: rgba(80, 0, 120, 0.3);
+  border-radius: 10px;
+}
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(80, 0, 120, 0.45);
+}

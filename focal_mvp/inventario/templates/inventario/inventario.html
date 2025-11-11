@@ -12,6 +12,7 @@
 
   <!-- Estilos -->
   <link rel="stylesheet" href="{% static 'inventario/css/table-styles.css' %}"/>
+  <link rel="stylesheet" href="{% static 'inventario/css/modal.css' %}"/>
 
   <!-- Utilidades -->
   <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}"/>
@@ -61,12 +62,23 @@
           <i class="bi bi-search" aria-hidden="true"></i>
         </button>
 
-        <a href="{% url 'agregar-producto' %}" class="search-button" aria-label="Agregar producto" title="Agregar producto">
+        <!-- Abre el formulario de producto en un modal -->
+        <a href="{% url 'agregar-producto' %}"
+           class="search-button"
+           aria-label="Agregar producto"
+           title="Agregar producto"
+           data-modal="ajax"
+           data-modal-title="Agregar producto">
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
         </a>
 
-        <a href="{% url 'agregar_proveedor' %}" class="search-button search-button--provider"
-           aria-label="Agregar proveedor" title="Agregar proveedor">
+        <!-- (Opcional) Proveedor en modal si su vista soporta AJAX -->
+        <a href="{% url 'agregar_proveedor' %}"
+           class="search-button search-button--provider"
+           aria-label="Agregar proveedor"
+           title="Agregar proveedor"
+           data-modal="ajax"
+           data-modal-title="Agregar proveedor">
           <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
         </a>
 
@@ -106,14 +118,9 @@
             <td>{{ producto.cantidad_lotes|default:"0" }}</td>
 
             <td class="acciones">
-              {% comment %}
-                has_lotes: True si hay al menos 1 lote. En Django, 0 es False y >0 es True,
-                así que podemos usar 'if producto.cantidad_lotes'.
-              {% endcomment %}
               {% with has_lotes=producto.cantidad_lotes %}
 
                 {% if producto.sell_by_weight %}
-                  {# ========= Producto PEsable ========= #}
                   {% if has_lotes %}
                     <a href="{% url 'salida_cecina_monto' %}?sku={{ producto.sku }}"
                        class="btn icon-btn icon-btn--cash"
@@ -129,7 +136,6 @@
                     </a>
                   {% endif %}
                 {% else %}
-                  {# ========= Producto POR UNIDAD ========= #}
                   <form method="post" action="{% url 'ajustar_stock' producto.id %}" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="operacion" value="sumar">
@@ -155,14 +161,14 @@
                   </form>
                 {% endif %}
 
-                <!-- 🗑 Eliminar (SIEMPRE disponible) -->
+                <!-- 🗑 Eliminar -->
                 <a href="{% url 'eliminar_producto' producto.id %}"
                    class="btn icon-btn icon-btn--danger"
                    title="Eliminar producto" aria-label="Eliminar producto">
                   <i class="bi bi-trash3" aria-hidden="true"></i>
                 </a>
 
-                <!-- ⚙ Gestionar (SIEMPRE disponible) -->
+                <!-- ⚙ Gestionar -->
                 <a href="{% url 'flujo_opciones' producto.id %}"
                    class="btn icon-btn icon-btn--primary"
                    title="Gestionar lotes y proveedores" aria-label="Gestionar lotes y proveedores">
@@ -187,7 +193,10 @@
           {% if query %}Intenta con otros términos o limpia el filtro.{% else %}Añade tu primer producto para empezar a gestionar tu stock.{% endif %}
         </p>
         <div class="empty-state-actions">
-          <a href="{% url 'agregar-producto' %}" class="btn-accion-principal">+ Agregar Nuevo Producto</a>
+          <a href="{% url 'agregar-producto' %}"
+             class="btn-accion-principal"
+             data-modal="ajax"
+             data-modal-title="Agregar producto">+ Agregar Nuevo Producto</a>
         </div>
       </div>
     </div>
@@ -209,6 +218,18 @@
   <p>© {% now "Y" %} FOCAL. Todos los derechos reservados.</p>
 </footer>
 
-<script src="{% static 'inventario/js/inventario.js' %}" defer></script>
+<!-- Modal reutilizable (estructura limpia, sin estilos ni JS inline) -->
+<div class="modal-overlay" data-modal-overlay hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h3 id="modal-title" class="modal-title">Título</h3>
+      <button class="modal-close" aria-label="Cerrar" data-modal-close>&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"><!-- contenido dinámico --></div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'inventario/js/app.js' %}" defer></script>
 </body>
 </html>
