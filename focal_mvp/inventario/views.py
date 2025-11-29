@@ -88,12 +88,15 @@ def home(request):
 
 @login_required
 def inventario_view(request):
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    
     """
     Lista de productos del inventario de la empresa actual.
     Si viene ?sku=, precarga el panel "Gestionar" con ese SKU.
 
     - Pinta en amarillo los productos cuyo lote más próximo vence en ≤15 días.
     - Elimina los lotes ya vencidos y muestra alerta.
+    - Elimina los lotes sin stock (cantidad <= 0) y muestra alerta.
     - Agrega alerta general si existen productos próximos a vencer.
     - 🧠 Anota en cada producto si su OfertaProducto vende por peso (sell_by_weight),
       más price_per_kg y min_step_grams para lógica de interfaz.
@@ -132,6 +135,29 @@ def inventario_view(request):
             detalle += f" … y {extras} más."
         messages.warning(request, f"Se eliminaron {deleted_count} lotes vencidos: {detalle}")
 
+    # --- 1.b) Lotes sin stock: eliminar y alertar ---
+    lotes_sin_stock = (
+        LoteProducto.objects
+        .select_related('producto', 'producto__producto')
+        .filter(producto__empresa=empresa_usuario, cantidad__lte=0)
+    )
+    if lotes_sin_stock.exists():
+        info_lotes_ss = list(lotes_sin_stock.values(
+            'id', 'producto__producto__sku', 'producto__producto__nombre'
+        ))
+        deleted_ss_count, _ = lotes_sin_stock.delete()
+        detalle_ss = " | ".join([
+            f"{l['producto__producto__nombre']} ({l['producto__producto__sku']})"
+            for l in info_lotes_ss[:5]
+        ])
+        extras_ss = max(0, len(info_lotes_ss) - 5)
+        if extras_ss:
+            detalle_ss += f" … y {extras_ss} más."
+        messages.info(
+            request,
+            f"Se eliminaron {deleted_ss_count} lotes sin stock (cantidad 0): {detalle_ss}"
+        )
+
     # --- 2) Subconsultas de lotes (stock, vencimiento, cantidad) ---
     productos_base = Producto.objects.filter(empresas=empresa_usuario)
 
@@ -165,7 +191,6 @@ def inventario_view(request):
         stock_total=subquery_stock,
         proximo_vencimiento=subquery_vencimiento,
         cantidad_lotes=subquery_cantidad_lotes,
-        # 🧠 campos para el template
         sell_by_weight=sub_sell_by_weight,
         price_per_kg=sub_price_per_kg,
         min_step_grams=sub_min_step,
@@ -183,8 +208,11 @@ def inventario_view(request):
         if not productos.exists():
             messages.info(request, f"No se encontraron resultados para «{query}».")
 
-    # --- 4) Alerta de próximos a vencer ---
-    productos_proximos = productos.filter(proximo_vencimiento__lte=hoy_mas_15, proximo_vencimiento__gte=hoy)
+    # --- 4) Alerta de próximos a vencer (sobre el queryset completo, antes de paginar) ---
+    productos_proximos = productos.filter(
+        proximo_vencimiento__lte=hoy_mas_15,
+        proximo_vencimiento__gte=hoy
+    )
     if productos_proximos.exists():
         lista_alerta = ", ".join(p.nombre for p in productos_proximos[:5])
         extras = max(0, productos_proximos.count() - 5)
@@ -192,13 +220,29 @@ def inventario_view(request):
             lista_alerta += f" … y {extras} más."
         messages.warning(request, f"Tienes productos próximos a vencer: {lista_alerta}")
 
+    # --- 4.b) Paginación (10 productos por página) ---
+    # ordena como quieras: por nombre, SKU, id, etc.
+    productos = productos.order_by('nombre')
+
+    paginator = Paginator(productos, 10)  # 10 productos por página
+    page_number = request.GET.get('page')
+
+    try:
+        productos_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        productos_page = paginator.page(1)
+    except EmptyPage:
+        productos_page = paginator.page(paginator.num_pages)
+
     # --- 5) Highlight seguro para el template ---
     created_sku = (request.GET.get('created_sku') or '').strip()
     highlight_sku = (request.GET.get('hl') or '').strip() or created_sku
 
     # --- 6) Render ---
     context = {
-        'productos': productos,
+        'productos': productos_page,     
+        'page_obj': productos_page,
+        'paginator': paginator,
         'query': query,
         'today': hoy,
         'hoy_mas_15dias': int(time.mktime(hoy_mas_15.timetuple())),
@@ -216,8 +260,24 @@ from django.urls import reverse
 @login_required
 @transaction.atomic
 def agregar_producto(request):
+    from datetime import date, datetime, time, timedelta
+    from django.utils import timezone
     from django.template.loader import render_to_string
     
+    """
+    Agrega un nuevo producto (o asocia uno existente) al inventario de la
+    empresa del usuario.
+
+    Si la petición es AJAX (desde modal):
+      - GET  -> devuelve el partial HTML del formulario (solo el <form>).
+      - POST -> devuelve JSON:
+                { ok: True, action: 'create'|'update', sku: '...', row_html: '<tr>...</tr>' }
+                o bien { ok: False, html: '<form ...>...</form>' } con errores.
+
+    Si NO es AJAX, funciona como antes con render/redirect de página completa.
+
+    ✨ Incluye heurística de "venta por peso" (cecina, queso, carnes, etc.).
+    """
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     # --- Validaciones iniciales: empresa y suscripción --------------------
@@ -265,7 +325,7 @@ def agregar_producto(request):
             # ---------------------------------------------------------
 
             try:
-                # 1) Crear o recuperar el Producto por SKU
+                # 1) Crear o recuperar el Producto por SKU (global)
                 producto, creado_producto = Producto.objects.get_or_create(
                     sku=sku,
                     defaults={
@@ -277,7 +337,7 @@ def agregar_producto(request):
                     }
                 )
 
-                # 2) Asociar a la empresa vía OfertaProducto (evita duplicados)
+                # 2) Asociar a la empresa vía OfertaProducto (no duplica por empresa)
                 oferta, creada_oferta = OfertaProducto.objects.get_or_create(
                     producto=producto,
                     empresa=empresa_usuario
@@ -327,7 +387,12 @@ def agregar_producto(request):
                 if is_ajax:
                     # Render de la fila para inserción/actualización en vivo
                     today = date.today()
-                    hoy_mas_15dias = int((today + timedelta(days=15)).strftime('%s'))  # epoch como en template
+                    # ✅ FIX portable (Windows/Mac/Linux): epoch de hoy+15 a las 00:00 zona actual
+                    target_dt = timezone.make_aware(
+                        datetime.combine(today + timedelta(days=15), time.min),
+                        timezone.get_current_timezone()
+                    )
+                    hoy_mas_15dias = int(target_dt.timestamp())
 
                     row_html = render_to_string(
                         'inventario/_producto_row.html',
@@ -338,14 +403,16 @@ def agregar_producto(request):
                         },
                         request=request,
                     )
+                    
+                   
+                  # post_url = reverse('post_creacion_producto', kwargs={'producto_id': producto.id})
 
                     return JsonResponse({
                         'ok': True,
                         'action': 'create' if creada_oferta else 'update',
                         'sku': producto.sku,
                         'row_html': row_html,
-                        # Si quieres forzar el flujo posterior, descomenta:
-                        # 'redirect': reverse('post_creacion_producto', kwargs={'producto_id': producto.id}),
+                      # 'redirect': post_url,
                     })
 
                 # Flujo no-AJAX (página completa)

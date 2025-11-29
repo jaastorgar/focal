@@ -7,6 +7,7 @@
   <title>Siguiente paso | FOCAL</title>
   <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
   <link rel="stylesheet" href="{% static 'inventario/css/post-creacion-standalone.css' %}">
+  <meta name="sku-api-template" content="{% url 'obtener_datos_sku_api' 'SKU_PLACEHOLDER' %}">
 </head>
 <body>
   <main class="container py-4">
@@ -26,18 +27,27 @@
         <p class="hint">Si el lote tendrá proveedor, primero crea el proveedor y luego registra el lote.</p>
 
         <div class="stack">
+          {# ABRIR EN MODAL: Asociar proveedor #}
           <a class="btn btn-outline-secondary"
-             href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}">
+             href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}"
+             data-modal="ajax"
+             data-modal-title="Asociar proveedor">
             🧾 Asociar proveedor
           </a>
 
+          {# ABRIR EN MODAL: Registrar primer lote #}
           <a class="btn btn-outline-primary"
-             href="{% url 'agregar_lote' %}?producto_id={{ producto.id }}">
+             href="{% url 'agregar_lote' %}?producto_id={{ producto.id }}"
+             data-modal="ajax"
+             data-modal-title="Registrar primer lote">
             ➕ Registrar primer lote
           </a>
 
+          {# Flujo secuencial: abre proveedor en modal; si tu vista soporta next, luego redirige a lote #}
           <a class="btn btn-ghost"
-             href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}&next=add_lote">
+             href="{% url 'agregar_proveedor' %}?producto_id={{ producto.id }}&next=add_lote"
+             data-modal="ajax"
+             data-modal-title="Proveedor y luego Lote">
             🧾→📦 Proveedor y luego Lote
           </a>
 
@@ -55,5 +65,19 @@
   <footer class="text-center mt-5 mb-3 footer-note">
     © {% now "Y" %} FOCAL. Todos los derechos reservados.
   </footer>
+
+  {# ========= Estructura del MODAL reutilizable ========= #}
+  <div class="modal-overlay" data-modal-overlay hidden>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h3 id="modal-title">Acción</h3>
+        <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <div id="modal-body" class="modal-body">
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'inventario/js/post-creacion.js' %}" defer></script>
 </body>
 </html>

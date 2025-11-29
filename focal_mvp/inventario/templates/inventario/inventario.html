@@ -182,6 +182,36 @@
         </tbody>
       </table>
     </div>
+
+    {# Paginación #}
+    {% if page_obj.has_other_pages %}
+      <nav class="pagination-nav" aria-label="Paginación de inventario">
+        <ul class="pagination-list">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                ‹ Anterior
+              </a>
+            </li>
+          {% endif %}
+
+          <li class="page-item page-item--info">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+          </li>
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                Siguiente ›
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+
   {% else %}
     <!-- Estado vacío / sin resultados -->
     <div class="empty-state-wrapper">

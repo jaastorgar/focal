@@ -174,16 +174,15 @@ main.container h1{
   border:1px solid var(--border-color);
   border-radius:12px;
   box-shadow:var(--shadow-light);
-  max-height:calc(100vh - var(--footer-height) - var(--header-height) - var(--search-block) - 40px);
-  overflow:auto;
-  position:relative;
+  max-height: none;
+  overflow: visible;
 }
 .tabla-inventario{
   width:100%;
   border-collapse:separate;
   border-spacing:0;
   font-size:.96rem;
-  min-width:980px; /* asegura layout estable en notebook/escritorio */
+  min-width:980px;
 }
 .tabla-inventario thead{
   position:sticky;
@@ -206,7 +205,7 @@ main.container h1{
 .tabla-inventario td{
   padding:.9rem 1rem;
   text-align:left;
-  vertical-align:middle; /* centrado vertical en todas las celdas */
+  vertical-align:middle;
   background:#fff;
 }
 
@@ -217,21 +216,19 @@ main.container h1{
 .tabla-inventario tbody tr:last-child{border-bottom:0;}
 
 /* ---------- Columna ACCIONES (alinear a la derecha) ---------- */
-/* evita quiebres: mínimo de ancho para caber 5 botones cómodos */
 .tabla-inventario th:last-child{min-width:220px;}
 .tabla-inventario td.acciones{
   white-space:nowrap;
   padding:.6rem 1rem;
-  display:grid;                   /* distribución uniforme y alineada */
+  display:grid;
   grid-auto-flow:column;
-  grid-auto-columns:min-content;  /* cada “columna-botón” al ancho mínimo */
-  align-items:center;             /* centrado vertical */
-  justify-content:end;            /* ← clave: pegado a la derecha */
+  grid-auto-columns:min-content;
+  align-items:center;
+  justify-content:end;
   gap:.45rem;
 }
-/* Los <form> de + / - no deben romper el grid */
 .tabla-inventario td.acciones form{
-  display:contents; /* su contenido participa directo en el grid */
+  display:contents;
   margin:0;
 }
 .tabla-inventario td.acciones a,
@@ -249,7 +246,7 @@ main.container h1{
   background:#fff;
   color:#374151;
   transition:transform .12s ease, box-shadow .2s ease, background .2s ease, opacity .2s;
-  flex:0 0 36px; /* tamaño uniforme */
+  flex:0 0 36px;
 }
 .icon-btn:hover{
   background:#f9fafb;
@@ -269,7 +266,6 @@ main.container h1{
   background:#F3E8FF;
   border-color:#d1c4e9;
 }
-/* Botón de descuento por monto ($→g) */
 .icon-btn--cash{
   color:var(--turquoise);
   border-color:rgba(10,232,198,.3);
@@ -453,11 +449,64 @@ main.container h1{
   transform:translateY(0) scale(1);
 }
 
+/* ---------- Paginación ---------- */
+.pagination-nav{
+  margin:1rem 0 0;
+  display:flex;
+  justify-content:flex-end;
+}
+.pagination-list{
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  padding:0;
+  margin:0;
+}
+.page-item{display:inline-flex;}
+.page-item--info{
+  font-size:.9rem;
+  color:var(--muted-text);
+  padding:.3rem .7rem;
+}
+.page-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:40px;
+  padding:.45rem .75rem;
+  border-radius:999px;
+  border:1px solid var(--border-color);
+  background:#fff;
+  color:var(--dark-text);
+  font-family:var(--font-primary);
+  font-weight:600;
+  font-size:.9rem;
+  text-decoration:none;
+  transition:background .2s, border-color .2s, color .2s, box-shadow .2s, transform .12s;
+}
+.page-link:hover{
+  background:#f9fafb;
+  border-color:var(--primary-purple);
+  color:var(--primary-purple);
+  box-shadow:var(--shadow-light);
+  transform:translateY(-1px);
+}
+.page-item--active .page-link{
+  background:var(--primary-purple);
+  border-color:var(--primary-purple);
+  color:#fff;
+  box-shadow:0 6px 18px rgba(74,0,139,.35);
+  cursor:default;
+}
+.page-item--disabled .page-link{
+  opacity:.5;
+  pointer-events:none;
+  background:#f5f6f7;
+}
+
 /* =======================================================================
    RESPONSIVE
-   - notebooks chicos / tablets
-   - tablets y móviles
-   - móviles pequeños
    ======================================================================= */
 @media (max-width:1200px){
   .tabla-inventario{min-width:900px;}
@@ -468,7 +517,6 @@ main.container h1{
   .btn-accion{padding:.5rem .72rem;}
   .tabla-inventario{min-width:820px;}
   .tabla-inventario th,.tabla-inventario td{padding:.8rem .75rem;}
-  /* asegurar que la columna Acciones mantenga alineación en pantallas medianas */
   .tabla-inventario th:last-child{min-width:210px;}
 }
 
@@ -483,7 +531,6 @@ main.container h1{
   .search-input{width:100%;}
   .search-button{flex:1;text-align:center;}
 
-  /* Tabla “mobile-first card” */
   .table-container{
     border-radius:12px;
     overflow:hidden;
@@ -521,7 +568,6 @@ main.container h1{
   }
   .tabla-inventario td:last-child{border-bottom:0;}
 
-  /* Etiquetas automáticas por columna para móviles */
   .tabla-inventario td:nth-child(1)::before{content:"Producto";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
   .tabla-inventario td:nth-child(2)::before{content:"SKU";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
   .tabla-inventario td:nth-child(3)::before{content:"Marca";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
@@ -530,9 +576,8 @@ main.container h1{
   .tabla-inventario td:nth-child(6)::before{content:"Lotes";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
   .tabla-inventario td:nth-child(7)::before{content:"Acciones";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
 
-  /* Acciones en móviles: que no se desordenen y sigan a la derecha dentro del grid de la celda */
   .tabla-inventario td.acciones{
-    grid-template-columns:1fr;   /* etiqueta arriba, botones abajo */
+    grid-template-columns:1fr;
     justify-content:stretch;
   }
   .tabla-inventario td.acciones::before{
@@ -541,10 +586,17 @@ main.container h1{
   .tabla-inventario td.acciones{
     display:flex; flex-wrap:wrap; gap:.45rem; justify-content:flex-end;
   }
+
+  /* paginación centrada en pantallas pequeñas */
+  .pagination-nav{
+    justify-content:center;
+    margin-top:.9rem;
+  }
 }
 
 @media (max-width:420px){
   .btn-accion{padding:.45rem .6rem;font-size:.92rem;}
   .tabla-inventario td{grid-template-columns:48% 52%;padding:.5rem .2rem;}
   .tabla-inventario td.acciones{justify-content:flex-end;}
+  .page-item--info{display:none;} /* en móvil mostrar solo botones */
 }
