@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* ==========================================================================
    FOCAL - Hoja de Estilos para Completar Recordatorio
    ========================================================================== */
@@ -6,15 +8,15 @@
    -------------------------------------------------------------------------- */
 :root {
   /* --- Colores de la Empresa --- */
-  --primary-purple: #4A008B; /* Morado Oscuro / Principal */
-  --secondary-purple: #7B1FA2; /* Morado Intermedio / Degradado */
-  --light-purple: #F3E8FF; /* Morado Claro / Accent (usado para fondos sutiles o texto sobre oscuro) */
-  --dark-text: #343A40; /* Gris Oscuro para texto principal */
-  --muted-text: #555555; /* Gris para texto secundario */
+  --primary-purple: #393991; /* Morado Oscuro / Principal */
+  --secondary-purple: #887ddf; /* Morado Intermedio / Degradado */
+  --light-purple: #d9c9ff; /* Morado Claro / Accent (usado para fondos sutiles o texto sobre oscuro) */
+  --dark-text: #2d2d2d; /* Gris Oscuro para texto principal */
+  --muted-text: #444444; /* Gris para texto secundario */
   --white: #FFFFFF; /* Blanco */
   --header-footer-bg: #2C0140; /* Morado muy oscuro para Navbar/Footer (nombre unificado) */
-  --hover-dark-purple: #38006B; /* Tono más oscuro para hover de botones */
-  --hover-light-purple: #E0B3FF; /* Morado claro para hover de enlaces */
+  --hover-dark-purple: #000956; /* Tono más oscuro para hover de botones */
+  --hover-light-purple: #c7b0ff; /* Morado claro para hover de enlaces */
   
   --border-color: #dee2e6;
   --shadow-light: rgba(0, 0, 0, 0.08);
@@ -32,41 +34,10 @@
   --success-bg: #d4edda;  /* Verde muy claro para 'éxito' */
   
   /* --- Definiciones de fuentes personalizadas --- */
-  --font-primary: 'InterTight', Arial, sans-serif; /* Para títulos y botones */
-  --font-secondary: 'HankenGrotesk', Arial, sans-serif; /* Para párrafos y contenido */
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; /* Para títulos y botones */
 }
 
 /* --- Definiciones de fuentes personalizadas --- */
-/* InterTight – títulos y botones */
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'InterTight';
-    src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-}
-
-/* HankenGrotesk – párrafos y contenido */
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'HankenGrotesk';
-    src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-}
-
 /* --- Estilos Generales del Documento --- */
 * {
     box-sizing: border-box;
@@ -75,7 +46,7 @@
 }
 
 body {
-    font-family: var(--font-secondary);
+    font-family: var(--font);
     font-weight: 300;
     color: var(--dark-text);
     background-color: #f8f9fa; /* Fondo suave */
@@ -108,7 +79,7 @@ body {
 }
 .app-header .logo {
   color: var(--white);
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 1.5rem;
   text-decoration: none;
   font-weight: 700;
@@ -143,7 +114,7 @@ main {
 }
 
 h1 {
-    font-family: var(--font-primary);
+    font-family: var(--font);
     font-weight: 700;
     font-size: 2.2rem;
     color: var(--primary-purple);
@@ -152,7 +123,7 @@ h1 {
 }
 
 h2 {
-    font-family: var(--font-primary);
+    font-family: var(--font);
     font-weight: 300;
     font-size: 1.5rem;
     color: var(--secondary-purple);
@@ -194,7 +165,7 @@ h2 {
 .alert-heading {
     color: inherit;
     margin-top: 0;
-    font-family: var(--font-primary);
+    font-family: var(--font);
     font-weight: 700;
     font-size: 1.3rem;
 }
@@ -236,7 +207,7 @@ h2 {
 .btn {
     display: inline-block;
     padding: 0.8rem 1.5rem;
-    font-family: var(--font-primary);
+    font-family: var(--font);
     font-weight: 700;
     font-size: 1rem;
     text-align: center;

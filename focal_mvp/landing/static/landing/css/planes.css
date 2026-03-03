@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* ==========================================================================
    FOCAL - Hoja de Estilos para la Página de Planes (Actualizada)
    ========================================================================== */
@@ -5,35 +7,23 @@
 /* 1. Variables y Configuración Base
    -------------------------------------------------------------------------- */
 :root {
-  --primary-purple: #4A008B;
-  --secondary-purple: #7B1FA2;
+  --primary-purple: #393991;
+  --secondary-purple: #887ddf;
   --light-purple: #f8f0ff;
-  --hover-dark-purple: #38006B;
+  --hover-dark-purple: #000956;
   --white: #FFFFFF;
   --dark-text: #212529;
   --muted-text: #6c757d;
   --border-color: #dee2e6;
-  --box-shadow: 0 8px 25px rgba(74, 0, 139, 0.09);
+  --box-shadow: 0 8px 25px rgba(57, 57, 145, 0.09);
   
-  --font-primary: 'InterTight', sans-serif;
-  --font-secondary: 'HankenGrotesk', sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-@font-face {
-  font-family: 'InterTight';
-  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight: 700;
-}
-@font-face {
-  font-family: 'HankenGrotesk';
-  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight: 400;
 }
 
 /* 2. Estructura de la Sección de Planes
@@ -51,14 +41,14 @@
 }
 
 .planes-section h2 {
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 2.8rem;
   color: var(--primary-purple);
   margin-bottom: 0.75rem;
 }
 
 .planes-section .subtitulo {
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   font-size: 1.15rem;
   color: var(--muted-text);
   max-width: 600px;
@@ -87,7 +77,7 @@
 
 .plan-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 16px 35px rgba(74, 0, 139, 0.15);
+  box-shadow: 0 16px 35px rgba(57, 57, 145, 0.15);
 }
 
 /* 4. Contenido de las Tarjetas
@@ -97,14 +87,14 @@
 }
 
 .plan-header h3 {
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 1.75rem;
   color: var(--secondary-purple);
   margin: 0;
 }
 
 .plan-header .precio {
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 3rem;
   color: var(--dark-text);
   margin: 0.5rem 0 0 0;
@@ -114,7 +104,7 @@
 .plan-header .precio span {
   font-size: 1rem;
   color: var(--muted-text);
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   font-weight: 400;
   margin-left: 0.25rem;
 }
@@ -131,7 +121,7 @@
 }
 
 .plan-body li {
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -157,7 +147,7 @@
   color: var(--white);
   border: none;
   border-radius: 8px;
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 1.1rem;
   font-weight: 700;
   text-align: center;

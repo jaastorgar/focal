@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* ==========================================================================
    Detalle de Producto – CSS completo y responsivo (FOCAL)
    • Mantiene paleta, tipografías y estilo de botones del resto de la app
@@ -6,16 +8,16 @@
 
 /* ---------- Variables de marca ---------- */
 :root{
-  --primary-purple:#4A008B;      /* Morado navbar/footer y botones principales */
-  --secondary-purple:#7B1FA2;    /* Morado intermedio para títulos */
-  --light-purple:#F3E8FF;        /* Fondo de la app */
+  --primary-purple:#393991;      /* Morado navbar/footer y botones principales */
+  --secondary-purple:#887ddf;    /* Morado intermedio para títulos */
+  --light-purple:#d9c9ff;        /* Fondo de la app */
   --white:#FFFFFF;
 
-  --dark-text:#343A40;
-  --muted-text:#555555;
+  --dark-text:#2d2d2d;
+  --muted-text:#444444;
 
-  --hover-dark-purple:#38006B;
-  --hover-light-purple:#E0B3FF;
+  --hover-dark-purple:#000956;
+  --hover-light-purple:#c7b0ff;
 
   --border-color:#E5E7EB;
   --shadow-light:rgba(0,0,0,.08);
@@ -24,11 +26,6 @@
 }
 
 /* ---------- Tipografías (si existen en /static) ---------- */
-@font-face{font-family:'InterTight';src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');font-weight:700}
-@font-face{font-family:'InterTight';src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');font-weight:300}
-@font-face{font-family:'HankenGrotesk';src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');font-weight:400}
-@font-face{font-family:'HankenGrotesk';src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');font-weight:300}
-
 /* ---------- Reset / base ---------- */
 *,*::before,*::after{box-sizing:border-box}
 html{height:100%}
@@ -37,7 +34,7 @@ body{
   display:flex;flex-direction:column;
   background:var(--light-purple);
   color:var(--dark-text);
-  font-family:'HankenGrotesk', Arial, sans-serif;
+  font-family:'Nunito', Arial, sans-serif;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
   padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);
@@ -61,7 +58,7 @@ main{
 }
 .nav-bar .logo a{
   color:#fff;text-decoration:none;
-  font-family:'InterTight', Arial, sans-serif;
+  font-family:'Nunito', Arial, sans-serif;
   font-weight:700;letter-spacing:.3px;
   font-size:clamp(1.3rem,2.4vw,1.6rem);
 }
@@ -72,7 +69,7 @@ main{
   padding:.55rem 1rem;border-radius:9999px;
   border:2px solid rgba(255,255,255,.92);
   background:transparent;color:#fff;
-  text-decoration:none;font-family:'InterTight',Arial,sans-serif;
+  text-decoration:none;font-family:'Nunito',Arial,sans-serif;
   font-weight:700;font-size:clamp(.88rem,1.8vw,.95rem);line-height:1;
   transition:transform .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
 }
@@ -90,13 +87,13 @@ main{
 /* ---------- Títulos ---------- */
 h1{
   margin:clamp(1.2rem,3.2vw,1.8rem) 0 .75rem;
-  font-family:'InterTight', Arial, sans-serif;
+  font-family:'Nunito', Arial, sans-serif;
   font-weight:700;letter-spacing:.2px;
   font-size:clamp(1.9rem,3.8vw,2.4rem);
 }
 h2{
   margin:clamp(1rem,2.5vw,1.25rem) 0 .75rem;
-  font-family:'InterTight', Arial, sans-serif;
+  font-family:'Nunito', Arial, sans-serif;
   font-weight:700;color:var(--secondary-purple);
   font-size:clamp(1.15rem,2.2vw,1.35rem);
 }
@@ -134,7 +131,7 @@ h2{
   min-height:48px;padding:.65rem 1.15rem;
   border-radius:12px;border:2px solid var(--btn-border);
   background:var(--btn-bg);color:var(--btn-text);
-  text-decoration:none;font-family:'InterTight',Arial,sans-serif;font-weight:700;
+  text-decoration:none;font-family:'Nunito',Arial,sans-serif;font-weight:700;
   font-size:.95rem;line-height:1;
   transition:transform .15s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
 }

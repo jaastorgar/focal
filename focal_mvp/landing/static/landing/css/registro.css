@@ -1,18 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* =========================================================
    SOY FOCAL — Registro (Ultra-Responsive: móvil → 4K/TV)
    ========================================================= */
 
 /* ------------------ Variables & Theme ------------------- */
 :root{
-  --primary-purple:#4A008B;
-  --secondary-purple:#7B1FA2;
-  --light-purple:#F3E8FF;
+  --primary-purple:#393991;
+  --secondary-purple:#887ddf;
+  --light-purple:#d9c9ff;
   --header-footer-bg:#2C0140;
-  --dark-text:#343A40;
-  --muted-text:#555555;
+  --dark-text:#2d2d2d;
+  --muted-text:#444444;
   --white:#FFFFFF;
-  --hover-dark-purple:#38006B;
-  --hover-light-purple:#E0B3FF;
+  --hover-dark-purple:#000956;
+  --hover-light-purple:#c7b0ff;
   --turquoise:#0AE8C6;
   --border-color:#e6e6e6;
   --error-text:#d32f2f;
@@ -23,7 +25,7 @@
   --shadow-2:0 8px 22px rgba(0,0,0,.14);
   --shadow-3:0 18px 44px rgba(0,0,0,.22);
 
-  --focus-shadow: rgba(74,0,139,.18);
+  --focus-shadow: rgba(57,57,145,.18);
 
   --header-h: clamp(64px, 8vw, 76px);
   --form-max: 900px;
@@ -38,32 +40,11 @@
 }
 
 /* ---------------------- Fonts (local) ------------------- */
-@font-face{
-  font-family:'InterTight';
-  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight:800;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'InterTight';
-  src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
-  font-weight:300;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'HankenGrotesk';
-  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight:400;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'HankenGrotesk';
-  src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-  font-weight:300;font-style:normal;font-display:swap;
-}
-
 /* --------------------- Reset / Base --------------------- */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font-family:'HankenGrotesk',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  font-family:'Nunito',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   color:var(--dark-text);
   background:var(--light-purple);
   line-height:1.6;
@@ -83,7 +64,7 @@ ul{list-style:none}
 .btn{
   display:inline-block; padding:.7rem 1.1rem;
   border-radius:var(--radius-12); border:2px solid transparent;
-  font-family:'InterTight',sans-serif; font-weight:800; letter-spacing:.02em;
+  font-family:'Nunito',sans-serif; font-weight:900; letter-spacing:.02em;
   transition:transform .15s, box-shadow .2s, background .2s, color .2s, border-color .2s;
   cursor:pointer;
 }
@@ -129,7 +110,7 @@ main.registration-container{
 }
 
 .form-title{
-  font-family:'InterTight',sans-serif; font-weight:900; letter-spacing:-.02em;
+  font-family:'Nunito',sans-serif; font-weight:900; letter-spacing:-.02em;
   font-size:clamp(2rem, 3.2vw, 2.6rem);
   text-align:center; margin-bottom:.5rem; color:var(--dark-text);
 }
@@ -140,7 +121,7 @@ main.registration-container{
 
 .form-section{ margin-bottom:2.6rem }
 .section-heading{
-  font-family:'InterTight',sans-serif; font-weight:900;
+  font-family:'Nunito',sans-serif; font-weight:900;
   color:var(--primary-purple);
   font-size:clamp(1.25rem, 1.9vw, 1.6rem);
   margin-bottom:1.1rem; padding-bottom:.75rem;
@@ -217,12 +198,12 @@ main.registration-container{
 .btn-submit{
   background:var(--primary-purple); color:#fff; border:2px solid var(--primary-purple);
   padding:1rem 2.8rem; border-radius:var(--radius-12);
-  font-family:'InterTight',sans-serif; font-weight:900; letter-spacing:.02em;
+  font-family:'Nunito',sans-serif; font-weight:900; letter-spacing:.02em;
   font-size: clamp(1rem, 1.9vw, 1.2rem);
-  box-shadow:0 12px 28px rgba(74,0,139,.34);
+  box-shadow:0 12px 28px rgba(57,57,145,.34);
   transition:all .2s ease;
 }
-.btn-submit:hover{ background:var(--hover-dark-purple); border-color:var(--hover-dark-purple); transform:translateY(-1px); box-shadow:0 16px 34px rgba(74,0,139,.42) }
+.btn-submit:hover{ background:var(--hover-dark-purple); border-color:var(--hover-dark-purple); transform:translateY(-1px); box-shadow:0 16px 34px rgba(57,57,145,.42) }
 
 /* ============================== FOOTER ============================== */
 .main-footer{
@@ -234,7 +215,7 @@ main.registration-container{
 }
 .main-footer .container{ display:flex; flex-direction:column; gap:20px }
 .footer-grid{ display:grid; grid-template-columns:1.2fr .9fr .9fr; gap:28px }
-.footer-title{ font-family:'InterTight',sans-serif; color:#fff; font-size:1.05rem; margin:2px 0 10px }
+.footer-title{ font-family:'Nunito',sans-serif; color:#fff; font-size:1.05rem; margin:2px 0 10px }
 .footer-text{ margin:.25rem 0 1rem; color:rgba(255,255,255,.85) }
 .footer-links{ display:flex; flex-direction:column; gap:8px }
 .footer-links a{ color:var(--light-purple) }

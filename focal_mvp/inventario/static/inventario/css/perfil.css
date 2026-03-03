@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* ==========================================================================
    FOCAL - Hoja de Estilos para la Página de Perfil
    ========================================================================== */
@@ -5,8 +7,8 @@
 /* 1. Variables y Configuración Base
    -------------------------------------------------------------------------- */
 :root {
-  --primary-purple: #4A008B;
-  --secondary-purple: #7B1FA2;
+  --primary-purple: #393991;
+  --secondary-purple: #887ddf;
   --light-purple: #f8f0ff;
   --white: #FFFFFF;
   --dark-text: #212529;
@@ -14,28 +16,15 @@
   --border-color: #dee2e6;
   --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.09);
   
-  --font-primary: 'InterTight', sans-serif;
-  --font-secondary: 'HankenGrotesk', sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-/* Las declaraciones @font-face se mantienen igual. */
-@font-face {
-  font-family: 'InterTight';
-  src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight: 700;
-}
-@font-face {
-  font-family: 'HankenGrotesk';
-  src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight: 400;
-}
-
 body {
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   background-color: var(--light-purple);
   color: var(--dark-text);
   margin: 0;
@@ -67,7 +56,7 @@ body {
   font-weight: 700;
 }
 .app-header .logo {
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 1.5rem;
 }
 .app-header .nav-links {
@@ -99,7 +88,7 @@ main.perfil-container {
 }
 
 main.perfil-container h1 {
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 2.5rem;
   color: var(--primary-purple);
   text-align: center;
@@ -119,7 +108,7 @@ main.perfil-container h1 {
 
 .perfil-buttons button {
   padding: 0.8rem 1.5rem;
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   font-size: 1rem;
   font-weight: 600;
   border: none;
@@ -159,7 +148,7 @@ main.perfil-container h1 {
 }
 
 .perfil-section h2 {
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: 1.8rem;
   color: var(--dark-text);
   margin-top: 0;

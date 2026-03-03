@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* =========================================================
    SOY FOCAL – Login styles (ACTUALIZADO: Google OAuth)
    Ultra-responsive: mobile → 4K/TV
@@ -5,22 +7,21 @@
 
 /* ------------------ Variables de marca ------------------ */
 :root{
-  --primary-purple:#4A008B;
-  --secondary-purple:#7B1FA2;
-  --light-purple:#F3E8FF;
+  --primary-purple:#393991;
+  --secondary-purple:#887ddf;
+  --light-purple:#d9c9ff;
   --header-footer-bg:#2C0140;
-  --dark-text:#343A40;
-  --muted-text:#555555;
+  --dark-text:#2d2d2d;
+  --muted-text:#444444;
   --white:#FFFFFF;
-  --hover-dark-purple:#38006B;
-  --hover-light-purple:#E0B3FF;
+  --hover-dark-purple:#000956;
+  --hover-light-purple:#c7b0ff;
   --turquoise:#0AE8C6;
   --border-color:#e6e6e6;
   --shadow-1:0 2px 10px rgba(0,0,0,.08);
   --shadow-2:0 8px 22px rgba(0,0,0,.14);
   --shadow-3:0 18px 44px rgba(0,0,0,.22);
-  --font-primary:'InterTight', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  --font-secondary:'HankenGrotesk', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
   /* Layout login */
   --header-h: clamp(64px, 8vw, 76px);
@@ -41,32 +42,11 @@
 }
 
 /* ---------------------- Tipografías ---------------------- */
-@font-face{
-  font-family:'InterTight';
-  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight:800;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'InterTight';
-  src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
-  font-weight:300;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'HankenGrotesk';
-  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight:400;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'HankenGrotesk';
-  src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-  font-weight:300;font-style:normal;font-display:swap;
-}
-
 /* ----------------------- Reset/Base ---------------------- */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font-family:var(--font-secondary);
+  font-family:var(--font);
   color:var(--dark-text);
   background:var(--light-purple);
   line-height:1.6;
@@ -82,7 +62,7 @@ ul{list-style:none}
 /* Botones globales (para Navbar) */
 .btn{
   display:inline-block; padding:.85rem 1.5rem; border-radius:12px;
-  font-family:var(--font-primary); font-weight:800; letter-spacing:.02em;
+  font-family:var(--font); font-weight:900; letter-spacing:.02em;
   border:2px solid transparent; text-decoration:none;
   transition:transform .15s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
   cursor:pointer;
@@ -137,7 +117,7 @@ ul{list-style:none}
   padding:.55rem .8rem; border-radius:999px; color:#fff;
   background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15);
 }
-.footer-title{font-family:var(--font-primary);color:#fff;font-size:1.05rem;margin:2px 0 10px}
+.footer-title{font-family:var(--font);color:#fff;font-size:1.05rem;margin:2px 0 10px}
 .footer-links{display:flex;flex-direction:column;gap:8px}
 .footer-links a{color:var(--light-purple)}
 .footer-links a:hover{color:#fff}
@@ -161,14 +141,14 @@ ul{list-style:none}
   box-shadow:0 16px 40px rgba(0,0,0,.15);
 }
 .login-title{
-  font-family:var(--font-primary); font-weight:800; color:var(--dark-text);
+  font-family:var(--font); font-weight:900; color:var(--dark-text);
   text-align:center; font-size:clamp(1.8rem, 3.2vw, 2.5rem);
   margin-bottom: 22px;
 }
 
 .alert{
   background:var(--light-purple); color:var(--dark-text);
-  border:1px solid rgba(74,0,139,.1);
+  border:1px solid rgba(57,57,145,.1);
   padding:12px 14px; border-radius:12px; margin-bottom:10px;
 }
 
@@ -181,7 +161,7 @@ ul{list-style:none}
 }
 .form-group input:focus{
   outline:none; border-color:var(--primary-purple);
-  box-shadow:0 0 0 3px rgba(74,0,139,.1);
+  box-shadow:0 0 0 3px rgba(57,57,145,.1);
 }
 .field-error{ color:#dc2626; margin-top:6px; }
 
@@ -190,14 +170,14 @@ ul{list-style:none}
   width:100%; padding:1.05rem 1.4rem; margin-top: 10px;
   border:2px solid var(--primary-purple);
   background:var(--primary-purple); color:#fff;
-  font-family:var(--font-primary); font-weight:800;
+  font-family:var(--font); font-weight:900;
   border-radius:12px;
-  box-shadow:0 12px 28px rgba(74,0,139,.34);
+  box-shadow:0 12px 28px rgba(57,57,145,.34);
   transition:all .2s ease;
 }
 .btn-primary-solid:hover{
   background:var(--hover-dark-purple); border-color:var(--hover-dark-purple);
-  transform:translateY(-1px); box-shadow:0 16px 34px rgba(74,0,139,.42);
+  transform:translateY(-1px); box-shadow:0 16px 34px rgba(57,57,145,.42);
 }
 
 /* Google OAuth */
@@ -205,7 +185,7 @@ ul{list-style:none}
   display:inline-flex; align-items:center; justify-content:center; gap:.6rem;
   width:100%; padding:.9rem 1rem; border-radius:10px;
   border:1px solid var(--google-border); background:var(--google-bg); color:var(--google-text);
-  font-weight:700; font-family:var(--font-primary); letter-spacing:.01em;
+  font-weight:700; font-family:var(--font); letter-spacing:.01em;
   box-shadow:var(--google-shadow);
   transition: background .15s ease, box-shadow .2s ease, transform .12s ease, border-color .15s ease;
   margin-top: 10px;
@@ -229,7 +209,7 @@ ul{list-style:none}
 
 /* Links inferiores */
 .login-links{ margin-top:18px; text-align:center; font-size:.92rem; }
-.login-links a{ color: var(--primary-purple); font-weight:700; font-family:var(--font-primary); }
+.login-links a{ color: var(--primary-purple); font-weight:700; font-family:var(--font); }
 .login-links a:hover{ color: var(--hover-dark-purple); text-decoration: underline; }
 .link-muted{ color: var(--muted-text); margin-left:.25rem; }
 
@@ -280,7 +260,7 @@ ul{list-style:none}
 }
 
 /* Focus visible para accesibilidad global */
-:focus-visible{ outline: 3px solid rgba(74,0,139,.35); outline-offset: 2px; }
+:focus-visible{ outline: 3px solid rgba(57,57,145,.35); outline-offset: 2px; }
 
 /* Ajuste anclas en scroll */
 :target{ scroll-margin-top: calc(var(--header-h) + 16px); }
