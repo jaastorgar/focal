@@ -1,25 +1,23 @@
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-from allauth.account.signals import user_signed_up, user_logged_in
-from allauth.socialaccount.signals import social_account_added
-from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.utils import timezone
-
+from django.contrib import messages
 from .models import Empresa, SuscripcionUsuario, PlanSuscripcion
 
+User = get_user_model()
 
 def _ensure_empresa_y_plan(user):
     """
     Crea una Empresa por defecto y una Suscripción activa si faltan.
-    Compatible con tu modelo actual (sin campos 'codigo' ni 'activo' en PlanSuscripcion).
     """
-    # 1) Empresa
     if not getattr(user, "empresa_id", None):
-        nombre_def = f"Almacén de {getattr(user, 'nombres', None) or user.first_name or user.email.split('@')[0]}"
+        nombre_def = f"Almacén de {user.username}"
         
         empresa = Empresa.objects.create(
             nombre_almacen=nombre_def,
             razon_social=nombre_def,
-            rut=f"PEND-{user.id}",  # temporal, evita duplicados
+            rut=f"PEND-{user.id}", 
             direccion_tributaria="Por definir",
             comuna="",
             region="",
@@ -35,10 +33,8 @@ def _ensure_empresa_y_plan(user):
     else:
         empresa = user.empresa
 
-    # 2) Plan: selecciona el más económico o el primero disponible
     plan = PlanSuscripcion.objects.order_by("precio").first()
 
-    # Evita duplicados de suscripción activa
     if plan and not SuscripcionUsuario.objects.filter(empresa=empresa, activa=True).exists():
         SuscripcionUsuario.objects.create(
             empresa=empresa,
@@ -46,18 +42,8 @@ def _ensure_empresa_y_plan(user):
             activa=True
         )
 
-
-@receiver(user_signed_up)
-def handle_user_signed_up(request, user, **kwargs):
-    _ensure_empresa_y_plan(user)
-    messages.info(request, "¡Bienvenido! Creamos tu almacén y activamos un plan inicial.")
-
-
-@receiver(social_account_added)
-def handle_social_added(request, sociallogin, **kwargs):
-    _ensure_empresa_y_plan(sociallogin.user)
-
-
-@receiver(user_logged_in)
-def handle_user_logged_in(request, user, **kwargs):
-    _ensure_empresa_y_plan(user)
+# Esta señal se dispara cada vez que se crea un usuario nuevo en Django
+@receiver(post_save, sender=User)
+def handle_user_created(sender, instance, created, **kwargs):
+    if created:
+        _ensure_empresa_y_plan(instance)

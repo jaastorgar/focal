@@ -9,175 +9,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{% static 'inventario/img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'landing/css/registro.css' %}">
-    <link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
 </head>
 <body>
     <header class="main-header" id="home">
-        <div class="container">
-        <a class="logo" href="#home" aria-label="Inicio">
-            <img src="/static/landing/img/Focal_imagotipo.svg" alt="Bootstrap" width="30" height="24" style="vertical-align:middle;margin-right:.5rem">
-            <span class="logo-text sr-only">SOY FOCAL</span>
-        </a>
+        <div class="header-container-fluid">
+            <a class="logo" href="{% url 'landing:landing' %}" aria-label="Inicio">
+                <img src="{% static 'landing/img/PERFIL.png' %}" alt="SOY FOCAL Logo">
+                <span class="logo-text sr-only">SOY FOCAL</span>
+            </a>
 
-        <button class="menu-toggle" aria-label="Abrir menú">☰</button>
-
-        <nav class="main-nav" aria-label="Navegación principal">
-            <ul>
-            <li><a href="{% url 'landing:landing' %}">Inicio</a></li>
-            <li><a href="{% url 'landing:landing' %}#features">Qué ofrecemos</a></li>
-            <li><a href="{% url 'landing:quienes_somos' %}">Nosotros</a></li>
-            <li><a href="{% url 'landing:landing' %}#contact">Contacto</a></li>
-            <li><a class="btn btn-primary" href="{% url 'landing:login' %}">Iniciar sesión</a></li>
-            <li><a class="btn btn-secondary" href="{% url 'landing:registro' %}">Regístrate</a></li>
-            </ul>
-        </nav>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul>
+                    <li><a href="{% url 'landing:landing' %}">Inicio</a></li>
+                    <li><a href="{% url 'landing:landing' %}#features">Qué ofrecemos</a></li>
+                    <li><a href="{% url 'landing:quienes_somos' %}">Nosotros</a></li>
+                    <li><a href="{% url 'landing:login' %}" class="btn btn-secondary">Iniciar Sesión</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
     <main class="registration-container">
-        <h2 class="form-title">Crea tu Cuenta en FOCAL</h2>
-        <p class="form-subtitle">Regístrate para empezar a gestionar tu negocio de forma inteligente.</p>
-
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
+        <header class="form-header">
+            <h1 class="form-title">Crea tu cuenta</h1>
+            <p class="form-subtitle">Únete a FOCAL y lleva tu inventario al siguiente nivel.</p>
+        </header>
 
         <form method="post" class="registration-form" novalidate>
             {% csrf_token %}
 
-            <div class="form-section">
-                <h3 class="section-heading">1. Datos del Administrador</h3>
-                <div class="form-grid">
-                    {% for field in user_form %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-                            {% if field.name == 'region' %}
-                                {{ field|add_class:"form-select"|attr:"data-region-target:almacenero"|attr:"id:id_almacenero-region" }}
-                            {% elif field.name == 'comuna' %}
-                                {{ field|add_class:"form-select"|attr:"data-comuna-target:almacenero"|attr:"id:id_almacenero-comuna" }}
-                            {% else %}
-                                {{ field }}
-                            {% endif %}
-
-                            {% if field.name == 'password1' %}
-                                <div id="password-feedback" class="password-requirements">
-                                    <ul>
-                                        <li id="req-length">Entre 8 y 12 caracteres</li>
-                                        <li id="req-uppercase">Al menos una mayúscula (A-Z)</li>
-                                        <li id="req-lowercase">Al menos una minúscula (a-z)</li>
-                                        <li id="req-number">Al menos un número (0-9)</li>
-                                        <li id="req-special">Al menos un carácter especial (_!@#$...)</li>
-                                        {# Eliminado: <li id="req-match">Las contraseñas deben coincidir</li> #}
-                                    </ul>
-                                </div>
-                            {% endif %}
-                            
-                            {% if field.name == 'password2' %}
-                                <div id="password-match-feedback" class="password-requirements password-match-box">
-                                    <ul>
-                                        <li id="req-match">Las contraseñas deben coincidir</li>
-                                    </ul>
-                                </div>
-                            {% endif %}
-
-                            {% if field.errors %}
-                                <div class="error-message">{{ field.errors|striptags }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.errors %}has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    <div class="input-wrapper">
+                        {% render_field field class="form-input" placeholder=field.label %}
+                        {% if field.errors %}
+                            <span class="error-message">{{ field.errors|first }}</span>
+                        {% endif %}
+                    </div>
                 </div>
+                {% endfor %}
             </div>
 
-            <div class="form-section">
-                <h3 class="section-heading">2. Datos de la Empresa</h3>
-                <div class="form-grid">
-                    {% for field in empresa_form %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-
-                            {% if field.name == 'region' %}
-                                {{ field|add_class:"form-select"|attr:"data-region-target:empresa"|attr:"id:id_empresa-region" }}
-                            {% elif field.name == 'comuna' %}
-                                {{ field|add_class:"form-select"|attr:"data-comuna-target:empresa"|attr:"id:id_empresa-comuna" }}
-                            {% else %}
-                                {{ field }}
-                            {% endif %}
-
-                            {% if field.errors %}
-                                <div class="error-message">{{ field.errors|striptags }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div class="form-submit-container">
-                <button type="submit" class="btn-submit">Crear Cuenta</button>
-            </div>
+            <footer class="form-footer">
+                <button type="submit" class="btn btn-primary btn-submit">
+                    Completar Registro
+                </button>
+                <p class="login-prompt">
+                    ¿Ya tienes una cuenta? <a href="{% url 'landing:login' %}">Inicia sesión aquí</a>
+                </p>
+            </footer>
         </form>
     </main>
 
     <footer class="main-footer">
         <div class="container">
-        <div class="footer-grid">
-            <div class="footer-col">
-            <p class="footer-text">
-                Herramientas simples para un control inteligente de tu inventario.
-            </p>
-
-            <ul class="contact-list">
-                <li>
-                <a class="contact-chip" href="mailto:soporte@soyfocal.cl">
-                    <span class="chip-ico">📧</span> soporte@soyfocal.cl
-                </a>
-                </li>
-                <li>
-                <a class="contact-chip" href="mailto:ventas@soyfocal.cl">
-                    <span class="chip-ico">🛒</span> ventas@soyfocal.cl
-                </a>
-                </li>
-            </ul>
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="{% static 'landing/img/PERFIL.png' %}" alt="FOCAL Logo">
+                    </div>
+                    <p class="footer-tagline">Potenciando el crecimiento de tu negocio con gestión inteligente.</p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Producto</h4>
+                    <nav class="footer-links">
+                        <a href="{% url 'landing:landing' %}#features">Características</a>
+                    </nav>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Compañía</h4>
+                    <nav class="footer-links">
+                        <a href="{% url 'landing:quienes_somos' %}">Nosotros</a>
+                        <a href="{% url 'landing:registro' %}">Registro</a>
+                    </nav>
+                </div>
             </div>
-
-            <div class="footer-col">
-            <h4 class="footer-title">Producto</h4>
-            <nav class="footer-links">
-                <a href="#features">Características</a>
-            </nav>
-            </div>
-
-            <div class="footer-col">
-            <h4 class="footer-title">Compañía</h4>
-            <nav class="footer-links">
-                <a href="#cta">Nosotros</a>
-                <a href="#contact">Contacto</a>
-                <a href="/registro/">Registro</a>
-            </nav>
-            </div>
-        </div>
-
-        <hr class="footer-divider" />
-
-        <div class="footer-bottom">
-            <p class="footer-copy">© <span id="year"></span> FOCAL. Todos los derechos reservados.</p>
-        </div>    
+            <hr class="footer-divider" />
+            <div class="footer-bottom">
+                <p>© <span id="year"></span> FOCAL. Todos los derechos reservados.</p>
+            </div>    
         </div>
     </footer>
 
-    <div class="floating-social" aria-hidden="true">
-        <a class="float-btn ig" href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram">
-        <i class="bi bi-instagram"></i>
-        </a>
-        <a class="float-btn wa" href="https://wa.me/" target="_blank" rel="noopener" aria-label="WhatsApp">
-        <i class="bi bi-whatsapp"></i>
-        </a>
-    </div>
-
-    <script>
-        // Año dinámico en el footer
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
     <script src="{% static 'landing/js/registro.js' %}" defer></script>
 </body>
 </html>

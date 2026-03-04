@@ -24,8 +24,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Cookies seguras en prod (sirviendo por HTTPS)
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 # Application definition
 
@@ -38,10 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
     'landing',
     'rest_framework',
     'widget_tweaks',
@@ -57,41 +53,6 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-# Allauth – usa tu flujo por email
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_EMAIL_VERIFICATION = "optional" 
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "/"
-DEBUG = True
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
-
-# Si tu User usa email como identificador, mantén esto:
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-
-# (opcional) normalizar nombres que llegan desde Google
-SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
-
-# Para que el correo del link sea el tuyo:
-DEFAULT_FROM_EMAIL = "FOCAL <plataforma.focal@gmail.com>"
-
-LOGIN_REDIRECT_URL = 'post_login_router'
-SOCIALACCOUNT_LOGIN_ON_GET = True
-
-# Proveedor Google (scopes básicos)
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "SCOPE": ["profile", "email"],
-        "AUTH_PARAMS": {"prompt": "consent", "access_type": "online"},
-    }
-}
-
-# Nuestros adapters (nuevo)
-ACCOUNT_ADAPTER = "inventario.adapters.FocalAccountAdapter"
-SOCIALACCOUNT_ADAPTER = "inventario.adapters.FocalSocialAdapter"
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -100,7 +61,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'focal_project.urls'
@@ -132,15 +92,12 @@ WSGI_APPLICATION = 'focal_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', 
+        'ENGINE': 'django.db.backends.postgresql', 
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default=3306, cast=int),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+        'PORT': config('DB_PORT', default=5432, cast=int),
     }
 }
 
@@ -176,17 +133,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Configuración para Gmail
-EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
-EMAIL_HOST = config("EMAIL_HOST", default="")
-EMAIL_PORT = config("EMAIL_PORT", cast=int, default=587)
-EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)
-EMAIL_USE_SSL = config("EMAIL_USE_SSL", cast=bool, default=False)
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="FOCAL <plataforma.focal@gmail.com>")
-EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", cast=int, default=20)
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -212,3 +158,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = 'landing:login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'

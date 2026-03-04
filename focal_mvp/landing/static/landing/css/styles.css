@@ -153,13 +153,30 @@ img,svg,video{max-width:100%;height:auto;display:block}
 }
 
 /* Logo */
-.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:#fff}
-.logo img {
-  width: clamp(40px, 6vw, 92px);
-  height:auto;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .25));
+.logo {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  text-decoration: none;
+  color: var(--white);
 }
-.logo-text{font-family:var(--font-primary);font-weight:900;letter-spacing:-.04em}
+
+.logo img {
+  width: clamp(100px, 6vw, 150px);
+  height: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .25));
+  
+  /* --- Ajustes para agrandar --- */
+  transform: scale(1.8); 
+  transform-origin: left center; 
+  transition: transform 0.3s ease;
+}
+
+.logo-text {
+  font-family: 'InterTight', sans-serif; /* Tu tipografía Bold */
+  font-weight: 700; 
+  letter-spacing: -.04em;
+}
 
 /* Nav */
 .main-nav ul{display:flex;align-items:center;gap:26px;list-style:none}

@@ -1,5 +1,4 @@
 {% load static %}
-{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,11 +10,10 @@
 </head>
 <body class="login-body">
 
-  <!-- ======================= HEADER ======================= -->
   <header class="main-header" id="home">
-    <div class="container">
+    <div class="header-container-fluid">
       <a class="logo" href="{% url 'landing:landing' %}" aria-label="Inicio">
-        <img src="{% static 'landing/img/Focal_imagotipo.svg' %}" alt="SOY FOCAL Logo">
+        <img src="{% static 'landing/img/PERFIL.png' %}" alt="SOY FOCAL Logo">
         <span class="logo-text sr-only">SOY FOCAL</span>
       </a>
 
@@ -24,122 +22,100 @@
           <li><a href="{% url 'landing:landing' %}">Inicio</a></li>
           <li><a href="{% url 'landing:landing' %}#features">Qué ofrecemos</a></li>
           <li><a href="{% url 'landing:quienes_somos' %}">Nosotros</a></li>
-          <li><a href="{% url 'landing:landing' %}#contact">Contacto</a></li>
-          <li><a class="btn btn-primary" href="{% url 'landing:login' %}">Iniciar sesión</a></li>
-          <li><a class="btn btn-secondary" href="{% url 'landing:registro' %}">Regístrate</a></li>
+          <li><a href="{% url 'landing:registro' %}" class="btn btn-secondary">Registrarse</a></li>
         </ul>
       </nav>
-      <button class="menu-toggle sr-only" aria-label="Abrir menú">☰</button>
     </div>
   </header>
 
-  <!-- ======================== MAIN ======================== -->
-  <main class="login-page" id="main-content">
-    <section class="login-wrap container">
-      <div class="login-card" role="form" aria-labelledby="login-title">
-        <h1 id="login-title" class="login-title">Iniciar sesión</h1>
-
-        {% if messages %}
-          <div class="login-messages">
-            {% for message in messages %}
-              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-          </div>
-        {% endif %}
-
-        <form method="post" novalidate>
-          {% csrf_token %}
-
-          {% if form.non_field_errors %}
-            <div class="alert alert-error">
-              {% for error in form.non_field_errors %}
-                <div>{{ error }}</div>
-              {% endfor %}
-            </div>
-          {% endif %}
-
-          {% for field in form %}
-            <div class="form-group">
-              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-              {{ field }}
-              {% if field.errors %}
-                <div class="field-error">{{ field.errors|striptags }}</div>
-              {% endif %}
-            </div>
-          {% endfor %}
-
-          <!-- Botón principal -->
-          <button type="submit" class="btn-primary-solid btn-block">Ingresar</button>
-
-          <!-- Separador visual -->
-          <div class="oauth-separator"><span>o continúa con</span></div>
-
-          <!-- Botón de Google -->
-          <a href="{% provider_login_url 'google' process='login' %}" class="btn-google">
-            <img class="btn-google__icon" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
-            <span class="btn-google__label">Continuar con Google</span>
-          </a>
-
-          <!-- Enlaces inferiores -->
-          <div class="login-links">
-            <a href="{% url 'password_reset' %}">¿Has olvidado la contraseña?</a>
-            <span class="link-muted">¿No tienes cuenta?
-              <a class="link-strong" href="{% url 'landing:registro' %}">Regístrate aquí</a>
-            </span>
-          </div>
-        </form>
+  <main class="login-page">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">Bienvenido</h1>
+        <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
       </div>
-    </section>
+
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li class="message-item {{ message.tags }}">
+          {{ message }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <form method="POST" class="login-form">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="username" class="form-label">Usuario</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" name="username" id="username" class="form-input" placeholder="Tu usuario" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input type="password" name="password" id="password" class="form-input" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" name="remember"> Recordarme
+          </label>
+          <a href="#" class="forgot-pass">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-login">
+          Entrar a mi cuenta
+        </button>
+      </form>
+
+      <div class="login-footer-info">
+        <p>¿No tienes cuenta? <a href="{% url 'landing:registro' %}">Regístrate aquí</a></p>
+      </div>
+    </div>
   </main>
 
-  <!-- ======================= FOOTER ======================= -->
   <footer class="main-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <p class="footer-text">
-            Herramientas simples para un control inteligente de tu inventario.
+          <div class="footer-logo">
+             <img src="{% static 'landing/img/PERFIL.png' %}" alt="FOCAL Logo">
+          </div>
+          <p class="footer-tagline">
+            Potenciando el crecimiento de tu negocio con gestión inteligente de inventario.
           </p>
           <ul class="contact-list">
-            <li>
-              <a class="contact-chip" href="mailto:soporte@soyfocal.cl">
-                <span class="chip-ico">📧</span> soporte@soyfocal.cl
-              </a>
-            </li>
-            <li>
-              <a class="contact-chip" href="mailto:ventas@soyfocal.cl">
-                <span class="chip-ico">🛒</span> ventas@soyfocal.cl
-              </a>
-            </li>
+            <li><a class="contact-chip" href="mailto:soporte@soyfocal.cl">📧 soporte@soyfocal.cl</a></li>
           </ul>
         </div>
-
         <div class="footer-col">
           <h4 class="footer-title">Producto</h4>
           <nav class="footer-links">
             <a href="{% url 'landing:landing' %}#features">Características</a>
           </nav>
         </div>
-
         <div class="footer-col">
           <h4 class="footer-title">Compañía</h4>
           <nav class="footer-links">
             <a href="{% url 'landing:quienes_somos' %}">Nosotros</a>
-            <a href="{% url 'landing:landing' %}#contact">Contacto</a>
             <a href="{% url 'landing:registro' %}">Registro</a>
           </nav>
         </div>
       </div>
-
       <hr class="footer-divider" />
-
       <div class="footer-bottom">
-        <p class="footer-copy">© <span id="year"></span> FOCAL. Todos los derechos reservados.</p>
+        <p>© FOCAL. Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>
 
-  <script src="{% static 'landing/js/login.js' %}"></script>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
