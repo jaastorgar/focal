@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* =======================================================================
    FOCAL - Estilos inventario (tabla, header y footer)
    Paleta y tipografías oficiales
@@ -5,9 +7,9 @@
 
 /* ---------- Variables de marca ---------- */
 :root{
-  --primary-purple:#4A008B;
-  --secondary-purple:#7B1FA2;
-  --light-purple:#F3E8FF;
+  --primary-purple:#393991;
+  --secondary-purple:#887ddf;
+  --light-purple:#d9c9ff;
   --white:#FFFFFF;
   --dark-text:#212529;
   --muted-text:#6b7280;
@@ -19,8 +21,7 @@
   --shadow-2:0 10px 24px rgba(0,0,0,.12);
   --shadow-3:0 14px 34px rgba(0,0,0,.18);
 
-  --font-primary:'InterTight', Arial, sans-serif;
-  --font-secondary:'HankenGrotesk', Arial, sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
   --header-height:64px;
   --search-block:92px;
@@ -34,7 +35,7 @@ body{
   margin:0;
   color:var(--dark-text);
   background:var(--light-purple);
-  font-family:var(--font-secondary);
+  font-family:var(--font);
   line-height:1.6;
   min-height:100vh;
   display:flex;
@@ -61,8 +62,8 @@ body{
   gap:.75rem;
 }
 .logo{
-  font-family:var(--font-primary);
-  font-weight:800;
+  font-family:var(--font);
+  font-weight:900;
   font-size:1.5rem;
   text-decoration:none;
   color:#fff;
@@ -82,7 +83,7 @@ body{
   color:#fff;
   text-decoration:none;
   font-weight:700;
-  font-family:var(--font-primary);
+  font-family:var(--font);
   transition:background .2s, transform .15s, border-color .2s;
 }
 .btn-accion:hover{
@@ -99,7 +100,7 @@ main.container{
   flex:1;
 }
 main.container h1{
-  font-family:var(--font-primary);
+  font-family:var(--font);
   color:var(--primary-purple);
   font-size:clamp(1.4rem,2.2vw,2.1rem);
   margin:.2rem 0 1rem;
@@ -125,7 +126,7 @@ main.container h1{
 .search-input:focus{
   outline:none;
   border-color:var(--primary-purple);
-  box-shadow:0 0 0 3px rgba(74,0,139,.18);
+  box-shadow:0 0 0 3px rgba(57,57,145,.18);
 }
 .search-button{
   padding:.75rem 1.1rem;
@@ -134,15 +135,15 @@ main.container h1{
   background:var(--primary-purple);
   color:#fff;
   text-decoration:none;
-  font-family:var(--font-primary);
-  font-weight:800;
+  font-family:var(--font);
+  font-weight:900;
   cursor:pointer;
   transition:background .2s, transform .15s;
   display:inline-flex;
   align-items:center;
   justify-content:center;
 }
-.search-button:hover{background:#38006B;transform:translateY(-1px);}
+.search-button:hover{background:#000956;transform:translateY(-1px);}
 .search-button--provider{
   background:#fff;
   color:var(--primary-purple);
@@ -194,8 +195,8 @@ main.container h1{
 .tabla-inventario th{
   padding:.9rem 1rem;
   text-align:left;
-  font-family:var(--font-primary);
-  font-weight:800;
+  font-family:var(--font);
+  font-weight:900;
   color:var(--dark-text);
   text-transform:uppercase;
   letter-spacing:.4px;
@@ -263,7 +264,7 @@ main.container h1{
 }
 .icon-btn--primary{color:var(--primary-purple);}
 .icon-btn--primary:hover{
-  background:#F3E8FF;
+  background:#d9c9ff;
   border-color:#d1c4e9;
 }
 .icon-btn--cash{
@@ -304,7 +305,7 @@ main.container h1{
 .empty-state-wrapper{min-height:40vh;display:grid;place-items:center;}
 .empty-state{text-align:center;max-width:520px;padding:1.5rem;}
 .empty-state-title{
-  font-family:var(--font-primary);
+  font-family:var(--font);
   font-size:clamp(1.3rem,2.2vw,1.8rem);
   color:var(--dark-text);
   margin:0 0 .6rem;
@@ -317,13 +318,13 @@ main.container h1{
   background:var(--primary-purple);
   color:#fff;
   text-decoration:none;
-  font-family:var(--font-primary);
-  font-weight:800;
+  font-family:var(--font);
+  font-weight:900;
   border:2px solid var(--primary-purple);
 }
 .btn-accion-principal:hover{
-  background:#38006B;
-  border-color:#38006B;
+  background:#000956;
+  border-color:#000956;
   transform:translateY(-1px);
 }
 
@@ -479,7 +480,7 @@ main.container h1{
   border:1px solid var(--border-color);
   background:#fff;
   color:var(--dark-text);
-  font-family:var(--font-primary);
+  font-family:var(--font);
   font-weight:600;
   font-size:.9rem;
   text-decoration:none;
@@ -496,7 +497,7 @@ main.container h1{
   background:var(--primary-purple);
   border-color:var(--primary-purple);
   color:#fff;
-  box-shadow:0 6px 18px rgba(74,0,139,.35);
+  box-shadow:0 6px 18px rgba(57,57,145,.35);
   cursor:default;
 }
 .page-item--disabled .page-link{
@@ -568,13 +569,13 @@ main.container h1{
   }
   .tabla-inventario td:last-child{border-bottom:0;}
 
-  .tabla-inventario td:nth-child(1)::before{content:"Producto";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
-  .tabla-inventario td:nth-child(2)::before{content:"SKU";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
-  .tabla-inventario td:nth-child(3)::before{content:"Marca";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
-  .tabla-inventario td:nth-child(4)::before{content:"Categoría";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
-  .tabla-inventario td:nth-child(5)::before{content:"Stock Total";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
-  .tabla-inventario td:nth-child(6)::before{content:"Lotes";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
-  .tabla-inventario td:nth-child(7)::before{content:"Acciones";font-family:var(--font-primary);font-weight:800;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(1)::before{content:"Producto";font-family:var(--font);font-weight:900;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(2)::before{content:"SKU";font-family:var(--font);font-weight:900;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(3)::before{content:"Marca";font-family:var(--font);font-weight:900;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(4)::before{content:"Categoría";font-family:var(--font);font-weight:900;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(5)::before{content:"Stock Total";font-family:var(--font);font-weight:900;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(6)::before{content:"Lotes";font-family:var(--font);font-weight:900;color:var(--dark-text);}
+  .tabla-inventario td:nth-child(7)::before{content:"Acciones";font-family:var(--font);font-weight:900;color:var(--dark-text);}
 
   .tabla-inventario td.acciones{
     grid-template-columns:1fr;

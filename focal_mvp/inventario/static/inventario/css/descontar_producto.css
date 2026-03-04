@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* ==========================================================================
    FOCAL – Descontar Producto: Estilos 100% responsivos
    Archivo: descontar_producto.css
@@ -5,31 +7,27 @@
 
 /* 1) Variables de marca ---------------------------------------------------- */
 :root{
-  --primary-purple:#4A008B;
-  --secondary-purple:#7B1FA2;
+  --primary-purple:#393991;
+  --secondary-purple:#887ddf;
   --light-purple-bg:#f7f5fa;
-  --hover-dark-purple:#38006B;
+  --hover-dark-purple:#000956;
   --white:#FFFFFF;
   --dark-text:#212529;
   --muted-text:#6c757d;
   --border-color:#e0e0e0;
-  --focus-shadow:rgba(74,0,139,.25);
+  --focus-shadow:rgba(57,57,145,.25);
   --danger:#d32f2f;
 
   --shadow-1:0 6px 18px rgba(0,0,0,.08);
   --shadow-2:0 10px 26px rgba(0,0,0,.12);
 
-  --font-primary:'InterTight', Arial, sans-serif;
-  --font-secondary:'HankenGrotesk', Arial, sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 /* 2) Base ------------------------------------------------------------------ */
 *,
 *::before,
 *::after{ box-sizing:border-box }
-
-@font-face{font-family:'InterTight';src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');font-weight:700}
-@font-face{font-family:'HankenGrotesk';src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');font-weight:400}
 
 html{scroll-behavior:smooth}
 body{
@@ -39,7 +37,7 @@ body{
   background:var(--light-purple-bg);
   color:var(--dark-text);
   line-height:1.6;
-  font-family:var(--font-secondary);
+  font-family:var(--font);
 }
 
 .container{ width:min(1200px,92%); margin-inline:auto }
@@ -57,7 +55,7 @@ body{
 }
 .app-header .logo{
   color:#fff; text-decoration:none;
-  font-family:var(--font-primary); font-weight:800;
+  font-family:var(--font); font-weight:900;
   letter-spacing:-.02em; font-size:1.5rem;
 }
 .nav-links{
@@ -71,7 +69,7 @@ body{
   border-radius:10px;
   border:2px solid rgba(255,255,255,.25);
   color:#fff; text-decoration:none;
-  font-family:var(--font-primary); font-weight:800; letter-spacing:.02em;
+  font-family:var(--font); font-weight:900; letter-spacing:.02em;
   transition:background .2s ease, transform .15s ease, border-color .2s ease;
 }
 .nav-links a:hover{
@@ -84,8 +82,8 @@ body{
 main{ flex:1; padding:2rem 0 3rem 0 }
 
 h1{
-  font-family:var(--font-primary);
-  font-weight:800;
+  font-family:var(--font);
+  font-weight:900;
   font-size:clamp(1.6rem, 3vw, 2.2rem);
   text-align:center; color:var(--dark-text);
   letter-spacing:-.01em; margin:.3rem 0 1rem;
@@ -144,7 +142,7 @@ h1{
 .btn{
   display:inline-block; text-decoration:none; text-align:center; cursor:pointer;
   padding:.9rem 1.5rem; border-radius:10px; border:2px solid transparent;
-  font-family:var(--font-primary); font-weight:800; letter-spacing:.02em;
+  font-family:var(--font); font-weight:900; letter-spacing:.02em;
   transition:transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
   min-width:180px;
 }

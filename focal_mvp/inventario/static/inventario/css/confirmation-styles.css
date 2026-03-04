@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* ==========================================================================
    FOCAL — Confirmación (Eliminar / Éxito / Avisos)
    Responsivo (móvil/tablet/desktop) + botón “Eliminar” rojo
@@ -5,10 +7,10 @@
 
 /* 1) Variables de marca */
 :root{
-  --primary-purple:#4A008B;          /* barra superior / botones primarios */
+  --primary-purple:#393991;          /* barra superior / botones primarios */
   --primary-purple-600:#3B0071;       /* hover primario */
   --surface:#FFFFFF;                  /* tarjetas */
-  --page:#F3E8FF;                     /* fondo */
+  --page:#d9c9ff;                     /* fondo */
   --ink:#212529;                      /* texto principal */
   --muted:#6C757D;                    /* texto secundario */
   --border:#DEE2E6;
@@ -21,8 +23,7 @@
   --sh-sm:0 2px 8px rgba(0,0,0,.06);
   --sh-md:0 8px 24px rgba(0,0,0,.12);
 
-  --font-primary:'InterTight', Arial, sans-serif;
-  --font-secondary:'HankenGrotesk', Arial, sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 /* 2) Reset */
@@ -32,21 +33,10 @@ body{
   margin:0; min-height:100dvh;
   display:flex; flex-direction:column;
   background:var(--page); color:var(--ink);
-  font-family:var(--font-secondary); line-height:1.6;
+  font-family:var(--font); line-height:1.6;
 }
 
 /* 3) (Opcional) fuentes locales si existen en /static/... */
-@font-face{
-  font-family:'InterTight';
-  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight:700; font-style:normal; font-display:swap;
-}
-@font-face{
-  font-family:'HankenGrotesk';
-  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight:400; font-style:normal; font-display:swap;
-}
-
 /* 4) Navbar (mismo estilo de la app) */
 .app-header{background:var(--primary-purple); color:#fff; box-shadow:var(--sh-sm)}
 .app-header nav{
@@ -54,8 +44,8 @@ body{
   display:flex; align-items:center; justify-content:space-between; gap:12px;
 }
 .app-header .logo{
-  color:#fff; text-decoration:none; font-weight:800; letter-spacing:.2px;
-  font-family:var(--font-primary);
+  color:#fff; text-decoration:none; font-weight:900; letter-spacing:.2px;
+  font-family:var(--font);
   font-size:clamp(1.25rem,1vw+1rem,1.5rem);
 }
 .app-header .nav-links{
@@ -67,7 +57,7 @@ body{
   display:inline-block; padding:var(--py) var(--px);
   border:1px solid rgba(255,255,255,.24);
   border-radius:999px; background:rgba(255,255,255,.08);
-  color:#fff; text-decoration:none; font-weight:800; font-family:var(--font-primary);
+  color:#fff; text-decoration:none; font-weight:900; font-family:var(--font);
   transition:background .18s ease, transform .18s ease, border-color .18s ease;
 }
 .app-header .nav-links a:hover{
@@ -84,7 +74,7 @@ main.confirmation-container{
   padding:clamp(16px,4vw,28px);
 }
 main.confirmation-container h1{
-  margin:0 0 .5rem 0; font-family:var(--font-primary); font-weight:800;
+  margin:0 0 .5rem 0; font-family:var(--font); font-weight:900;
   letter-spacing:.2px; color:var(--danger);
   font-size:clamp(1.4rem,1.1rem + 1.4vw,2.1rem);
 }
@@ -101,7 +91,7 @@ main.confirmation-container p{
 }
 .details-card p{margin:.35rem 0}
 .details-card strong{color:var(--danger-700)}
-.warning-text{margin:1.1rem 0; font-weight:800; color:var(--danger-700)}
+.warning-text{margin:1.1rem 0; font-weight:900; color:var(--danger-700)}
 
 /* 6) Botones — diseño consistente + variantes */
 .actions, .delete-form-actions{
@@ -113,7 +103,7 @@ main.confirmation-container p{
   display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
   padding:var(--py) var(--px);
   border-radius:10px; border:1px solid transparent; cursor:pointer;
-  text-decoration:none; font-family:var(--font-primary); font-weight:800; letter-spacing:.2px;
+  text-decoration:none; font-family:var(--font); font-weight:900; letter-spacing:.2px;
   transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
 }
 .btn:hover, .btn-accion:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.08)}
@@ -121,7 +111,7 @@ main.confirmation-container p{
 
 .btn-primary{background:var(--primary-purple); border-color:var(--primary-purple); color:#fff}
 .btn-primary:hover{background:var(--primary-purple-600); border-color:var(--primary-purple-600)}
-.btn-primary:focus-visible{outline:3px solid rgba(74,0,139,.35); outline-offset:2px}
+.btn-primary:focus-visible{outline:3px solid rgba(57,57,145,.35); outline-offset:2px}
 
 .btn-secondary, .btn-secundario{background:#F8F9FA; color:#2D2D2D; border-color:#DBE1E6}
 .btn-secondary:hover, .btn-secundario:hover{background:#ECEFF2; border-color:#CED6DD}

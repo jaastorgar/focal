@@ -1,21 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* ------------------ Variables de marca ------------------ */
 :root{
-  --primary-purple:#4A008B;
-  --secondary-purple:#7B1FA2;
-  --light-purple:#F3E8FF;
+  --primary-purple:#393991;
+  --secondary-purple:#887ddf;
+  --light-purple:#d9c9ff;
   --header-footer-bg:#2C0140;
-  --dark-text:#343A40;
-  --muted-text:#555555;
+  --dark-text:#2d2d2d;
+  --muted-text:#444444;
   --white:#FFFFFF;
-  --hover-dark-purple:#38006B;
-  --hover-light-purple:#E0B3FF;
+  --hover-dark-purple:#000956;
+  --hover-light-purple:#c7b0ff;
   --turquoise:#0AE8C6;
   --border-color:#e6e6e6;
   --shadow-1:0 2px 10px rgba(0,0,0,.08);
   --shadow-2:0 8px 22px rgba(0,0,0,.14);
   --shadow-3:0 18px 44px rgba(0,0,0,.22);
-  --font-primary:'InterTight', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  --font-secondary:'HankenGrotesk', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
   /* Escalas fluidas */
   --fs-xxs: clamp(0.80rem, 0.73rem + 0.30vw, 0.90rem);
@@ -27,33 +28,12 @@
 }
 
 /* ---------------------- Tipografías ---------------------- */
-@font-face{
-  font-family:'InterTight';
-  src:url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype');
-  font-weight:800;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'InterTight';
-  src:url('../fonts/InterTight/InterTight-Light.ttf') format('truetype');
-  font-weight:300;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'HankenGrotesk';
-  src:url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype');
-  font-weight:400;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'HankenGrotesk';
-  src:url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype');
-  font-weight:300;font-style:normal;font-display:swap;
-}
-
 /* ---------------------- Layout base ---------------------- */
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 body{
   margin:0;
-  font-family:var(--font-primary);
+  font-family:var(--font);
   color:var(--dark-text);
   background: linear-gradient(180deg, #fff 0%, var(--light-purple) 100%);
   -webkit-font-smoothing: antialiased;
@@ -78,10 +58,10 @@ body{
 /* -------------------- Titulares & textos -------------------- */
 h1{
   margin: 0 0 6px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: .2px;
   color: var(--primary-purple);
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: var(--fs-xl);
   line-height: 1.15;
 }
@@ -89,7 +69,7 @@ h1{
 p.subtitle{
   margin: 0 0 18px;
   color: var(--muted-text);
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   line-height: 1.5;
   font-size: var(--fs-sm);
 }
@@ -115,7 +95,7 @@ label{
   font-size: var(--fs-xs);
   color: var(--muted-text);
   margin: 6px 0;
-  font-family: var(--font-secondary);
+  font-family: var(--font);
 }
 
 input[type="text"],
@@ -127,7 +107,7 @@ input[type="number"]{
   background: #fff;
   color: var(--dark-text);
   outline: none;
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   font-size: var(--fs-sm);
   transition: box-shadow .15s ease, border-color .15s ease, background-color .15s ease;
 }
@@ -136,7 +116,7 @@ input::placeholder{ color:#999; }
 
 input:focus{
   border-color: var(--primary-purple);
-  box-shadow: 0 0 0 4px rgba(74,0,139,.12), 0 0 0 1px var(--primary-purple) inset;
+  box-shadow: 0 0 0 4px rgba(57,57,145,.12), 0 0 0 1px var(--primary-purple) inset;
   background: #fff;
 }
 
@@ -154,7 +134,7 @@ button{
   border-radius:12px;
   padding: clamp(10px, 1.8vw, 14px) clamp(14px, 2.6vw, 18px);
   font-weight:700;
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: var(--fs-sm);
   transition: transform .06s ease, box-shadow .2s ease, background-color .15s ease, color .15s ease;
   will-change: transform;
@@ -183,7 +163,7 @@ button{
   margin-top:10px;
   font-size: var(--fs-xs);
   color: var(--muted-text);
-  font-family: var(--font-secondary);
+  font-family: var(--font);
 }
 
 /* ------------------------ Preview box ---------------------- */
@@ -196,8 +176,8 @@ button{
   box-shadow: var(--shadow-1);
 }
 
-.preview .ok{ color: var(--primary-purple); font-weight:800; }
-.preview .warn{ color:#D7263D; font-weight:800; }
+.preview .ok{ color: var(--primary-purple); font-weight:900; }
+.preview .warn{ color:#D7263D; font-weight:900; }
 
 .badge{
   display:inline-block;
@@ -207,7 +187,7 @@ button{
   background: var(--light-purple);
   color: var(--primary-purple);
   border: 1px solid var(--secondary-purple);
-  font-family: var(--font-secondary);
+  font-family: var(--font);
 }
 
 .muted{ color: var(--muted-text); font-size: var(--fs-xs); }
@@ -237,7 +217,7 @@ button{
   border-radius:10px;
   margin:8px 0;
   font-size: var(--fs-xs);
-  font-family: var(--font-secondary);
+  font-family: var(--font);
   border: 1px solid var(--border-color);
 }
 
@@ -271,7 +251,7 @@ button{
   padding: 12px 16px;
   border-radius: 14px;
   box-shadow: var(--shadow-2);
-  font-family: var(--font-primary);
+  font-family: var(--font);
 }
 
 /* ---------------------- Utilidades pequeñas ---------------------- */

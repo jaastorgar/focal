@@ -1,29 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
 /* --- Variables de Colores de la Empresa --- */
 :root {
-  --primary-purple: #4A008B;
-  --secondary-purple: #7B1FA2;
-  --light-purple: #F3E8FF;
-  --dark-text: #343A40;
-  --muted-text: #555555;
+  --primary-purple: #393991;
+  --secondary-purple: #887ddf;
+  --light-purple: #d9c9ff;
+  --dark-text: #2d2d2d;
+  --muted-text: #444444;
   --white: #FFFFFF;
   --header-footer-bg: #2C0140;
-  --hover-dark-purple: #38006B;
-  --hover-light-purple: #E0B3FF;
+  --hover-dark-purple: #000956;
+  --hover-light-purple: #c7b0ff;
   --border-color: #dee2e6;
   --shadow-light: rgba(0, 0, 0, 0.08);
   --shadow-medium: rgba(0, 0, 0, 0.15);
   --shadow-dark: rgba(0, 0, 0, 0.3);
 
-  --font-primary: 'InterTight', Arial, sans-serif;
-  --font-secondary: 'HankenGrotesk', Arial, sans-serif;
+  --font: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 /* Fuentes (opcional si existen en static) */
-@font-face { font-family: 'InterTight'; src: url('../fonts/InterTight/InterTight-Bold.ttf') format('truetype'); font-weight: 700; }
-@font-face { font-family: 'InterTight'; src: url('../fonts/InterTight/InterTight-Light.ttf') format('truetype'); font-weight: 300; }
-@font-face { font-family: 'HankenGrotesk'; src: url('../fonts/HankenGrotesk/HankenGrotesk-Regular.ttf') format('truetype'); font-weight: 400; }
-@font-face { font-family: 'HankenGrotesk'; src: url('../fonts/HankenGrotesk/HankenGrotesk-Light.ttf') format('truetype'); font-weight: 300; }
-
 /* =========================================================
    QUIÉNES SOMOS – Estilos específicos (no pisa styles.css)
    ========================================================= */
@@ -36,7 +32,7 @@
   text-align: center;
 }
 .team-hero h1{
-  font-family: var(--font-primary);
+  font-family: var(--font);
   letter-spacing: -0.02em;
   font-size: clamp(2rem, 5vw, 3rem);
   margin-bottom: .4rem;
@@ -62,7 +58,7 @@
 }
 .origin-box h2{
   color: var(--dark-text);
-  font-family: var(--font-primary);
+  font-family: var(--font);
   margin-bottom: 12px;
   font-size: clamp(1.4rem, 3vw, 1.9rem);
 }
@@ -85,7 +81,7 @@
 }
 .team-section h2{
   color: var(--dark-text);
-  font-family: var(--font-primary);
+  font-family: var(--font);
   font-size: clamp(1.8rem, 4vw, 2.4rem);
 }
 .team-section .section-description{
@@ -124,7 +120,7 @@
   box-shadow: 0 16px 32px var(--shadow-medium);
 }
 .team-card:focus-within{
-  box-shadow: 0 0 0 4px rgba(74,0,139,.15), 0 12px 28px var(--shadow-medium);
+  box-shadow: 0 0 0 4px rgba(57,57,145,.15), 0 12px 28px var(--shadow-medium);
 }
 
 /* Avatar circular */
@@ -148,7 +144,7 @@
 /* Textos dentro de la tarjeta */
 .team-card h3{
   margin-top: 6px;
-  font-family: var(--font-primary);
+  font-family: var(--font);
   color: var(--dark-text);
   font-size: clamp(1.05rem, 2.4vw, 1.2rem);
 }
